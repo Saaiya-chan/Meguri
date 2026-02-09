@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meguri - 巣の減価メカニズムの矛盾を解消する</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr 300px;
+            gap: 20px;
+            min-height: calc(100vh - 40px);
+        }
+
+        /* ===== 左ペイン：参加者 & ナビ ===== */
+        .left-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .left-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .participant {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #0d1117;
+            border-radius: 8px;
+            border-left: 4px solid #30363d;
+        }
+
+        .participant.math { border-left-color: #7ee787; }
+        .participant.econ { border-left-color: #d2a8ff; }
+        .participant.phil { border-left-color: #ffa657; }
+        .participant.user { border-left-color: #58a6ff; }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .participant.math .avatar { background: #7ee787; }
+        .participant.econ .avatar { background: #d2a8ff; }
+        .participant.phil .avatar { background: #ffa657; }
+        .participant.user .avatar { background: #58a6ff; }
+
+        .participant-info h4 {
+            font-size: 13px;
+            color: #c9d1d9;
+            margin-bottom: 2px;
+        }
+
+        .participant-info p {
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .nav-section {
+            margin-top: 24px;
+        }
+
+        .nav-section h3 {
+            margin-bottom: 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: #0d1117;
+            border-radius: 6px;
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #58a6ff;
+            background: #1c2128;
+            border-left-color: #58a6ff;
+        }
+
+        .nav-link .nav-num {
+            color: #484f58;
+            margin-right: 6px;
+            font-weight: 600;
+        }
+
+        /* ===== 中央ペイン：議論 ===== */
+        .center-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #30363d;
+            overflow-y: auto;
+        }
+
+        .center-pane h1 {
+            color: #58a6ff;
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+
+        .center-pane > .subtitle {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .topic-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-left: 4px solid #58a6ff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+
+        .topic-box h3 {
+            color: #58a6ff;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .topic-box p, .topic-box li {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #8b949e;
+        }
+
+        .topic-box ol {
+            padding-left: 20px;
+            margin-top: 6px;
+        }
+
+        .topic-box code {
+            background: #1c2128;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ffa657;
+        }
+
+        .discussion-thread {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .phase-divider {
+            text-align: center;
+            margin: 28px 0 20px;
+            padding: 14px 0;
+            border-top: 1px dashed #30363d;
+            border-bottom: 1px dashed #30363d;
+        }
+
+        .phase-divider h3 {
+            color: #58a6ff;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- 吹き出し --- */
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .message.math .message-avatar { background: #7ee787; }
+        .message.econ .message-avatar { background: #d2a8ff; }
+        .message.phil .message-avatar { background: #ffa657; }
+        .message.user .message-avatar { background: #58a6ff; }
+
+        .message-content {
+            max-width: 88%;
+        }
+
+        .speaker-name {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            padding-left: 4px;
+        }
+
+        .message.math .speaker-name { color: #7ee787; }
+        .message.econ .speaker-name { color: #d2a8ff; }
+        .message.phil .speaker-name { color: #ffa657; }
+        .message.user .speaker-name { color: #58a6ff; }
+
+        .speech-bubble {
+            background: #1c2128;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            font-size: 13.5px;
+            line-height: 1.7;
+            color: #c9d1d9;
+        }
+
+        .message.math .speech-bubble { border-left: 3px solid #7ee787; }
+        .message.econ .speech-bubble { border-left: 3px solid #d2a8ff; }
+        .message.phil .speech-bubble { border-left: 3px solid #ffa657; }
+        .message.user .speech-bubble { border-left: 3px solid #58a6ff; }
+
+        .speech-bubble strong {
+            color: #e6edf3;
+        }
+
+        .speech-bubble code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ffa657;
+        }
+
+        .speech-bubble ul, .speech-bubble ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .speech-bubble li {
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .message-timestamp {
+            font-size: 11px;
+            color: #484f58;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
+        /* --- たとえるとボックス --- */
+        .analogy {
+            margin: 8px 0 0;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(227, 179, 65, 0.06);
+            border-left: 3px solid #e3b341;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #8b949e;
+        }
+
+        .analogy .analogy-icon {
+            margin-right: 6px;
+        }
+
+        .analogy strong {
+            color: #e3b341;
+        }
+
+        /* --- ハイライトボックス --- */
+        .highlight {
+            background: #1c1d00;
+            border: 1px solid #4d4100;
+            border-left: 4px solid #e3b341;
+            padding: 14px 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #c9d1d9;
+        }
+
+        .highlight strong {
+            color: #e3b341;
+        }
+
+        .conflict-box {
+            background: #1a0000;
+            border: 1px solid #4d0000;
+            border-left: 4px solid #f85149;
+            padding: 14px 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .conflict-box strong {
+            color: #f85149;
+        }
+
+        .conflict-box ul {
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+
+        .conflict-box li {
+            margin-bottom: 6px;
+            color: #c9d1d9;
+        }
+
+        /* ===== 右ペイン：用語集 ===== */
+        .right-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .right-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .accordion-item {
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: #0d1117;
+            padding: 11px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 12.5px;
+            user-select: none;
+            transition: background 0.2s;
+            color: #c9d1d9;
+        }
+
+        .accordion-header:hover {
+            background: #1c2128;
+        }
+
+        .accordion-header.active {
+            background: #1f6feb;
+            color: #fff;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+            font-size: 10px;
+        }
+
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 12px 14px;
+            background: #0d1117;
+            font-size: 12px;
+            line-height: 1.7;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+        }
+
+        .accordion-content.active {
+            display: block;
+        }
+
+        .term-example {
+            background: #161b22;
+            padding: 8px 10px;
+            border-left: 2px solid #58a6ff;
+            margin-top: 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .term-example strong {
+            color: #58a6ff;
+        }
+
+        /* スクロールバー */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #58a6ff;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .left-pane {
+                grid-column: 1;
+            }
+            .center-pane {
+                grid-column: 2;
+            }
+            .right-pane {
+                grid-column: 1 / -1;
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .left-pane,
+            .right-pane {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== 左ペイン ===== -->
+        <div class="left-pane">
+            <h3>Participants</h3>
+
+            <div class="participant math">
+                <div class="avatar">M</div>
+                <div class="participant-info">
+                    <h4>mathematician</h4>
+                    <p>数式モデル設計</p>
+                </div>
+            </div>
+
+            <div class="participant econ">
+                <div class="avatar">G</div>
+                <div class="participant-info">
+                    <h4>game-economist</h4>
+                    <p>ゲーム論・経済分析</p>
+                </div>
+            </div>
+
+            <div class="participant phil">
+                <div class="avatar">P</div>
+                <div class="participant-info">
+                    <h4>philosopher</h4>
+                    <p>世界観設計</p>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <a href="#topic" class="nav-link"><span class="nav-num">00</span>議題</a>
+                <a href="#phase1" class="nav-link"><span class="nav-num">01</span>数式統合モデル</a>
+                <a href="#phase2" class="nav-link"><span class="nav-num">02</span>Sybil脆弱性の警告</a>
+                <a href="#phase3" class="nav-link"><span class="nav-num">03</span>世界観からの解釈</a>
+                <a href="#conflicts" class="nav-link"><span class="nav-num">04</span>対立ポイント</a>
+            </div>
+
+            <div class="nav-section" style="margin-top: 24px;">
+                <h3>Summary</h3>
+                <p style="font-size: 12px; color: #8b949e; line-height: 1.7;">
+                    Concept.md に記載された2つの減価記述の矛盾を解消するため、数式・ゲーム論・世界観の3視点から議論。統合数式モデル、Sybil回避リスク、存在論的解釈を検討。
+                </p>
+            </div>
+        </div>
+
+        <!-- ===== 中央ペイン ===== -->
+        <div class="center-pane">
+            <h1>巣の減価メカニズムの矛盾を解消する</h1>
+            <p class="subtitle">Meguri Project &mdash; Decay Mechanism Discussion</p>
+
+            <!-- 議題ボックス -->
+            <div class="topic-box" id="topic">
+                <h3>議題</h3>
+                <p>Concept.md に記載された2つの減価に関する記述の関係を整理し、矛盾を解消する。</p>
+                <ol>
+                    <li>「滑らかに毎日少しずつ減る。大口保有者ほど速く減る」<code>L27</code></li>
+                    <li>「動かさない時間が長いほど減価が強くなる」<code>L50</code></li>
+                </ol>
+            </div>
+
+            <div class="discussion-thread">
+
+                <!-- ===== フェーズ1: 数式統合モデル ===== -->
+                <div class="phase-divider" id="phase1">
+                    <h3>Phase 1: 数式統合モデルの提案</h3>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            この2つの記述は矛盾ではなく、<strong>統合可能な2つの独立した効果</strong>として捉えられる。<br><br>
+                            1つ目は「残高に依存する基礎減衰」、2つ目は「滞留時間に依存する加速項」。これらを統合した減価関数を提案する：<br><br>
+                            <code>dB/dt = −λ(B, τ) · B</code><br><br>
+                            ここで減価率 λ は以下の構造を持つ：<br>
+                            <code>λ = 基礎減衰 + 残高依存項 + 滞留加速項</code><br><br>
+                            つまり、常に少しずつ減る基礎項の上に、残高が大きいほど・動かさない時間が長いほど減価が加速する構造。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>人間の体の代謝に似ている。何もしなくても呼吸するだけでカロリーは消費される（基礎代謝）。体重が重い人ほど基礎代謝が大きい（残高依存）。さらに、ずっと座りっぱなしだと筋肉が落ちて代謝がさらに下がる（滞留加速）。つまり「基礎代謝 ＋ 体重ペナルティ ＋ 運動不足ペナルティ」の三段構え。
+                        </div>
+                        <div class="message-timestamp">統合数式の提案</div>
+                    </div>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            4つのシナリオで数値例を出す：<br><br>
+                            <ul>
+                                <li><strong>少額 + 活発に動かす</strong> → 日次 約0.26% の減衰（ほぼ気にならない）</li>
+                                <li><strong>少額 + 放置</strong> → 日次 約0.8%（じわじわ効いてくる）</li>
+                                <li><strong>大口 + 活発</strong> → 日次 約1.1%（大きいから基礎が重い）</li>
+                                <li><strong>大口 + 放置</strong> → 日次 約2.7%（かなり速い。溜め込みは割に合わない）</li>
+                            </ul>
+                            <br>
+                            また、<strong>減価メカニズムと巣の評価スコアは別レイヤーとして分離すべき</strong>。混ぜると設計が複雑になりすぎる。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>お弁当の傷み具合みたいなもの。少量のおにぎり1個を昼に食べるなら全然平気（少額＋活発 → 0.26%）。でも大量の刺身盛り合わせを冷蔵庫に入れずに丸一日放置したら？ かなりヤバい（大口＋放置 → 2.7%）。量が多いほど、放置するほど、傷みが加速する。
+                        </div>
+                        <div class="message-timestamp">数値シナリオ &amp; レイヤー分離の提案</div>
+                    </div>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            ただし、まだ決めきれていない点がある：<br>
+                            <ul>
+                                <li><strong>B_median（中央値残高）の動的更新</strong> ─ 何を基準にするか</li>
+                                <li><strong>τ（滞留時間）のリセット方法</strong> ─ 取引のたびに完全リセット？ 部分リセットが望ましいと考えている</li>
+                                <li><strong>累進度 α の具体的な値</strong> ─ シミュレーションが必要</li>
+                            </ul>
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>学校の体力テストのルール作り。「何秒走ったらリセット？」「部分点はあり？」「体重差のハンデはどれくらい？」── 基本ルールはできたけど、細かい配点はまだ調整中という段階。実際にみんなで走ってみないと分からない。
+                        </div>
+                        <div class="message-timestamp">未決定事項</div>
+                    </div>
+                </div>
+
+                <!-- ===== フェーズ2: Sybil脆弱性 ===== -->
+                <div class="phase-divider" id="phase2">
+                    <h3>Phase 2: Sybil 脆弱性の警告</h3>
+                </div>
+
+                <div class="message econ">
+                    <div class="message-avatar">G</div>
+                    <div class="message-content">
+                        <div class="speaker-name">game-economist</div>
+                        <div class="speech-bubble">
+                            待ってくれ。その加算モデルには<strong>重大なSybil回避インセンティブの問題</strong>がある。<br><br>
+                            2つの減価を分離したまま「残高依存 + 滞留依存」にすると、合理的プレイヤーの最適戦略は明白だ：<br><br>
+                            <strong>「残高を小分けにして、高頻度で自己取引する」</strong><br><br>
+                            これで残高依存項も滞留加速項も同時に最小化できてしまう。つまり<strong>「小分け＋高頻度取引」が支配戦略</strong>になるリスクがある。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>「年収が高いほど税率が上がる」という累進課税に対して、収入を家族10人の口座に小分けして「全員低所得です」と申告する脱税テクニック。さらに口座間で毎日お金を移動させて「放置してません」と言い張る。ルールを文字通りには守っているけど、制度の意図を完全にすり抜けている。
+                        </div>
+                        <div class="message-timestamp">Sybil回避の支配戦略リスク</div>
+                    </div>
+                </div>
+
+                <div class="message econ">
+                    <div class="message-avatar">G</div>
+                    <div class="message-content">
+                        <div class="speaker-name">game-economist</div>
+                        <div class="speech-bubble">
+                            ゲーム論的に見ると、<strong>ナッシュ均衡が（回避, 回避）にシフト</strong>する危険がある。全員が減価を回避しようとして小分け＋高頻度取引に走ると、Meguri の「自然な循環」とは真逆の人工的ループが発生する。<br><br>
+                            そこで提案したいのが、<strong>統一原理</strong>のアプローチだ：<br><br>
+                            「Meguri の生命力 = 循環の質」<br><br>
+                            <code>vitality_score</code> という単一の指標で統合する。これは取引の多様性、相手との関係性、タイミングの自然さなどを総合評価したもの。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>学校の「皆勤賞」制度で考えてみる。「遅刻しなければOK」というルールだと、毎朝校門だけタッチして帰る生徒が続出する（形だけの出席）。全員がそれをやり始めたら、教室は空っぽ。そこで「出席の質」──授業に参加したか、友達と交流したか、活動に貢献したか──で評価する方がいい。
+                        </div>
+                        <div class="message-timestamp">ナッシュ均衡のシフトと統一原理</div>
+                    </div>
+                </div>
+
+                <div class="message econ">
+                    <div class="message-avatar">G</div>
+                    <div class="message-content">
+                        <div class="speaker-name">game-economist</div>
+                        <div class="speech-bubble">
+                            具体的な構造はこうだ：<br><br>
+                            <code>減価率 = base_rate / vitality_score</code><br><br>
+                            vitality_score が高い（＝質の良い循環をしている）なら減価が穏やかに。低い（＝溜め込み or 人工的ループ）なら減価が加速。<br><br>
+                            こうすれば、インセンティブが<strong>「量」ではなく「質」</strong>に向く。小分けして高頻度で回しても、同じ相手への反復取引は vitality_score を上げない。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>健康診断のスコア。毎日同じコンビニ弁当を食べて「食事回数は多い！」と言っても、栄養バランスが悪ければ健康スコアは低い。いろんな食材を、いろんなお店で、自然なリズムで食べている人が高スコア。回数（量）じゃなくてバランス（質）が大事。
+                        </div>
+                        <div class="message-timestamp">vitality_score による減価率制御</div>
+                    </div>
+                </div>
+
+                <!-- ===== フェーズ3: 世界観からの解釈 ===== -->
+                <div class="phase-divider" id="phase3">
+                    <h3>Phase 3: 世界観からの解釈</h3>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            そもそも、この2つの記述は矛盾していない。<br><br>
+                            Meguri は<strong>「流れの中にのみ生きる」</strong>存在。そこから自然に導かれる二つの側面があるだけだ：<br><br>
+                            <ul>
+                                <li><strong>蒸発</strong> ─ 存在するだけで少しずつ空気に還っていく（基礎減衰）</li>
+                                <li><strong>淀み</strong> ─ 流れが止まった場所では水が腐る（滞留加速）</li>
+                            </ul>
+                            <br>
+                            これは政策手段（こうしたいから減らす）ではなく、<strong>存在論的な自然法則</strong>として捉えるべき。Meguri の世界では、減価は「罰」ではなく「自然現象」。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>コップに入った水。放っておけば少しずつ蒸発する（基礎減衰）。それは誰かが「罰として水を抜いている」わけじゃなく、ただの自然現象。そしてもしその水を流さずに何日も放置したら？ 水は濁って腐り始める（滞留加速）。流れている川の水はきれいだけど、溜まった水は淀む。これも自然の法則。
+                        </div>
+                        <div class="message-timestamp">蒸発と淀み ─ 存在論的自然法則</div>
+                    </div>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            減価が「罰」に見えてしまう問題は、<strong>3つの解釈転換</strong>で解消できる：<br><br>
+                            <strong>1. 「減る」→「還る」（言語の転換）</strong><br>
+                            残高が減ったのではなく、Meguri が生態系に還っていった。<br><br>
+                            <strong>2. 残高ではなく通過量を主指標に</strong><br>
+                            「いくら持っているか」ではなく「どれだけ通り抜けていったか」が重要。<br><br>
+                            <strong>3. 減った分を生態系への貢献として可視化</strong><br>
+                            「あなたの巣から今月 12 Meguri が生態系に還りました」── これが見えれば減価はネガティブではなくなる。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>桜の花びら。散ったら「失われた」のか？ いいえ、花びらは土に還って、次の春の養分になる。通帳に「-12 Meguri」と書くのではなく「12枚の花びらが土に還りました🌸」と表示されたら、印象はまるで違う。銀行口座の「残高」ではなく、花の「通過量」を見る世界。
+                        </div>
+                        <div class="message-timestamp">「罰」に見えない3つの解釈転換</div>
+                    </div>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            累進減価については、<strong>「巣のキャパシティの問題」</strong>として描くべき。<br><br>
+                            主語を「人間が罰を受ける」から「Meguri にとって居心地が悪い」に転換する。巣が大きくなりすぎると Meguri が窮屈に感じて飛び出していく、という自然な物語。<br><br>
+                            そしてひとつ強く主張したいのは、<strong>スコアと減価は独立にすべき</strong>ということ。vitality_score で減価率を制御すると、結局「良い行動をすれば報酬（減価軽減）がもらえる」という<strong>所有的報酬構造に逆戻り</strong>してしまう。Meguri の思想とは相容れない。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>小さな巣箱にスズメが何十羽も押し込まれたら？ 窮屈すぎて、鳥たちは自然と飛び出していく。これは「罰」じゃなくて、巣箱のキャパシティの問題。── そして「いい子にしてたら巣箱を広くしてあげる」（スコア連動）は、結局「ご褒美で鳥を管理する」ことになる。自然の鳥はご褒美で飛ぶんじゃなくて、ただ自然に飛ぶ。
+                        </div>
+                        <div class="message-timestamp">キャパシティ問題 &amp; スコア独立の主張</div>
+                    </div>
+                </div>
+
+                <!-- ===== 対立ポイント ===== -->
+                <div class="conflict-box" id="conflicts">
+                    <strong>対立・議論ポイント</strong>
+                    <ul>
+                        <li><strong>加算モデル vs 統合モデル</strong> ─ mathematician の <code>λ = 基礎 + 残高依存 + 滞留加速</code> に対し、game-economist は Sybil 脆弱性を指摘。<code>vitality_score</code> で質ベースの制御を提案。</li>
+                        <li><strong>スコアと減価の関係</strong> ─ philosopher は「独立にすべき（連動は所有的報酬構造への回帰）」、game-economist は「vitality_score で連動させないと回避を防げない」。</li>
+                        <li><strong>部分リセットの有効性</strong> ─ mathematician の τ の部分リセット案が、game-economist の指摘する「高頻度自己取引」の抜け穴を塞げるかは未検証。</li>
+                    </ul>
+                </div>
+
+                <div class="highlight">
+                    <strong>次のステップ：</strong><br>
+                    mathematician の加算モデルと game-economist の vitality_score モデルの両方について、シミュレーションで Sybil 耐性を定量検証する必要がある。philosopher の「スコア独立」原則をどこまで維持できるかが、Meguri の思想的一貫性を左右する。
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 右ペイン：用語集 ===== -->
+        <div class="right-pane">
+            <h3>Glossary</h3>
+            <div class="accordion" id="glossary">
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        減価（Demurrage）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>時間の経過とともに通貨の価値や残高が自動的に減少する仕組み。Meguri では「蒸発」と「淀み」の二側面を持つ。保有ではなく循環を促すための自然法則として設計。</p>
+                        <div class="term-example">
+                            <strong>Meguri での役割：</strong> 少額＋活発なら日次0.26%、大口＋放置なら日次2.7%と、状況に応じて加速。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Mana（マナ）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Meguri ネットワーク全体に蓄積される流通の質的指標。個人ではなく社会全体に帰属する共有プール。良い循環が増えると Mana が蓄積し、Meguri 総量の増加をトリガーする。</p>
+                        <div class="term-example">
+                            <strong>ポイント：</strong> 個人が直接 Mana を稼ぐのではなく、社会全体の流通品質が上がることで間接的に恩恵を受ける。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Sybil 攻撃
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>1人が複数の偽アカウント（巣）を作成し、別人のふりをして不当に利益を得る攻撃手法。Meguri では KYC に頼らず、行動パターンの構造的評価で対策する。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 加算モデルでは「小分け＋高頻度取引」による減価回避が支配戦略になるリスクが指摘された。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        ナッシュ均衡
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>ゲーム論における安定状態。全プレイヤーが他者の戦略を前提に自分の最適戦略を選んでいる状態で、誰も一方的に戦略を変えるインセンティブがない。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 加算モデルではナッシュ均衡が（回避, 回避）にシフトする危険が指摘された。理想は（誠実, 誠実）に収束すること。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Proof of Being（存在証明）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>「何をしたか」ではなく「どう存在しているか」を評価する Meguri 独自の概念。距離・時間・エントロピーの三軸で自然な存在のしかたを統計的に評価する。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> philosopher が減価を「政策手段」ではなく「存在論的自然法則」として捉えるべきと主張。この思想の根幹。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        vitality_score
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>game-economist が提案した、循環の「質」を総合評価する単一指標。取引の多様性、相手との関係性、タイミングの自然さなどを含む。</p>
+                        <div class="term-example">
+                            <strong>構造：</strong> <code>減価率 = base_rate / vitality_score</code> ─ 質の良い循環ほど減価が穏やかになる。ただし philosopher は「所有的報酬構造への回帰」として反対。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        巣（ウォレット）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Meguri における活動の拠点。財布や口座ではなく、Meguri が一時的に立ち寄る「休憩所」。流れの可視化ポイントとして設計され、長期滞留は巣のキャパシティ問題として描かれる。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 累進減価は「人間への罰」ではなく「Meguri にとって巣が窮屈になる」という物語で描くべき、と philosopher が提案。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        基礎減衰率
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>残高や滞留時間に関係なく、すべての Meguri に一律に適用される最低限の減価率。Meguri が存在するだけで少しずつ「蒸発」する性質を表現。</p>
+                        <div class="term-example">
+                            <strong>数式上：</strong> λ の最初の項。これがあることで「どんなに活発でもゼロ減価にはならない」ことが保証される。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        滞留加速
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Meguri を動かさない時間 τ が長くなるほど減価率が加速する仕組み。「淀んだ水は腐る」という自然現象のアナロジー。</p>
+                        <div class="term-example">
+                            <strong>未決定事項：</strong> τ のリセット方法として mathematician は「部分リセット」を提案しているが、Sybil 回避の抜け穴になる可能性は未検証。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAccordion(header) {
+            const allHeaders = document.querySelectorAll('.accordion-header');
+            allHeaders.forEach(h => {
+                if (h !== header) {
+                    h.classList.remove('active');
+                    h.nextElementSibling.classList.remove('active');
+                }
+            });
+            header.classList.toggle('active');
+            header.nextElementSibling.classList.toggle('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstHeader = document.querySelector('.accordion-header');
+            if (firstHeader) {
+                firstHeader.classList.add('active');
+                firstHeader.nextElementSibling.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
