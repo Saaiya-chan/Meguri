@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meguri - Mana増加メカニズムの確率モデルを設計する</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr 300px;
+            gap: 20px;
+            min-height: calc(100vh - 40px);
+        }
+
+        /* ===== 左ペイン：参加者 & ナビ ===== */
+        .left-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .left-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .participant {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #0d1117;
+            border-radius: 8px;
+            border-left: 4px solid #30363d;
+        }
+
+        .participant.math { border-left-color: #7ee787; }
+        .participant.econ { border-left-color: #d2a8ff; }
+        .participant.phil { border-left-color: #ffa657; }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .participant.math .avatar { background: #7ee787; }
+        .participant.econ .avatar { background: #d2a8ff; }
+        .participant.phil .avatar { background: #ffa657; }
+
+        .participant-info h4 {
+            font-size: 13px;
+            color: #c9d1d9;
+            margin-bottom: 2px;
+        }
+
+        .participant-info p {
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .nav-section {
+            margin-top: 24px;
+        }
+
+        .nav-section h3 {
+            margin-bottom: 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: #0d1117;
+            border-radius: 6px;
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #58a6ff;
+            background: #1c2128;
+            border-left-color: #58a6ff;
+        }
+
+        .nav-link .nav-num {
+            color: #484f58;
+            margin-right: 6px;
+            font-weight: 600;
+        }
+
+        /* ===== 中央ペイン：議論 ===== */
+        .center-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #30363d;
+            overflow-y: auto;
+        }
+
+        .center-pane h1 {
+            color: #58a6ff;
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+
+        .center-pane > .subtitle {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .topic-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-left: 4px solid #58a6ff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+
+        .topic-box h3 {
+            color: #58a6ff;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .topic-box p {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #8b949e;
+        }
+
+        .discussion-thread {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .phase-divider {
+            text-align: center;
+            margin: 28px 0 20px;
+            padding: 14px 0;
+            border-top: 1px dashed #30363d;
+            border-bottom: 1px dashed #30363d;
+        }
+
+        .phase-divider h3 {
+            color: #58a6ff;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- 吹き出し --- */
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .message.math .message-avatar { background: #7ee787; }
+        .message.econ .message-avatar { background: #d2a8ff; }
+        .message.phil .message-avatar { background: #ffa657; }
+
+        .message-content {
+            max-width: 88%;
+        }
+
+        .speaker-name {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            padding-left: 4px;
+        }
+
+        .message.math .speaker-name { color: #7ee787; }
+        .message.econ .speaker-name { color: #d2a8ff; }
+        .message.phil .speaker-name { color: #ffa657; }
+
+        .speech-bubble {
+            background: #1c2128;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            font-size: 13.5px;
+            line-height: 1.7;
+            color: #c9d1d9;
+        }
+
+        .message.math .speech-bubble { border-left: 3px solid #7ee787; }
+        .message.econ .speech-bubble { border-left: 3px solid #d2a8ff; }
+        .message.phil .speech-bubble { border-left: 3px solid #ffa657; }
+
+        .speech-bubble strong {
+            color: #e6edf3;
+        }
+
+        .speech-bubble code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ffa657;
+        }
+
+        .speech-bubble ul, .speech-bubble ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .speech-bubble li {
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .message-timestamp {
+            font-size: 11px;
+            color: #484f58;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
+        /* --- たとえるとボックス --- */
+        .analogy {
+            margin: 8px 0 0;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(227, 179, 65, 0.06);
+            border-left: 3px solid #e3b341;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #8b949e;
+        }
+
+        .analogy .analogy-icon {
+            margin-right: 6px;
+        }
+
+        .analogy strong {
+            color: #e3b341;
+        }
+
+        /* --- ハイライトボックス --- */
+        .highlight {
+            background: #1c1d00;
+            border: 1px solid #4d4100;
+            border-left: 4px solid #e3b341;
+            padding: 14px 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #c9d1d9;
+        }
+
+        .highlight strong {
+            color: #e3b341;
+        }
+
+        .conflict-box {
+            background: #1a0000;
+            border: 1px solid #4d0000;
+            border-left: 4px solid #f85149;
+            padding: 14px 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .conflict-box strong {
+            color: #f85149;
+        }
+
+        .conflict-box ul {
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+
+        .conflict-box li {
+            margin-bottom: 6px;
+            color: #c9d1d9;
+        }
+
+        /* ===== 右ペイン：用語集 ===== */
+        .right-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .right-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .accordion-item {
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: #0d1117;
+            padding: 11px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 12.5px;
+            user-select: none;
+            transition: background 0.2s;
+            color: #c9d1d9;
+        }
+
+        .accordion-header:hover {
+            background: #1c2128;
+        }
+
+        .accordion-header.active {
+            background: #1f6feb;
+            color: #fff;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+            font-size: 10px;
+        }
+
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 12px 14px;
+            background: #0d1117;
+            font-size: 12px;
+            line-height: 1.7;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+        }
+
+        .accordion-content.active {
+            display: block;
+        }
+
+        .term-example {
+            background: #161b22;
+            padding: 8px 10px;
+            border-left: 2px solid #58a6ff;
+            margin-top: 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .term-example strong {
+            color: #58a6ff;
+        }
+
+        /* スクロールバー */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #58a6ff;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .left-pane {
+                grid-column: 1;
+            }
+            .center-pane {
+                grid-column: 2;
+            }
+            .right-pane {
+                grid-column: 1 / -1;
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .left-pane,
+            .right-pane {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== 左ペイン ===== -->
+        <div class="left-pane">
+            <h3>Participants</h3>
+
+            <div class="participant math">
+                <div class="avatar">M</div>
+                <div class="participant-info">
+                    <h4>mathematician</h4>
+                    <p>数式モデル設計</p>
+                </div>
+            </div>
+
+            <div class="participant econ">
+                <div class="avatar">G</div>
+                <div class="participant-info">
+                    <h4>game-economist</h4>
+                    <p>ゲーム論・経済分析</p>
+                </div>
+            </div>
+
+            <div class="participant phil">
+                <div class="avatar">P</div>
+                <div class="participant-info">
+                    <h4>philosopher</h4>
+                    <p>世界観設計</p>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <a href="#topic" class="nav-link"><span class="nav-num">00</span>議題</a>
+                <a href="#phase1" class="nav-link"><span class="nav-num">01</span>ポアソン過程モデル</a>
+                <a href="#phase2" class="nav-link"><span class="nav-num">02</span>ハイブリッド型設計</a>
+                <a href="#phase3" class="nav-link"><span class="nav-num">03</span>確率性の哲学</a>
+                <a href="#conflicts" class="nav-link"><span class="nav-num">04</span>対立ポイント</a>
+            </div>
+
+            <div class="nav-section" style="margin-top: 24px;">
+                <h3>Summary</h3>
+                <p style="font-size: 12px; color: #8b949e; line-height: 1.7;">
+                    Mana蓄積から新規Meguri発行までの確率モデルを設計。ポアソン過程の数学的厳密性、ハイブリッド型の安定性、確率性の哲学的根拠を三視点から議論。
+                </p>
+            </div>
+        </div>
+
+        <!-- ===== 中央ペイン ===== -->
+        <div class="center-pane">
+            <h1>Mana増加メカニズムの確率モデルを設計する</h1>
+            <p class="subtitle">Meguri Project &mdash; Mana Probability Model Discussion</p>
+
+            <!-- 議題ボックス -->
+            <div class="topic-box" id="topic">
+                <h3>議題</h3>
+                <p>Mana が蓄積して新規 Meguri が発行される仕組みを確率モデルで設計する。「ふっと増える」という生命的な増加を、数学的に厳密かつゲーム論的に安定な形で実現する方法を探る。</p>
+            </div>
+
+            <div class="discussion-thread">
+
+                <!-- ===== フェーズ1: ポアソン過程 ===== -->
+                <div class="phase-divider" id="phase1">
+                    <h3>Phase 1: ポアソン過程による確率モデル（数学的アプローチ）</h3>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            確率モデルの候補を3つ検討した結果、<strong>ポアソン過程</strong>を推奨する。<br><br>
+                            <ul>
+                                <li><strong>ポアソン過程</strong>：到着間隔が指数分布。無記憶性があり、実装容易。✅推奨</li>
+                                <li>マルコフ連鎖：状態遷移確率が複雑。初期設計には過剰</li>
+                                <li>自己組織化臨界：理論的に美しいが実装困難</li>
+                            </ul>
+                            <br>
+                            具体的には<strong>非定常ポアソン過程</strong>：<br>
+                            <code>Λ(t) = η · Mana(t)</code><br><br>
+                            Mana が多いほど発生率が高くなる。時間ではなく Mana 量で駆動される。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>バスの到着時刻。バス停で10分待ったからといって「もうすぐ来るはず」ではない。次のバスまでの待ち時間の期待値は、今待った時間とは無関係に常に「平均15分」。これが無記憶性（ポアソン過程の特性）。Mana が多いと「バスの本数が増える」感じで、到着しやすくなる。
+                        </div>
+                        <div class="message-timestamp">ポアソン過程の選定理由</div>
+                    </div>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            増加量の分布は<strong>対数正規分布（LogNormal）</strong>を推奨：<br><br>
+                            <code>ΔM ~ LogNormal(μ, σ²)</code><br><br>
+                            理由：<br>
+                            <ul>
+                                <li>右に裾が長い（大きな増加も稀に起こる）</li>
+                                <li>生物の細胞サイズ分布と整合</li>
+                                <li>負の値を取らない（Meguri が減ることはない）</li>
+                            </ul>
+                            <br>
+                            配分方法は<strong>VRF（検証可能ランダム関数）で均等確率（1/n）</strong>を推奨。各巣が選ばれる確率は完全に等しく、暗号学的に操作不可能。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>宝くじの当選金額分布。ほとんどは小額だけど、たまにドカンと大きいのが来る。対数正規分布はこの「基本は小さい、たまにデカい」を表現できる。そして配分先は完全公平な抽選（1/n）。どんなに頑張っても、どんなにスコアが高くても、当選確率は変えられない。
+                        </div>
+                        <div class="message-timestamp">対数正規分布 &amp; VRF均等配分</div>
+                    </div>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            ポアソン過程の<strong>無記憶性</strong>が重要：<br><br>
+                            指数分布の待ち時間 T ~ Exp(λ) は、P(T > s + t | T > s) = P(T > t) を満たす。つまり<strong>「今まで待ったから、もうすぐ」が成立しない</strong>。<br><br>
+                            また、<strong>最適化不能性の数学的証明</strong>：<br>
+                            個人がネットワーク全体の Mana に与える影響は O(1/n²) で、n が大きい（数千〜数万巣）場合、実質ゼロ。個人がいくら頑張っても発生確率を制御できない。<br><br>
+                            ただし、<strong>長期期待値は前回の決定論モデルと完全一致</strong>する。確率的なのはタイミングだけで、10年平均すれば全員に同じ量が配られる。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>サイコロは前の出目を覚えていない。5回連続で1が出ても、6回目に1が出る確率は1/6のまま（無記憶性）。そして、あなたが1人で必死にサイコロを振っても、学校全体1000人が同時に振っているサイコロの「出目の合計」にはほとんど影響しない（O(1/n²)）。でも10年振り続ければ、全員の出目の平均は1〜6の3.5に収束する（長期期待値の一致）。
+                        </div>
+                        <div class="message-timestamp">無記憶性と最適化不能性の証明</div>
+                    </div>
+                </div>
+
+                <!-- ===== フェーズ2: ハイブリッド型 ===== -->
+                <div class="phase-divider" id="phase2">
+                    <h3>Phase 2: ハイブリッド型設計（ゲーム論的アプローチ）</h3>
+                </div>
+
+                <div class="message econ">
+                    <div class="message-avatar">G</div>
+                    <div class="message-content">
+                        <div class="speaker-name">game-economist</div>
+                        <div class="speech-bubble">
+                            純粋な確率モデルには問題がある。<strong>ハイブリッド型</strong>を推奨する：<br><br>
+                            <strong>確定75% + Bloom25%</strong><br><br>
+                            <ul>
+                                <li><strong>宝くじ型（100%確率）</strong>：分散が大きすぎて通貨供給が不安定。運が悪いと何ヶ月も増えない</li>
+                                <li><strong>積立型（100%決定論）</strong>：完全に最適化可能。世界観と不一致</li>
+                                <li><strong>ハイブリッド型</strong>：安定性（確定75%）とサプライズ（Bloom25%）の両立 ✅</li>
+                            </ul>
+                            <br>
+                            確定部分は dM/dt = γ · Q(t) で決定論的に蓄積。Bloom は予測不能に発生。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>給料の仕組み。100%歩合制（宝くじ型）だと、運が悪いと来月の家賃が払えない。100%固定給（積立型）だと、頑張っても給料変わらないからモチベ下がる。ベストは「固定給75% + ボーナス25%」（ハイブリッド）。安定しつつ、サプライズもある。
+                        </div>
+                        <div class="message-timestamp">ハイブリッド型の提案</div>
+                    </div>
+                </div>
+
+                <div class="message econ">
+                    <div class="message-avatar">G</div>
+                    <div class="message-content">
+                        <div class="speaker-name">game-economist</div>
+                        <div class="speech-bubble">
+                            <strong>Bloom Event（開花イベント）</strong>の設計パラメータ：<br><br>
+                            <ul>
+                                <li><strong>平均間隔</strong>：7-14日（週1回程度）</li>
+                                <li><strong>量</strong>：年間成長の25%</li>
+                                <li><strong>ボラティリティ</strong>：±0.04%以内（統計的に安定、体験は生き生き）</li>
+                            </ul>
+                            <br>
+                            重要なのは<strong>待ち伏せ不能性</strong>。いつ Bloom が起こるか誰にもわからない。だから攻撃者は24時間365日ずっとアクティブでいる必要がある。<br><br>
+                            これは<strong>一時コストを持続コストに変換</strong>する防御機構。「明日Bloomする」とわかれば前日だけ頑張ればいいが、わからないから毎日頑張る必要がある。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>種を蒔いて毎日水をやる → ある日突然花が咲く（Bloom）。いつ咲くかは誰にもわからない。だから「明日咲くから今日だけ水やろう」という作戦は使えない。毎日ちゃんと世話しないと、咲いたときに自分の庭がスカスカ。地震もいつ来るかわからないから、毎日防災準備をする必要があるのと同じ構造。
+                        </div>
+                        <div class="message-timestamp">Bloom Event の設計と待ち伏せ不能性</div>
+                    </div>
+                </div>
+
+                <div class="message econ">
+                    <div class="message-avatar">G</div>
+                    <div class="message-content">
+                        <div class="speaker-name">game-economist</div>
+                        <div class="speech-bubble">
+                            行動経済学の知見：<strong>確率加重関数</strong><br><br>
+                            人間は小確率を過大評価する。客観確率1%のイベントを、体感では5-10%に感じる。だから Bloom が年間成長の25%でも、体感的には「結構来る！」と感じて、体験が生き生きする。<br><br>
+                            <strong>Sybil 攻撃分析</strong>：4つの攻撃パターンをすべて無効化<br>
+                            <ul>
+                                <li><strong>確率操作</strong>：VRF で不可能</li>
+                                <li><strong>恩恵独占</strong>：複数巣で確率 n/N → 1巣で確率 1/N のn倍コスト</li>
+                                <li><strong>タイミング投機</strong>：待ち伏せ不能</li>
+                                <li><strong>閾値攻撃</strong>：個人の影響 O(1/n²) で無視可能</li>
+                            </ul>
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>宝くじを買う心理。1等当選確率は1000万分の1なのに、買った瞬間「もしかしたら…！」と期待する（確率加重関数）。客観的には超低確率でも、主観的にはドキドキする。Sybil攻撃は、偽の宝くじを自分で100枚作っても、全体のクジの数が100万枚あったら誤差（恩恵独占の無効化）。
+                        </div>
+                        <div class="message-timestamp">確率加重関数と Sybil 無効化</div>
+                    </div>
+                </div>
+
+                <!-- ===== フェーズ3: 哲学 ===== -->
+                <div class="phase-divider" id="phase3">
+                    <h3>Phase 3: 確率性の哲学的根拠</h3>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            なぜ Meguri に確率性が必要なのか？ <strong>五つの哲学的根拠</strong>：<br><br>
+                            <strong>1. 生命は決定論的ではない</strong><br>
+                            揺らぎは生命のフィーチャー。細胞分裂のタイミングも確率的。<br><br>
+                            <strong>2. 制御不能性が「脱所有」を完成させる</strong><br>
+                            誰も Meguri の増加をコントロールできない。人間の意図の外側にある。<br><br>
+                            <strong>3. 確率性が「今」への集中を生む</strong><br>
+                            未来が計算不能だから、現在が固有の価値を持つ。<br><br>
+                            <strong>4. 確率性が共同体を生む</strong><br>
+                            不確実性を共有すると、信頼が生まれる。<br><br>
+                            <strong>5. グッドハートの法則の無力化</strong><br>
+                            最適化の唯一解は「誠実に生きる」。小手先の戦術が無効。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>1. 生命の揺らぎ = 桜の開花。毎年3月下旬だけど、ピッタリ3月25日とは決まっていない（確率的）。2. 制御不能性 = 雨。誰も雨を降らせられないから、雨乞いではなく祈りになる（脱所有）。3. 今への集中 = 明日の天気がわからないから、今日の晴れが尊い。4. 共同体 = 台風。みんな不確実性の中にいるから、助け合う。5. グッドハートの法則 = カンニングできないテスト。最適解は「ちゃんと勉強する」しかない。
+                        </div>
+                        <div class="message-timestamp">確率性の五つの哲学的根拠</div>
+                    </div>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            「ふっと分裂する」という表現の<strong>生命論的意味</strong>：<br><br>
+                            <ul>
+                                <li><strong>蓄積と爆発の非対称性</strong>：連続的に Mana が蓄積し、離散的に Meguri が増加。水が99度まで温まり、100度で「ふっと」沸騰する相転移</li>
+                                <li><strong>受動性</strong>：増加は「する」ものではなく「出来事として起こる」もの。意図の不在</li>
+                                <li><strong>個→全体の創発</strong>：各巣の小さな活動が積み重なり、ある瞬間に全体として新しい生命が生まれる</li>
+                            </ul>
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>水の沸騰がまさにこれ。水は20度→30度→...→99度とじわじわ温まる（連続的蓄積）。でも99度と100度の間には何かがある。100度になった瞬間「ふっと」沸騰する（離散的増加、相転移）。誰も「沸騰させよう」と意図していない。熱を加え続けた結果として、ある瞬間に起こる（受動性、創発）。
+                        </div>
+                        <div class="message-timestamp">「ふっと分裂する」の生命論的意味</div>
+                    </div>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            ここで<strong>重要な提案</strong>をしたい：<br><br>
+                            <strong>減衰は決定論、増加は確率（非対称設計）</strong><br><br>
+                            理由：<br>
+                            <ul>
+                                <li><strong>減衰が確率的だと、不運な人が破綻する悪夢</strong>。毎月の支出が予測できないと生活が成り立たない</li>
+                                <li><strong>増加だけ確率的なら公平性を保てる</strong>。減る分は平等に、増える分はサプライズとして</li>
+                            </ul>
+                            <br>
+                            また、公平概念を再定義：<strong>機会の平等 + 期待値の平等</strong><br>
+                            全員が同じ確率で選ばれ（機会の平等）、10年平均すれば全員に同じ量が配られる（期待値の平等）。<br><br>
+                            <strong>「Meguri的公平」：全員が同じ生態系・自然法則のもとにある</strong>
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>税金は確実に取られる（減衰＝決定論）。でもボーナスはもらえるかわからない（増加＝確率）。税金がランダムだったら生活設計できない悪夢。ボーナスがランダムなのは「嬉しいサプライズ」として受け入れられる。そして公平性は「雨はランダムに降るけど、10年平均したらみんなの畑に同じ量降る」。毎日均等に降る人工的な散水（決定論）ではなく、自然の雨（確率）。
+                        </div>
+                        <div class="message-timestamp">非対称設計と Meguri 的公平</div>
+                    </div>
+                </div>
+
+                <!-- ===== 対立ポイント ===== -->
+                <div class="conflict-box" id="conflicts">
+                    <strong>対立・議論ポイント</strong>
+                    <ul>
+                        <li><strong>配分方法</strong> ─ mathematician は均等確率（1/n）で完全操作不可能。game-economist は vitality 連動で貢献反映したい。philosopher は「雨は平等に降る」という世界観を支持（均等寄り）。操作不可能性 vs 貢献反映の根本的ジレンマ。</li>
+                        <li><strong>確率の範囲</strong> ─ mathematician は全体をポアソン過程（100%確率）、game-economist はハイブリッド型（確定75% + Bloom25%）。安定性と世界観のトレードオフ。philosopher は「増加だけ確率」を支持。</li>
+                        <li><strong>非対称設計の安定性</strong> ─ philosopher の「減衰＝決定論、増加＝確率」はゲーム論的に安定か？ 減衰が予測可能だと、減衰を最小化する行動が支配戦略にならないか要検証。</li>
+                    </ul>
+                </div>
+
+                <div class="highlight">
+                    <strong>次のステップ：</strong><br>
+                    ハイブリッド型（確定75% + Bloom25%）でシミュレーション実装。配分方法は均等確率（1/n）をベースラインとし、vitality 連動版も並行テスト。philosopher の非対称設計（減衰=決定論、増加=確率）がゲーム論的に安定かを、前回の減価議論モデルと統合して検証。Bloom Event のパラメータ（間隔7-14日、量25%）の微調整も並行実施。
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 右ペイン：用語集 ===== -->
+        <div class="right-pane">
+            <h3>Glossary</h3>
+            <div class="accordion" id="glossary">
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        ポアソン過程
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>確率過程の一種で、イベントがランダムに独立して発生するモデル。到着間隔が指数分布に従う。無記憶性を持ち、「待った時間」が次の到着に影響しない。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> mathematician が Mana 増加のベースモデルとして推奨。Λ(t) = η · Mana(t) で非定常ポアソン過程として定式化。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        VRF（検証可能ランダム関数）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>暗号学的に安全な乱数生成関数。生成者が結果を操作できず、かつ第三者が正当性を検証可能。ブロックチェーンのランダムネスに広く使われる。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> mathematician が配分先決定に推奨。各巣が選ばれる確率を均等（1/n）にし、操作不可能性を暗号学的に保証。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        無記憶性（Memorylessness）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>確率過程において、過去の状態が未来の挙動に影響しない性質。指数分布とポアソン過程の特徴的な性質。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 「今まで待ったから、もうすぐ来る」が成立しない。サイコロは前の出目を覚えていない。この性質が最適化を構造的に不可能にする。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        対数正規分布
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>変数の対数が正規分布に従う分布。右に裾が長く、負の値を取らない。生物の細胞サイズや所得分布など、自然現象・社会現象で頻出。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> Meguri 増加量 ΔM の分布として mathematician が推奨。「基本は小さい、たまにデカい」を表現。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        グッドハートの法則
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>「ある指標が目標として使われると、それは良い指標ではなくなる」という法則。前回の良い循環の議論でも登場。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> philosopher が確率性の根拠の一つとして言及。確率モデルでは最適化の唯一解が「誠実に生きる」になり、小手先の戦術が無効化される。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Bloom Event（開花イベント）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>game-economist が提案した、ハイブリッド型の確率部分。平均間隔7-14日で、年間成長の25%を占める予測不能な増加イベント。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 種を蒔いて水をやり続けると、ある日突然花が咲く。いつ咲くかわからないから、毎日世話をする必要がある（待ち伏せ不能性）。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        待ち伏せ不能性
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>イベントのタイミングが予測不能なため、攻撃者が特定の瞬間を狙って待ち伏せできない性質。一時コストを持続コストに変換する防御機構。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 地震はいつ来るかわからないから、毎日防災準備が必要。「明日来る」と予測できたら前日だけ準備すればいい（待ち伏せ可能）。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        確率加重関数
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>行動経済学の概念。人間は客観確率を正しく知覚せず、小確率を過大評価し、大確率を過小評価する。カーネマン＝トベルスキーのプロスペクト理論の要素。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> Bloom が年間成長の25%でも、体感的には「結構来る！」と感じる。宝くじの当選確率1000万分の1でも「もしかしたら…！」と期待する心理。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        公平概念（機会の平等、期待値の平等）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>philosopher が提案した Meguri における公平性の定義。全員が同じ確率で選ばれる（機会の平等）+ 長期平均で全員に同じ量が配られる（期待値の平等）。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 雨はランダムに降るけど、10年平均したらみんなの畑に同じ量降る。毎日均等に降る人工散水（決定論）ではなく、自然の雨（確率）。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        相転移
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>物理学の概念。系の状態が連続的に変化していく中で、ある臨界点で性質が不連続に変化する現象。水の沸騰（液体→気体）、磁石の磁化など。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> Mana が連続的に蓄積し、ある閾値で「ふっと」Meguri が増加する。99度まで液体、100度で沸騰。philosopher が「ふっと分裂する」の生命論的意味として言及。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        エルゴード性
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>確率過程において、時間平均と集団平均が一致する性質。1人を長期間観測した平均 = 多数を瞬間観測した平均。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> mathematician の「長期期待値は決定論モデルと一致」の根拠。1つの巣を10年観測した平均 Meguri 増加量 = 全巣を1年観測した平均増加量。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAccordion(header) {
+            const allHeaders = document.querySelectorAll('.accordion-header');
+            allHeaders.forEach(h => {
+                if (h !== header) {
+                    h.classList.remove('active');
+                    h.nextElementSibling.classList.remove('active');
+                }
+            });
+            header.classList.toggle('active');
+            header.nextElementSibling.classList.toggle('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstHeader = document.querySelector('.accordion-header');
+            if (firstHeader) {
+                firstHeader.classList.add('active');
+                firstHeader.nextElementSibling.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

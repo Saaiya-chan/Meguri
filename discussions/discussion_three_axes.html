@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meguri - 3軸Sybil対策の数学的妥当性を検証する</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr 300px;
+            gap: 20px;
+            min-height: calc(100vh - 40px);
+        }
+
+        /* ===== 左ペイン：参加者 & ナビ ===== */
+        .left-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .left-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .participant {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #0d1117;
+            border-radius: 8px;
+            border-left: 4px solid #30363d;
+        }
+
+        .participant.math { border-left-color: #7ee787; }
+        .participant.arch { border-left-color: #d2a8ff; }
+        .participant.phil { border-left-color: #ffa657; }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .participant.math .avatar { background: #7ee787; }
+        .participant.arch .avatar { background: #d2a8ff; }
+        .participant.phil .avatar { background: #ffa657; }
+
+        .participant-info h4 {
+            font-size: 13px;
+            color: #c9d1d9;
+            margin-bottom: 2px;
+        }
+
+        .participant-info p {
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .nav-section {
+            margin-top: 24px;
+        }
+
+        .nav-section h3 {
+            margin-bottom: 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: #0d1117;
+            border-radius: 6px;
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #58a6ff;
+            background: #1c2128;
+            border-left-color: #58a6ff;
+        }
+
+        .nav-link .nav-num {
+            color: #484f58;
+            margin-right: 6px;
+            font-weight: 600;
+        }
+
+        /* ===== 中央ペイン：議論 ===== */
+        .center-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #30363d;
+            overflow-y: auto;
+        }
+
+        .center-pane h1 {
+            color: #58a6ff;
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+
+        .center-pane > .subtitle {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .topic-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-left: 4px solid #58a6ff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+
+        .topic-box h3 {
+            color: #58a6ff;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .topic-box p {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #8b949e;
+        }
+
+        .discussion-thread {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .phase-divider {
+            text-align: center;
+            margin: 28px 0 20px;
+            padding: 14px 0;
+            border-top: 1px dashed #30363d;
+            border-bottom: 1px dashed #30363d;
+        }
+
+        .phase-divider h3 {
+            color: #58a6ff;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- 吹き出し --- */
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .message.math .message-avatar { background: #7ee787; }
+        .message.arch .message-avatar { background: #d2a8ff; }
+        .message.phil .message-avatar { background: #ffa657; }
+
+        .message-content {
+            max-width: 88%;
+        }
+
+        .speaker-name {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            padding-left: 4px;
+        }
+
+        .message.math .speaker-name { color: #7ee787; }
+        .message.arch .speaker-name { color: #d2a8ff; }
+        .message.phil .speaker-name { color: #ffa657; }
+
+        .speech-bubble {
+            background: #1c2128;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            font-size: 13.5px;
+            line-height: 1.7;
+            color: #c9d1d9;
+        }
+
+        .message.math .speech-bubble { border-left: 3px solid #7ee787; }
+        .message.arch .speech-bubble { border-left: 3px solid #d2a8ff; }
+        .message.phil .speech-bubble { border-left: 3px solid #ffa657; }
+
+        .speech-bubble strong {
+            color: #e6edf3;
+        }
+
+        .speech-bubble code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ffa657;
+        }
+
+        .speech-bubble ul, .speech-bubble ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .speech-bubble li {
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .message-timestamp {
+            font-size: 11px;
+            color: #484f58;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
+        /* --- たとえるとボックス --- */
+        .analogy {
+            margin: 8px 0 0;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(227, 179, 65, 0.06);
+            border-left: 3px solid #e3b341;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #8b949e;
+        }
+
+        .analogy .analogy-icon {
+            margin-right: 6px;
+        }
+
+        .analogy strong {
+            color: #e3b341;
+        }
+
+        /* --- ハイライトボックス --- */
+        .highlight {
+            background: #1c1d00;
+            border: 1px solid #4d4100;
+            border-left: 4px solid #e3b341;
+            padding: 14px 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #c9d1d9;
+        }
+
+        .highlight strong {
+            color: #e3b341;
+        }
+
+        .conflict-box {
+            background: #1a0000;
+            border: 1px solid #4d0000;
+            border-left: 4px solid #f85149;
+            padding: 14px 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .conflict-box strong {
+            color: #f85149;
+        }
+
+        .conflict-box ul {
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+
+        .conflict-box li {
+            margin-bottom: 6px;
+            color: #c9d1d9;
+        }
+
+        /* ===== 右ペイン：用語集 ===== */
+        .right-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .right-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .accordion-item {
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: #0d1117;
+            padding: 11px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 12.5px;
+            user-select: none;
+            transition: background 0.2s;
+            color: #c9d1d9;
+        }
+
+        .accordion-header:hover {
+            background: #1c2128;
+        }
+
+        .accordion-header.active {
+            background: #1f6feb;
+            color: #fff;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+            font-size: 10px;
+        }
+
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 12px 14px;
+            background: #0d1117;
+            font-size: 12px;
+            line-height: 1.7;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+        }
+
+        .accordion-content.active {
+            display: block;
+        }
+
+        .term-example {
+            background: #161b22;
+            padding: 8px 10px;
+            border-left: 2px solid #58a6ff;
+            margin-top: 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .term-example strong {
+            color: #58a6ff;
+        }
+
+        /* スクロールバー */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #58a6ff;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .left-pane {
+                grid-column: 1;
+            }
+            .center-pane {
+                grid-column: 2;
+            }
+            .right-pane {
+                grid-column: 1 / -1;
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .left-pane,
+            .right-pane {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== 左ペイン ===== -->
+        <div class="left-pane">
+            <h3>Participants</h3>
+
+            <div class="participant math">
+                <div class="avatar">M</div>
+                <div class="participant-info">
+                    <h4>mathematician</h4>
+                    <p>数式モデル設計</p>
+                </div>
+            </div>
+
+            <div class="participant arch">
+                <div class="avatar">A</div>
+                <div class="participant-info">
+                    <h4>architect</h4>
+                    <p>実装設計</p>
+                </div>
+            </div>
+
+            <div class="participant phil">
+                <div class="avatar">P</div>
+                <div class="participant-info">
+                    <h4>philosopher</h4>
+                    <p>世界観設計</p>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <a href="#topic" class="nav-link"><span class="nav-num">00</span>議題</a>
+                <a href="#phase1" class="nav-link"><span class="nav-num">01</span>三軸の統合状況</a>
+                <a href="#phase2" class="nav-link"><span class="nav-num">02</span>段階的実装計画</a>
+                <a href="#phase3" class="nav-link"><span class="nav-num">03</span>監視との境界線</a>
+                <a href="#conflicts" class="nav-link"><span class="nav-num">04</span>対立ポイント</a>
+            </div>
+
+            <div class="nav-section" style="margin-top: 24px;">
+                <h3>Summary</h3>
+                <p style="font-size: 12px; color: #8b949e; line-height: 1.7;">
+                    Concept.md の「距離・時間・エントロピー」三軸を検証。数学的には統合済み（距離軸は不要説）、実装面では段階的判断、哲学面では監視との境界と二層設計を議論。
+                </p>
+            </div>
+        </div>
+
+        <!-- ===== 中央ペイン ===== -->
+        <div class="center-pane">
+            <h1>3軸Sybil対策の数学的妥当性を検証する</h1>
+            <p class="subtitle">Meguri Project &mdash; Three-Axes Sybil Resistance Discussion</p>
+
+            <!-- 議題ボックス -->
+            <div class="topic-box" id="topic">
+                <h3>議題</h3>
+                <p>Concept.md に記載された「距離・時間・エントロピー」の三軸評価が、現在の統合設計でどう実現されているか（または実現すべきか）を検証する。特に距離軸の要否、プライバシーとの整合性、実装可能性を精査。</p>
+            </div>
+
+            <div class="discussion-thread">
+
+                <!-- ===== フェーズ1: 三軸の統合状況 ===== -->
+                <div class="phase-divider" id="phase1">
+                    <h3>Phase 1: 三軸の統合状況（数学的検証）</h3>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            結論から言うと、<strong>三軸の独立スコアは不要</strong>。既に他のメカニズムに統合されている：<br><br>
+                            <ul>
+                                <li><strong>時間軸</strong> → 減価の滞留ペナルティ <code>λ_stag·h(τ)</code> に統合済み</li>
+                                <li><strong>エントロピー軸</strong> → 循環の質 Q_equity（フローの分散）+ VRF の均等配分に統合済み</li>
+                                <li><strong>距離軸</strong> → <strong>不要</strong>（プライバシー矛盾、代替可能）</li>
+                            </ul>
+                            <br>
+                            前回指摘した5つの矛盾（次元不一致、符号矛盾、相互補完問題など）はすべて解決済み。独立した「三軸スコア」を作る必要はない。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>「健康管理アプリ」で考えてみる。最初は「運動スコア」「食事スコア」「睡眠スコア」の三軸を表示していた。でも実際には、運動不足なら体重が増える（減価に影響）、食事バランスが悪いと健康診断で引っかかる（循環の質に影響）。つまり三軸は既に「体重」と「健康診断結果」に統合されているから、わざわざ別スコアを作る必要がない。
+                        </div>
+                        <div class="message-timestamp">三軸の統合状況まとめ</div>
+                    </div>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            <strong>自己弱体化の数学的証明</strong>を示す：<br><br>
+                            k個の巣を運用する効用を U(k) とすると、<br>
+                            <code>U(k) = k·個別利益 − k²·時間分割コスト − k·運用コスト</code><br><br>
+                            計算すると <strong>k≥3 で U(k) < U(1)</strong> が成立。つまり3つ以上の巣を持つと損失が発生する。<br><br>
+                            重要なのは、<strong>この証明に距離情報は不要</strong>。時間制約（1日24時間）だけで自己弱体化が成立する。<br><br>
+                            代替案：<strong>巣間相関分析</strong>（取引時刻の相関を検出）、<strong>ネットワークトポロジー</strong>（同じグループ内だけで取引）などで距離軸は代替可能。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>3つのバイトを掛け持ちすると、各バイトで寝坊・疲労・ミスが増えて全部クビになる（自己弱体化）。「通勤距離が長い」という情報がなくても、「1日24時間しかない」という時間制約だけで掛け持ちは破綻する。相関分析は「2つのTwitterアカウントが毎回同じ時間に投稿 → 同一人物疑惑」みたいな検出方法。
+                        </div>
+                        <div class="message-timestamp">自己弱体化の証明と距離軸の代替案</div>
+                    </div>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            推奨：<strong>Concept.md の更新</strong><br><br>
+                            「距離・時間・エントロピーの三軸」という表現を修正し、<strong>「減価・循環の質・確率的配分の三層構造」</strong>として再整理する。<br><br>
+                            これは「三軸」ではなく「三層」で、各層が独立したメカニズムとして機能し、全体として Sybil 耐性を実現する。距離・時間・エントロピーは、それぞれの層に埋め込まれた要素として位置づける。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>「三軸」は3つの独立した物差し（縦・横・高さ）。「三層」は3つの防御壁（外壁・内壁・金庫室）。Meguri は後者。各層が違う役割を持ち、全部突破しないと攻撃できない多層防御。距離・時間・エントロピーは各層の「建材」として使われているが、独立した柱ではない。
+                        </div>
+                        <div class="message-timestamp">Concept.md 更新の推奨</div>
+                    </div>
+                </div>
+
+                <!-- ===== フェーズ2: 段階的実装 ===== -->
+                <div class="phase-divider" id="phase2">
+                    <h3>Phase 2: 段階的実装計画（実装設計）</h3>
+                </div>
+
+                <div class="message arch">
+                    <div class="message-avatar">A</div>
+                    <div class="message-content">
+                        <div class="speaker-name">architect</div>
+                        <div class="speech-bubble">
+                            実装難易度の評価：<br><br>
+                            <ul>
+                                <li><strong>エントロピー・時間軸：実装容易</strong> ★☆☆☆☆<br>取引データから直接算出可能。プライバシー懸念も最小。</li>
+                                <li><strong>距離軸：実装可能だが慎重判断</strong> ★★★☆☆<br>GPS精度は粗い位置（100m-1kmグリッド）で十分。VPN対策にはデバイスローカルのセンサー（加速度計、ジャイロ）を使用。zk-SNARK で「移動の多様性」を秘匿証明可能。</li>
+                            </ul>
+                            <br>
+                            <strong>VRF統合：完全に可能</strong><br>
+                            VRF と zk-SNARK は相乗効果あり。VRF が配分先を決定し、zk が証明の正当性を保証。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>エントロピー・時間軸は「レシートを見れば買い物パターンがわかる」レベル（簡単）。距離軸は「スマホの歩数計で大まかな移動を推定」レベル（できるけど慎重に）。VPN対策は「VPNで位置偽装しても、歩数計は嘘つけない」という多重チェック。
+                        </div>
+                        <div class="message-timestamp">実装難易度評価</div>
+                    </div>
+                </div>
+
+                <div class="message arch">
+                    <div class="message-avatar">A</div>
+                    <div class="message-content">
+                        <div class="speaker-name">architect</div>
+                        <div class="speech-bubble">
+                            <strong>段階的実装の修正版</strong>：<br><br>
+                            <ul>
+                                <li><strong>Phase 0: シミュレーション（1-2ヶ月）</strong> ← 新規追加<br>合成データで三軸の効果を検証</li>
+                                <li><strong>Phase 1: エントロピーのみ（2-3ヶ月）</strong><br>Q_equity + VRF のみで運用開始</li>
+                                <li><strong>Phase 2: エントロピー+時間（3-4ヶ月）</strong><br>滞留ペナルティ統合</li>
+                                <li><strong>Phase 2.5: 評価期間（3-6ヶ月）</strong> ← 新規追加<br>二軸で十分か実データで検証。距離軸の可否判断。</li>
+                                <li><strong>Phase 3: 距離軸（4-6ヶ月、条件付き）</strong><br>Phase 2.5 の結果次第で実装</li>
+                            </ul>
+                            <br>
+                            推奨：<strong>戦略A（保守的）</strong> — Phase 2.5 で実データ判断してから距離軸の可否を決める。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>新しい料理のレシピ開発。Phase 0 = 頭の中でシミュレーション。Phase 1 = 塩と胡椒だけで試作。Phase 2 = 醤油を追加。Phase 2.5 = 試食会で評価「これで完成？ それとも味噌も必要？」。Phase 3 = 必要なら味噌追加（条件付き）。最初から全部入れると、どれが効いてるかわからない。
+                        </div>
+                        <div class="message-timestamp">段階的実装計画（Phase 2.5追加）</div>
+                    </div>
+                </div>
+
+                <!-- ===== フェーズ3: 監視との境界 ===== -->
+                <div class="phase-divider" id="phase3">
+                    <h3>Phase 3: 監視との境界線（世界観設計）</h3>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            「評価」と「監視」の境界を定義する。<strong>五条件</strong>：<br><br>
+                            <strong>1. 非人格化</strong><br>
+                            パターンのみを評価し、個人を特定しない。<br><br>
+                            <strong>2. 目的限定</strong><br>
+                            Sybil検出と恩恵配分のみ。他の目的に流用しない。<br><br>
+                            <strong>3. 対称性</strong><br>
+                            全員が同じルールで評価される。特権階級なし。<br><br>
+                            <strong>4. 透明性</strong><br>
+                            アルゴリズムを公開。ブラックボックス禁止。<br><br>
+                            <strong>5. 主権在民</strong><br>
+                            データはユーザーのデバイスに保存。中央サーバーに送信しない。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>監視カメラ（誰がどこにいたか記録、顔認証で個人特定）vs 体温計（熱があるか二値判定のみ、名前は記録しない）。Meguri が目指すのは後者。非人格化は「年齢確認（20歳以上かどうかだけ）」vs「顔認証（あなたは山田太郎）」の違い。前者は個人を特定しない。
+                        </div>
+                        <div class="message-timestamp">監視との境界 ─ 五条件</div>
+                    </div>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            <strong>活動制限者への配慮</strong>が必要：<br><br>
+                            距離軸は障がい者・高齢者・貧困層に不利。「移動できない = 悪い」という評価になってしまう。<br><br>
+                            解決策：<br>
+                            <ul>
+                                <li><strong>移動「量」→「一貫性」への再定義</strong><br>在宅ワーカーが毎日同じ場所 = 自然。毎日東京-大阪往復 = 不自然。</li>
+                                <li><strong>軸間代替性</strong><br>距離が低くてもエントロピー・時間が高ければOK。</li>
+                                <li><strong>絶対評価ではなく異常検出</strong><br>「低い = 悪い」ではなく「パターンが不自然 = 疑義あり」。</li>
+                            </ul>
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>車椅子の人と健常者で「移動の自然さ」の基準を変える。車椅子の人が毎日家の周り500m = 自然。健常者が毎日500mだけ = 少し不自然かも。でも車椅子の人が「取引相手が多様」（エントロピー高）なら全く問題なし（軸間代替性）。評価は「この人は怠け者」ではなく「このパターンは2つの別人が演じている可能性」（異常検出）。
+                        </div>
+                        <div class="message-timestamp">活動制限者への配慮</div>
+                    </div>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            <strong>二層設計</strong>を提案する：<br><br>
+                            <strong>第一層：異常検出（Sybil対策）</strong><br>
+                            二値出力：正常 / 疑義あり。閾値は厳しく設定。<br><br>
+                            <strong>第二層：恩恵配分基礎（促進的機能）</strong><br>
+                            連続スコア。ただし効果は薄く（減価の±5%程度）。<br><br>
+                            この分離により、Sybil検出（セキュリティ）と循環促進（インセンティブ）を独立に調整できる。<br><br>
+                            さらに<strong>スコアレス設計</strong>を提案：デフォルトでスコアは非表示。ユーザーが要求したときのみ開示。「体温は測るが、毎日数値を見ない」という生き方。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">🎯</span>
+                            <strong>たとえると：</strong>空港の荷物検査。第一層 = 金属探知機で異常検出（ピーッと鳴ったら疑義あり）。第二層 = 開封して中身確認（グラデーションで評価）。最初から全員の荷物を開けたら大混乱（一層だけだと厳しすぎ）。スコアレス設計は「健康診断の数値を見ないで生きる。医者が『問題ない』と言えばそれで十分」。毎日体重計に乗って一喜一憂しない生き方。
+                        </div>
+                        <div class="message-timestamp">二層設計 &amp; スコアレス設計</div>
+                    </div>
+                </div>
+
+                <!-- ===== 対立ポイント ===== -->
+                <div class="conflict-box" id="conflicts">
+                    <strong>対立・議論ポイント</strong>
+                    <ul>
+                        <li><strong>距離軸の要否</strong> ─ mathematician「不要（時間制約だけで自己弱体化成立、プライバシー矛盾）」vs architect「Phase 2.5で判断（技術的には可能）」vs philosopher「再定義すれば可（量→一貫性）、ただし活動制限者への配慮必須」。三者三様の立場。</li>
+                        <li><strong>三軸スコアの設計</strong> ─ mathematician「独立スコア廃止、既に統合済み」vs architect「段階的実装で効果を実測」vs philosopher「二層設計で異常検出と促進を分離」。実装パターンの違い。</li>
+                        <li><strong>スコアの可視化</strong> ─ philosopher が独自提案した「スコアレス設計（デフォルト非表示）」は、透明性（アルゴリズム公開）とのバランスをどう取るか。「アルゴリズムは公開、個人スコアは非表示」で整合するか要検討。</li>
+                    </ul>
+                </div>
+
+                <div class="highlight">
+                    <strong>次のステップ：</strong><br>
+                    Phase 0（シミュレーション）で三軸の効果を定量検証。特に距離軸の有無で Sybil 耐性がどれだけ変わるか数値化。architect の Phase 2.5 評価期間を設定し、実データで二軸の十分性を判断。philosopher の二層設計とスコアレス設計を技術仕様に落とし込み、プロトタイプで UX を検証。Concept.md は mathematician 提案の「三層構造」に更新。
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 右ペイン：用語集 ===== -->
+        <div class="right-pane">
+            <h3>Glossary</h3>
+            <div class="accordion" id="glossary">
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Sybil 攻撃
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>1人が複数の偽アカウント（巣）を作成し、別人のふりをして不当に利益を得る攻撃手法。Meguri では KYC に頼らず、行動パターンの構造的評価で対策する。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 三軸（距離・時間・エントロピー）で対策する構想が、実際には「三層構造」に統合されている。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Proof of Being（存在証明）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>「何をしたか」ではなく「どう存在しているか」を評価する Meguri 独自の概念。距離・時間・エントロピーの三軸で自然な存在のしかたを統計的に評価する。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> mathematician が「独立スコア不要」と指摘。三軸は既に減価・循環の質・VRF に統合されている。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        zk-SNARK
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>「Zero-Knowledge Succinct Non-Interactive Argument of Knowledge」の略。データを明かさずに条件を満たすことを数学的に証明する暗号技術。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> architect が距離軸の実装方法として言及。「位置情報は見せずに、移動の多様性を証明」が可能。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        巣間相関分析
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>複数の巣の行動パターン（特に取引時刻）の相関を統計的に検出する手法。高い相関 = 同一人物の可能性。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> mathematician が距離軸の代替案として提案。2つのTwitterアカウントが毎回同じ時間に投稿 → 同一人物疑惑。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        ネットワークトポロジー
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>ネットワークの構造（誰と誰が繋がっているか）。Meguri では取引関係のグラフ構造を解析し、閉じたグループを検出。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> mathematician が距離軸の代替案として提案。複数巣が同じ小グループ内でしか取引していない → Sybil疑惑。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        自己弱体化
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Sybil 攻撃（複数巣運用）が、攻撃者自身にダメージを与える構造。リソース（時間・注意・資本）の分割により、各巣のパフォーマンスが低下。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> mathematician が数学的に証明。k≥3 巣で U(k) < U(1)（3つ以上の巣を持つと損失）。時間制約だけで成立、距離情報不要。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        VRF（検証可能ランダム関数）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>暗号学的に安全な乱数生成関数。生成者が結果を操作できず、かつ第三者が正当性を検証可能。Mana の配分先決定に使用。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> エントロピー軸の一部として統合済み。均等確率（1/n）を暗号学的に保証。architect が zk-SNARK との相乗効果を指摘。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        非人格化
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>個人を特定せず、パターンのみを評価する設計。「誰が」ではなく「どんな行動パターンか」だけを見る。監視との境界を定める重要概念。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> philosopher が「監視との境界五条件」の第一項として提示。顔認証（個人特定）vs 年齢確認（20歳以上かどうかだけ）。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        異常検出（Anomaly Detection）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>統計的に正常な範囲から外れたパターンを検出する手法。「低い = 悪い」という絶対評価ではなく、「パターンが不自然」という相対評価。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> philosopher が二層設計の第一層として提案。金属探知機（ピーッと鳴ったら疑義あり）のような二値判定。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        スコアレス設計
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>philosopher が提案した、スコアをデフォルトで非表示にする UI 設計。「体温は測るが、毎日数値を見ない」という生き方。スコア最適化ゲームを防ぐ。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 透明性（アルゴリズム公開）と両立可能。「健康診断の数値を見ないで生きる。医者が『問題ない』と言えばそれで十分」。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Phase 2.5（評価期間）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>architect が新規追加した実装フェーズ。エントロピー+時間の二軸で運用し、実データで十分性を検証する期間（3-6ヶ月）。距離軸の可否を判断。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 試食会で「これで完成？ それとも味噌も必要？」と評価する段階。最初から全部入れると、どれが効いてるかわからない。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAccordion(header) {
+            const allHeaders = document.querySelectorAll('.accordion-header');
+            allHeaders.forEach(h => {
+                if (h !== header) {
+                    h.classList.remove('active');
+                    h.nextElementSibling.classList.remove('active');
+                }
+            });
+            header.classList.toggle('active');
+            header.nextElementSibling.classList.toggle('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstHeader = document.querySelector('.accordion-header');
+            if (firstHeader) {
+                firstHeader.classList.add('active');
+                firstHeader.nextElementSibling.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

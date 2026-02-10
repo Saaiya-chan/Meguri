@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meguri プロジェクト - 議論ログ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ===== ヘッダー ===== */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid #30363d;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #58a6ff;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #8b949e;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .project-description {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 30px;
+            background: #161b22;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            font-size: 14px;
+            line-height: 1.8;
+            color: #c9d1d9;
+        }
+
+        .project-description strong {
+            color: #58a6ff;
+        }
+
+        /* ===== カードグリッド ===== */
+        .discussion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .discussion-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .discussion-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #7ee787, #58a6ff);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .discussion-card:hover {
+            transform: translateY(-4px);
+            border-color: #58a6ff;
+            box-shadow: 0 8px 24px rgba(88, 166, 255, 0.15);
+        }
+
+        .discussion-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-number {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #0d1117;
+            border: 2px solid #30363d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #58a6ff;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e6edf3;
+            margin-bottom: 12px;
+            padding-right: 40px;
+            line-height: 1.4;
+        }
+
+        .card-description {
+            font-size: 13px;
+            color: #8b949e;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .card-members {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .member-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            font-size: 11px;
+            color: #c9d1d9;
+        }
+
+        .member-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .member-badge.math .dot { background: #7ee787; }
+        .member-badge.econ .dot { background: #d2a8ff; }
+        .member-badge.phil .dot { background: #ffa657; }
+        .member-badge.arch .dot { background: #d2a8ff; }
+
+        .card-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #1f6feb;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .card-button:hover {
+            background: #388bfd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(31, 111, 235, 0.4);
+        }
+
+        /* ===== フッター ===== */
+        footer {
+            text-align: center;
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        footer a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== レスポンシブ ===== */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 28px;
+            }
+
+            .subtitle {
+                font-size: 16px;
+            }
+
+            .discussion-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== アニメーション ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .discussion-card {
+            animation: fadeInUp 0.6s ease backwards;
+        }
+
+        .discussion-card:nth-child(1) { animation-delay: 0.1s; }
+        .discussion-card:nth-child(2) { animation-delay: 0.2s; }
+        .discussion-card:nth-child(3) { animation-delay: 0.3s; }
+        .discussion-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== ヘッダー ===== -->
+        <header>
+            <h1>🌀 Meguri プロジェクト 議論ログ</h1>
+            <p class="subtitle">循環を本質とした仮想通貨の設計思想を探る、理論的議論の記録</p>
+
+            <div class="project-description">
+                <p>
+                    <strong>Meguri（めぐり）</strong>は、所有ではなく循環を本質とした仮想通貨のコンセプトです。
+                    時間とともに自然に減衰し、良い循環を通じて社会全体に増加する。
+                    ウォレットは金庫ではなく「巣」、通貨は生き物のように流れていく——
+                    そんな「脱所有」の経済システムを、数学・ゲーム論・哲学の三視点から設計しています。
+                </p>
+            </div>
+        </header>
+
+        <!-- ===== 議論カード ===== -->
+        <div class="discussion-grid">
+
+            <!-- カード1: 減価メカニズム -->
+            <div class="discussion-card">
+                <div class="card-number">01</div>
+                <h3 class="card-title">巣の減価メカニズムの矛盾を解消する</h3>
+                <p class="card-description">
+                    「大口保有者ほど速く減る」と「動かさない時間が長いほど減価が強くなる」の2つの記述の関係を整理。統合数式モデル、Sybil回避リスク、世界観的解釈を議論。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge math">
+                        <span class="dot"></span>
+                        mathematician
+                    </span>
+                    <span class="member-badge econ">
+                        <span class="dot"></span>
+                        game-economist
+                    </span>
+                    <span class="member-badge phil">
+                        <span class="dot"></span>
+                        philosopher
+                    </span>
+                </div>
+                <a href="discussion_decay.html" class="card-button">議論を読む →</a>
+            </div>
+
+            <!-- カード2: 良い循環 -->
+            <div class="discussion-card">
+                <div class="card-number">02</div>
+                <h3 class="card-title">「良い循環」の定義を明確化する</h3>
+                <p class="card-description">
+                    Meguri における「良い循環」とは何か？ 乗算モデル（4軸AND条件）と加算モデル（重み付き）の対立、Mana蓄積への接続、グッドハートの法則を議論。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge math">
+                        <span class="dot"></span>
+                        mathematician
+                    </span>
+                    <span class="member-badge econ">
+                        <span class="dot"></span>
+                        game-economist
+                    </span>
+                    <span class="member-badge phil">
+                        <span class="dot"></span>
+                        philosopher
+                    </span>
+                </div>
+                <a href="discussion_circulation.html" class="card-button">議論を読む →</a>
+            </div>
+
+            <!-- カード3: Mana確率モデル -->
+            <div class="discussion-card">
+                <div class="card-number">03</div>
+                <h3 class="card-title">Mana増加メカニズムの確率モデルを設計する</h3>
+                <p class="card-description">
+                    「ふっと増える」生命的な増加を確率モデルで実現。ポアソン過程、ハイブリッド型（確定75% + Bloom25%）、確率性の五つの哲学的根拠を議論。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge math">
+                        <span class="dot"></span>
+                        mathematician
+                    </span>
+                    <span class="member-badge econ">
+                        <span class="dot"></span>
+                        game-economist
+                    </span>
+                    <span class="member-badge phil">
+                        <span class="dot"></span>
+                        philosopher
+                    </span>
+                </div>
+                <a href="discussion_mana_probability.html" class="card-button">議論を読む →</a>
+            </div>
+
+            <!-- カード4: 3軸Sybil対策 -->
+            <div class="discussion-card">
+                <div class="card-number">04</div>
+                <h3 class="card-title">3軸Sybil対策の数学的妥当性を検証する</h3>
+                <p class="card-description">
+                    「距離・時間・エントロピー」三軸の統合状況を検証。数学的には既に統合済み、実装面では段階的判断、哲学面では監視との境界と二層設計を議論。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge math">
+                        <span class="dot"></span>
+                        mathematician
+                    </span>
+                    <span class="member-badge arch">
+                        <span class="dot"></span>
+                        architect
+                    </span>
+                    <span class="member-badge phil">
+                        <span class="dot"></span>
+                        philosopher
+                    </span>
+                </div>
+                <a href="discussion_three_axes.html" class="card-button">議論を読む →</a>
+            </div>
+
+        </div>
+
+        <!-- ===== フッター ===== -->
+        <footer>
+            <p>🌀 Meguri Project — 循環する通貨、生き物のような経済</p>
+            <p style="margin-top: 8px;">
+                Generated by <a href="https://claude.ai" target="_blank">Claude Code</a> |
+                議事録係: minutes-secretary
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
