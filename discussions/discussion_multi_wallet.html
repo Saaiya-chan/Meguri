@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meguri - 正当な複数ウォレット保有への対応を設計する</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr 300px;
+            gap: 20px;
+            min-height: calc(100vh - 40px);
+        }
+
+        /* ===== 左ペイン：参加者 & ナビ ===== */
+        .left-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .left-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .participant {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #0d1117;
+            border-radius: 8px;
+            border-left: 4px solid #30363d;
+        }
+
+        .participant.math { border-left-color: #7ee787; }
+        .participant.econ { border-left-color: #d2a8ff; }
+        .participant.phil { border-left-color: #ffa657; }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .participant.math .avatar { background: #7ee787; }
+        .participant.econ .avatar { background: #d2a8ff; }
+        .participant.phil .avatar { background: #ffa657; }
+
+        .participant-info h4 {
+            font-size: 13px;
+            color: #c9d1d9;
+            margin-bottom: 2px;
+        }
+
+        .participant-info p {
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .nav-section {
+            margin-top: 24px;
+        }
+
+        .nav-section h3 {
+            margin-bottom: 12px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: #0d1117;
+            border-radius: 6px;
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #58a6ff;
+            background: #1c2128;
+            border-left-color: #58a6ff;
+        }
+
+        .nav-link .nav-num {
+            color: #484f58;
+            margin-right: 6px;
+            font-weight: 600;
+        }
+
+        /* ===== 中央ペイン：議論 ===== */
+        .center-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #30363d;
+            overflow-y: auto;
+        }
+
+        .center-pane h1 {
+            color: #58a6ff;
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+
+        .center-pane > .subtitle {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .topic-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-left: 4px solid #58a6ff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+
+        .topic-box h3 {
+            color: #58a6ff;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .topic-box p, .topic-box li {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #8b949e;
+        }
+
+        .topic-box ol {
+            padding-left: 20px;
+            margin-top: 6px;
+        }
+
+        .topic-box code {
+            background: #1c2128;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ffa657;
+        }
+
+        .discussion-thread {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .phase-divider {
+            text-align: center;
+            margin: 28px 0 20px;
+            padding: 14px 0;
+            border-top: 1px dashed #30363d;
+            border-bottom: 1px dashed #30363d;
+        }
+
+        .phase-divider h3 {
+            color: #58a6ff;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- 吹き出し --- */
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .message.math .message-avatar { background: #7ee787; }
+        .message.econ .message-avatar { background: #d2a8ff; }
+        .message.phil .message-avatar { background: #ffa657; }
+
+        .message-content {
+            max-width: 88%;
+        }
+
+        .speaker-name {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            padding-left: 4px;
+        }
+
+        .message.math .speaker-name { color: #7ee787; }
+        .message.econ .speaker-name { color: #d2a8ff; }
+        .message.phil .speaker-name { color: #ffa657; }
+
+        .speech-bubble {
+            background: #1c2128;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            font-size: 13.5px;
+            line-height: 1.7;
+            color: #c9d1d9;
+        }
+
+        .message.math .speech-bubble { border-left: 3px solid #7ee787; }
+        .message.econ .speech-bubble { border-left: 3px solid #d2a8ff; }
+        .message.phil .speech-bubble { border-left: 3px solid #ffa657; }
+
+        .speech-bubble strong {
+            color: #e6edf3;
+        }
+
+        .speech-bubble code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ffa657;
+        }
+
+        .speech-bubble ul, .speech-bubble ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .speech-bubble li {
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .message-timestamp {
+            font-size: 11px;
+            color: #484f58;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
+        /* --- たとえ話ボックス --- */
+        .analogy {
+            margin: 8px 0 0;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(227, 179, 65, 0.06);
+            border-left: 3px solid #e3b341;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #8b949e;
+        }
+
+        .analogy .analogy-icon {
+            margin-right: 6px;
+        }
+
+        .analogy strong {
+            color: #e3b341;
+        }
+
+        /* --- ハイライトボックス --- */
+        .highlight {
+            background: #1c1d00;
+            border: 1px solid #4d4100;
+            border-left: 4px solid #e3b341;
+            padding: 14px 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #c9d1d9;
+        }
+
+        .highlight strong {
+            color: #e3b341;
+        }
+
+        .conflict-box {
+            background: #1a0000;
+            border: 1px solid #4d0000;
+            border-left: 4px solid #f85149;
+            padding: 14px 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .conflict-box strong {
+            color: #f85149;
+        }
+
+        .conflict-box ul {
+            padding-left: 20px;
+            margin-top: 8px;
+        }
+
+        .conflict-box li {
+            margin-bottom: 6px;
+            color: #c9d1d9;
+        }
+
+        /* ===== 右ペイン：用語集 ===== */
+        .right-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .right-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .accordion-item {
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: #0d1117;
+            padding: 11px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 12.5px;
+            user-select: none;
+            transition: background 0.2s;
+            color: #c9d1d9;
+        }
+
+        .accordion-header:hover {
+            background: #1c2128;
+        }
+
+        .accordion-header.active {
+            background: #1f6feb;
+            color: #fff;
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+            font-size: 10px;
+        }
+
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 12px 14px;
+            background: #0d1117;
+            font-size: 12px;
+            line-height: 1.7;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+        }
+
+        .accordion-content.active {
+            display: block;
+        }
+
+        .term-example {
+            background: #161b22;
+            padding: 8px 10px;
+            border-left: 2px solid #58a6ff;
+            margin-top: 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .term-example strong {
+            color: #58a6ff;
+        }
+
+        /* スクロールバー */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #58a6ff;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .left-pane {
+                grid-column: 1;
+            }
+            .center-pane {
+                grid-column: 2;
+            }
+            .right-pane {
+                grid-column: 1 / -1;
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .left-pane,
+            .right-pane {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ===== 左ペイン ===== -->
+        <div class="left-pane">
+            <h3>Participants</h3>
+
+            <div class="participant phil">
+                <div class="avatar">P</div>
+                <div class="participant-info">
+                    <h4>philosopher</h4>
+                    <p>世界観設計</p>
+                </div>
+            </div>
+
+            <div class="participant math">
+                <div class="avatar">M</div>
+                <div class="participant-info">
+                    <h4>mathematician</h4>
+                    <p>数式モデル設計</p>
+                </div>
+            </div>
+
+            <div class="participant econ">
+                <div class="avatar">G</div>
+                <div class="participant-info">
+                    <h4>game-economist</h4>
+                    <p>ゲーム論・経済分析</p>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <a href="#topic" class="nav-link"><span class="nav-num">00</span>議題</a>
+                <a href="#phase1" class="nav-link"><span class="nav-num">01</span>世界観からの問い直し</a>
+                <a href="#phase2" class="nav-link"><span class="nav-num">02</span>グループ評価の数式</a>
+                <a href="#phase3" class="nav-link"><span class="nav-num">03</span>ゲーム論的破綻</a>
+                <a href="#phase4" class="nav-link"><span class="nav-num">04</span>結論の収束</a>
+                <a href="#conflicts" class="nav-link"><span class="nav-num">05</span>対立と合意</a>
+            </div>
+
+            <div class="nav-section" style="margin-top: 24px;">
+                <h3>Summary</h3>
+                <p style="font-size: 12px; color: #8b949e; line-height: 1.7;">
+                    複数ウォレット保有を「許可する設計」と「常に不利にする設計」の二案を検討。哲学的には自然淘汰、数学的にはグループ評価、ゲーム論的には全面不利が望ましいと結論。
+                </p>
+            </div>
+        </div>
+
+        <!-- ===== 中央ペイン ===== -->
+        <div class="center-pane">
+            <h1>正当な複数ウォレット保有への対応を設計する</h1>
+            <p class="subtitle">Meguri Project &mdash; Multi-Wallet Policy Discussion</p>
+
+            <!-- 議題ボックス -->
+            <div class="topic-box" id="topic">
+                <h3>議題</h3>
+                <p>1人のユーザーが複数の巣（ウォレット）を持つケースにどう対応するか。「正当な複数保有」は存在するのか、もし存在するなら評価モデルにどう組み込むか。</p>
+                <ol>
+                    <li>複数保有の正当性を哲学的に検討する</li>
+                    <li>宣言あり/なしの評価モデルを数式化する</li>
+                    <li>ゲーム論的に各設計の攻撃耐性を検証する</li>
+                </ol>
+            </div>
+
+            <div class="discussion-thread">
+
+                <!-- ===== フェーズ1: 世界観からの問い直し ===== -->
+                <div class="phase-divider" id="phase1">
+                    <h3>Phase 1: 世界観からの問い直し</h3>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            まず問い方を変えたい。<br><br>
+                            「複数の巣は正当か、攻撃か」── この二項対立自体が Meguri らしくない。問うべきは<strong>「その複数の巣は生態的に持続可能か」</strong>だ。<br><br>
+                            自然界を見てほしい。渡り鳥は夏の巣と冬の巣を持つ。それは「攻撃」じゃなく、生態的に自然な行動。でも1匹のヤドカリが100個の殻を占有していたら？ それは不自然で、他の生き物の生存を圧迫している。<br><br>
+                            つまり判断基準は「数」ではなく<strong>「生態的な合理性」</strong>。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">💡</span>
+                            <strong>たとえ話：</strong>東京と京都に家を持つ人を想像しよう。仕事で東京、週末は京都のアトリエで創作活動── これは「二拠点生活」であって不正じゃない。でも誰も住んでいないマンションを100戸買い占めている人は？ 同じ「複数の家を持つ」でも、生態が全然違う。前者は2つの場所で「生きている」。後者はただ「所有している」。
+                        </div>
+                        <div class="message-timestamp">二項対立から生態的持続可能性へ</div>
+                    </div>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            そして Meguri の三軸評価（距離・時間・エントロピー）は、まさにこの「生態的持続可能性」を測っている。<br><br>
+                            複数の巣を持つこと自体は禁止する必要がない。<strong>三軸評価が「自然法則」として機能</strong>し、不自然な存在は勝手に育たないからだ。<br><br>
+                            維持できる巣は生きる。維持できない巣は衰退する。これは<strong>「裁判ではなく自然淘汰」</strong>。<br><br>
+                            さらに提案したいのが<strong>「巣のクラスタリング」</strong>という考え方。似た行動パターンを持つ複数の巣は、同じ「群れ」として自動検出される。意図的に分散させているなら統計的に見抜ける。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">💡</span>
+                            <strong>たとえ話：</strong>森の生態系。枯れた木に「お前は違法だ！」と裁判する森はない。日光が届かない場所の木は自然に衰退し、日当たりのいい場所で新しい木が育つ。── 森は「法律」ではなく「自然法則」でバランスを保っている。Meguri の三軸評価もそういう存在であるべき。
+                        </div>
+                        <div class="message-timestamp">自然淘汰 &amp; 巣のクラスタリング提案</div>
+                    </div>
+                </div>
+
+                <!-- ===== フェーズ2: グループ評価の数式 ===== -->
+                <div class="phase-divider" id="phase2">
+                    <h3>Phase 2: グループ評価の数式モデル</h3>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            哲学的フレームは理解した。それを数式に落とし込む。<br><br>
+                            <strong>ケース1: 宣言ありグループ評価</strong><br>
+                            ユーザーが「この巣は同じ人間のものです」と自己申告する場合の評価式：<br><br>
+                            <code>S_group = max(S(n<sub>i</sub>)) &times; k<sup>(&minus;&delta;)</sup> + &epsilon;</code><br><br>
+                            ここで：<br>
+                            <ul>
+                                <li><code>max(S(n<sub>i</sub>))</code> = グループ内で最もスコアの高い巣の評価</li>
+                                <li><code>k</code> = 巣の数</li>
+                                <li><code>&delta;</code> = 減衰パラメータ（推奨値 0.3）</li>
+                                <li><code>&epsilon;</code> = 最低保証項（完全にゼロにはしない）</li>
+                            </ul>
+                            <br>
+                            &delta; = 0.3 の場合の具体例：<br>
+                            <ul>
+                                <li><strong>1巣</strong>：100%（そのまま）</li>
+                                <li><strong>2巣</strong>：81%（k<sup>-0.3</sup> = 0.812）</li>
+                                <li><strong>3巣</strong>：72%（k<sup>-0.3</sup> = 0.720）</li>
+                                <li><strong>5巣</strong>：62%（k<sup>-0.3</sup> = 0.617）</li>
+                            </ul>
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">💡</span>
+                            <strong>たとえ話：</strong>飲食店の支店展開で考えてみよう。1店舗なら店長が毎日いて、味も接客もベスト（100%）。2店舗に増やすと、店長は行ったり来たりで各店のクオリティが少し下がる（81%）。5店舗になると、さらに目が届かなくなる（62%）。── 店舗は増やせるけど、品質は必ず下がる。「増やすほど不利」の構造。
+                        </div>
+                        <div class="message-timestamp">宣言ありグループ評価式</div>
+                    </div>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            <strong>ケース2: 宣言なし（未申告）の場合</strong><br><br>
+                            宣言なしで複数巣を運用し、後から同一人物と判明した場合は、宣言ありより厳しい評価になるべき。<br><br>
+                            具体的には、&delta; を大きくする（例：0.3 → 0.6）か、追加のペナルティ係数を掛ける。<br><br>
+                            さらに重要なポイントが2つある：<br><br>
+                            <strong>1. 巣間の移動は距離スコアにカウントしない</strong><br>
+                            A巣 → B巣 → A巣 のような巣間シャトル移動は、距離軸の評価から中立化する。これで「自分の巣の間を往復して距離スコアを稼ぐ」というハックを防ぐ。<br><br>
+                            <strong>2. 必ず「巣が少ないほど有利」の単調性を保つ</strong><br>
+                            どんなパラメータ設定でも <code>S(k) > S(k+1)</code> が成り立つことを数学的に保証する。これが崩れると複数保有のインセンティブが生まれてしまう。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">💡</span>
+                            <strong>たとえ話：</strong>会社の経費精算。出張を事前申告すれば通常の精算（宣言あり）。無断出張が後からバレたら、より厳しい監査と減額（宣言なし）。── そして「東京オフィスと大阪オフィスを往復しただけ」は出張距離としてカウントしない。当たり前の話だけど、数式にも同じルールが必要。
+                        </div>
+                        <div class="message-timestamp">宣言なしの場合 &amp; 不正利用防止</div>
+                    </div>
+                </div>
+
+                <!-- ===== フェーズ3: ゲーム論的破綻 ===== -->
+                <div class="phase-divider" id="phase3">
+                    <h3>Phase 3: ゲーム論的破綻の指摘</h3>
+                </div>
+
+                <div class="message econ">
+                    <div class="message-avatar">G</div>
+                    <div class="message-content">
+                        <div class="speaker-name">game-economist</div>
+                        <div class="speech-bubble">
+                            すまない、数式は美しいけど、この設計には<strong>致命的なゲーム論的欠陥</strong>がある。<br><br>
+                            「正当な複数保有」を許容する設計は、<strong>逆選択（Adverse Selection）</strong>を引き起こす。<br><br>
+                            <ul>
+                                <li><strong>正直なユーザー</strong>は複数巣を宣言し、ペナルティ（81%スコア）を受け入れる</li>
+                                <li><strong>不正なユーザー</strong>は宣言せず、各巣で100%スコアを維持しようとする</li>
+                            </ul>
+                            <br>
+                            結果、<strong>宣言するインセンティブがない</strong>。「嘘をつく（宣言しない）」が支配戦略になる。正直者だけが損をする世界。<br><br>
+                            これは保険市場のレモン問題と同じ構造。健康な人ほど保険に入らず、病気がちな人だけが加入し、保険料が上がり、さらに健康な人が離脱する── 悪循環。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">💡</span>
+                            <strong>たとえ話：</strong>駐車場の例えが分かりやすい。「2台目以降は駐車料金20%割引します。ただし自己申告制です」。── 正直に申告する人は割引を受けるけど台数が記録される。申告しない人は割引なしだけど「1台しか持ってない」顔ができる。もし台数が多いほど将来の不利（税金増加など）があるなら、誰も申告しない。<strong>正直者だけが損をする制度設計</strong>。
+                        </div>
+                        <div class="message-timestamp">逆選択（Adverse Selection）の発生</div>
+                    </div>
+                </div>
+
+                <div class="message econ">
+                    <div class="message-avatar">G</div>
+                    <div class="message-content">
+                        <div class="speaker-name">game-economist</div>
+                        <div class="speech-bubble">
+                            もう一つの問題がある。<strong>宣言制は「嘘をつくのが支配戦略」になる</strong>。<br><br>
+                            複数巣の宣言/未宣言をゲームの利得表で分析すると：<br><br>
+                            <ul>
+                                <li><strong>宣言する</strong> → スコア81%（正直者ペナルティ）</li>
+                                <li><strong>宣言しない＋バレない</strong> → スコア100%（丸儲け）</li>
+                                <li><strong>宣言しない＋バレる</strong> → スコア40%程度（厳しいペナルティ）</li>
+                            </ul>
+                            <br>
+                            バレる確率が十分に高ければ宣言が合理的になるけど、<strong>クラスタリング精度が100%でない限り</strong>、期待値的に「宣言しない」が有利になる確率が高い。<br><br>
+                            しかも検出精度を上げるほどシステムが複雑になり、プライバシーリスクも増大する。これは設計として望ましくない。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">💡</span>
+                            <strong>たとえ話：</strong>学校の試験で「カンニングしたら自己申告してください。申告すれば10点減点、バレたら50点減点」。── ほとんどの人は「バレなきゃいいや」と思う。監視カメラを大量に設置すれば抑止できるけど、それは学校を「刑務所」にすることを意味する。そもそも「カンニングが構造的に不可能」な試験の方がずっといい。
+                        </div>
+                        <div class="message-timestamp">宣言制の致命的問題</div>
+                    </div>
+                </div>
+
+                <div class="message econ">
+                    <div class="message-avatar">G</div>
+                    <div class="message-content">
+                        <div class="speaker-name">game-economist</div>
+                        <div class="speech-bubble">
+                            したがって、ゲーム理論的に最も堅牢な設計は：<br><br>
+                            <strong>「複数保有は常に不利」── 例外なく。</strong><br><br>
+                            理由を整理する：<br>
+                            <ul>
+                                <li><strong>シンプルさ</strong>：「正当な複数保有」の判定が不要。判定基準の設計・運用・争いがすべてなくなる</li>
+                                <li><strong>耐攻撃性</strong>：「正当です」と主張する逃げ道がない。全員に同じルール</li>
+                                <li><strong>インセンティブ整合</strong>：「1巣に集中する」が支配戦略になる</li>
+                                <li><strong>Meguri の思想との整合</strong>：「所有を増やす」こと自体が不利な世界</li>
+                            </ul>
+                            <br>
+                            ただし、<strong>引っ越しや端末移行</strong>のようなケースへの対応は必要。これは Decay（減価）による自然消滅で対処できる。古い巣は使わなくなれば自然に衰退し、新しい巣に「生態」が移行する。特別なルールは不要。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">💡</span>
+                            <strong>たとえ話：</strong>携帯電話の番号ポータビリティ。「古い番号の携帯」と「新しい番号の携帯」を同時に持つ期間は自然にある。でも古い方は徐々に使わなくなり、着信も減り、最終的に解約される。これを「移行のための複数保有ルール」で管理するより、「使われない携帯は自然に休眠する」方がシンプル。引っ越しは禁止ではなく、古い家は自然に空き家になるだけ。
+                        </div>
+                        <div class="message-timestamp">結論：「複数保有は常に不利」が最適設計</div>
+                    </div>
+                </div>
+
+                <!-- ===== フェーズ4: 結論の収束 ===== -->
+                <div class="phase-divider" id="phase4">
+                    <h3>Phase 4: 結論の収束</h3>
+                </div>
+
+                <div class="message phil">
+                    <div class="message-avatar">P</div>
+                    <div class="message-content">
+                        <div class="speaker-name">philosopher</div>
+                        <div class="speech-bubble">
+                            game-economist の分析には一理ある。<br><br>
+                            ただ強調したいのは、「常に不利」は<strong>「禁止」とは違う</strong>ということ。<br><br>
+                            Meguri の世界で複数の巣を持つことは「違法」ではない。ただ、自然法則として「1つの存在は1つの巣で最も輝く」。それは渡り鳥が2つの巣を持てても、<strong>同時に2箇所で眠れない</strong>のと同じ自然の摂理。<br><br>
+                            「禁止する」のではなく「自然に不利になる」── この区別は Meguri の世界観にとって非常に重要。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">💡</span>
+                            <strong>たとえ話：</strong>太陽は「夜を禁止」しているわけじゃない。ただ、太陽が沈めば暗くなる── それは自然法則。Meguri も「複数の巣を禁止」するのではなく、「1つの巣でないと光が当たりにくい」という自然法則を設計する。禁止と自然法則では、同じ結果でも世界観がまるで違う。
+                        </div>
+                        <div class="message-timestamp">「禁止」と「自然に不利」の区別</div>
+                    </div>
+                </div>
+
+                <div class="message math">
+                    <div class="message-avatar">M</div>
+                    <div class="message-content">
+                        <div class="speaker-name">mathematician</div>
+                        <div class="speech-bubble">
+                            両者の議論を踏まえ、数式モデルを修正する。<br><br>
+                            「宣言ありグループ評価」は取り下げ、代わりに<strong>三軸評価の自然な性質として「複数巣が不利になる」ことを数学的に保証する</strong>設計にする。<br><br>
+                            具体的には：<br>
+                            <ul>
+                                <li><strong>距離軸</strong>：同一人物の複数巣は物理的に同じ場所にある（＝距離パターンが重複）→ 多様性が低下</li>
+                                <li><strong>時間軸</strong>：1人が24時間を複数巣に分配 → 各巣の活動密度が低下 → freshness が下がる</li>
+                                <li><strong>エントロピー軸</strong>：同一人物の行動パターンは巣をまたいで類似する → クロスエントロピーが低い</li>
+                            </ul>
+                            <br>
+                            つまり<strong>三軸評価が正しく機能すれば、追加のペナルティ項なしで複数巣が自動的に不利になる</strong>。宣言制は不要。
+                        </div>
+                        <div class="analogy">
+                            <span class="analogy-icon">💡</span>
+                            <strong>たとえ話：</strong>体育のテストをもう一度使おう。双子が二人分のテストを一人で受けようとしたら？ 腕立てを一人分やってから、もう一人分やる── でも体力は一人分しかない。2回目は確実に成績が下がる。しかも「筋肉の動き方」が同じだから、採点者が見たら「これ同じ人じゃない？」と気づく。<strong>ペナルティを設定しなくても、物理的に不利</strong>。
+                        </div>
+                        <div class="message-timestamp">数式モデルの修正方針</div>
+                    </div>
+                </div>
+
+                <!-- ===== 対立と合意 ===== -->
+                <div class="highlight" id="conflicts">
+                    <strong>3者の合意ポイント：</strong><br><br>
+                    <ul style="padding-left: 20px; margin-top: 8px;">
+                        <li><strong>複数保有は「常に不利」</strong>── 例外的な「正当なケース」を設けない</li>
+                        <li><strong>「禁止」ではなく「自然に不利」</strong>── 世界観として重要な区別</li>
+                        <li><strong>宣言制は採用しない</strong>── 逆選択の問題が致命的</li>
+                        <li><strong>三軸評価の自然な性質で対処</strong>── 追加のペナルティ項は不要</li>
+                        <li><strong>引っ越し・移行は Decay で対処</strong>── 古い巣は自然に衰退する</li>
+                    </ul>
+                </div>
+
+                <div class="conflict-box">
+                    <strong>残課題・議論ポイント</strong>
+                    <ul>
+                        <li><strong>三軸の複数巣検出能力</strong> ─ 現行の三軸評価が「同一人物の複数巣」を十分に不利にできるか、シミュレーションでの定量検証が必要。特に巧妙な分離（別の場所で別の時間帯に運用）への耐性。</li>
+                        <li><strong>クラスタリングの扱い</strong> ─ philosopher 提案の「巣のクラスタリング」をスコア計算に組み込むか、監視用の参考指標にとどめるか。</li>
+                        <li><strong>移行期間の設計</strong> ─ Decay による自然消滅が「引っ越しの移行期間」として十分スムーズか。ユーザー体験の観点から検証が必要。</li>
+                        <li><strong>δ パラメータの存続</strong> ─ 宣言制を廃止しても、同一人物と検出された場合に <code>k<sup>(&minus;&delta;)</sup></code> を適用するオプションは残すべきか。</li>
+                    </ul>
+                </div>
+
+                <div class="highlight">
+                    <strong>次のステップ：</strong><br>
+                    三軸評価の「複数巣自動検出能力」をシミュレーションで検証する。特に (1) 同一場所・同一時間帯での複数巣運用、(2) 意図的に分離した巣の運用、(3) 引っ越し移行時の UX の3シナリオについて定量データを取得し、追加パラメータの要否を判断する。
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 右ペイン：用語集 ===== -->
+        <div class="right-pane">
+            <h3>Glossary</h3>
+            <div class="accordion" id="glossary">
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        巣（ウォレット）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Meguri における活動の拠点。財布や口座ではなく、Meguri が一時的に立ち寄る「休憩所」。1人1巣が最も効率的に機能する設計。</p>
+                        <div class="term-example">
+                            <strong>今回の結論：</strong> 複数巣は「禁止」ではなく「自然に不利」。三軸評価が自然法則として機能する。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Sybil 攻撃
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>1人が複数の偽アカウント（巣）を作成し、別人のふりをして不当に利益を得る攻撃手法。複数巣の議論はSybil対策と密接に関連する。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 「正当な複数保有」を認めるとSybil攻撃者の隠れ蓑になるため、全面的に不利とする設計が最適。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        逆選択（Adverse Selection）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>情報の非対称性により、望ましくない相手だけが取引に参加する現象。保険市場では「病気がちな人だけが加入→保険料上昇→健康な人が離脱」の悪循環で知られる。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 宣言制を導入すると、正直者だけが宣言してペナルティを受け、不正者は宣言しない── 逆選択の典型パターン。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        支配戦略
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>ゲーム論の用語。他のプレイヤーの行動に関係なく、常に最適となる戦略。制度設計では「望ましい行動が支配戦略になる」ことが理想。</p>
+                        <div class="term-example">
+                            <strong>今回の議論：</strong> 宣言制では「嘘をつく」が支配戦略。「常に不利」設計では「1巣に集中する」が支配戦略。後者が望ましい。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        グループ評価式
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>mathematician が提案した複数巣の評価式。<code>S_group = max(S(n<sub>i</sub>)) &times; k<sup>(&minus;&delta;)</sup> + &epsilon;</code>。巣の数 k が増えるほどスコアが減衰する構造。</p>
+                        <div class="term-example">
+                            <strong>結果：</strong> 宣言制の逆選択問題により採用見送り。三軸評価の自然な性質で代替する方針に。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        三軸評価
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Proof of Being の核心。距離（D）・時間（T）・エントロピー（E）の3軸で巣の「生態」を評価する。複数巣は三軸すべてで自然にスコアが低下する。</p>
+                        <div class="term-example">
+                            <strong>複数巣への効果：</strong> D: 移動パターン重複、T: 活動密度低下、E: 行動パターン類似 → 追加ペナルティなしで不利に。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Decay（減価）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>時間の経過とともに Meguri が自然に減少する仕組み。使われない巣の Meguri は徐々に「蒸発」する。移行・引っ越し時には旧巣の Decay が自然な解決策となる。</p>
+                        <div class="term-example">
+                            <strong>今回の役割：</strong> 引っ越し時に特別なルールは不要。古い巣は使わなくなれば自然に衰退する。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        巣のクラスタリング
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>philosopher が提案した概念。似た行動パターン（距離・時間・エントロピー）を持つ複数の巣を統計的に「同じ群れ」として自動検出する手法。</p>
+                        <div class="term-example">
+                            <strong>未決定：</strong> スコア計算に直接組み込むか、監視用参考指標にとどめるかは今後の検討課題。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Proof of Being（PoB）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>「何をしたか」ではなく「どう存在しているか」を評価する Meguri 独自のコンセンサスメカニズム。複数巣問題に対しても、追加ルールではなく PoB の自然な評価構造で対処する。</p>
+                        <div class="term-example">
+                            <strong>関連議論：</strong> <a href="discussion_proof_of_being.html" style="color: #58a6ff;">Proof of Being の定義を明確化する</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        エントロピー
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>情報理論における「予測困難性」の指標。同一人物が複数巣を運用すると、巣をまたいだ行動パターンが類似し、クロスエントロピーが低下する。</p>
+                        <div class="term-example">
+                            <strong>複数巣での問題：</strong> 同一人物の「癖」は隠せない。タイピングの速度、活動時間帯、取引パターンの偏り── すべてが巣をまたいで一致する。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAccordion(header) {
+            const allHeaders = document.querySelectorAll('.accordion-header');
+            allHeaders.forEach(h => {
+                if (h !== header) {
+                    h.classList.remove('active');
+                    h.nextElementSibling.classList.remove('active');
+                }
+            });
+            header.classList.toggle('active');
+            header.nextElementSibling.classList.toggle('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstHeader = document.querySelector('.accordion-header');
+            if (firstHeader) {
+                firstHeader.classList.add('active');
+                firstHeader.nextElementSibling.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
