@@ -244,6 +244,56 @@
         .discussion-card:nth-child(4) { animation-delay: 0.4s; }
         .discussion-card:nth-child(5) { animation-delay: 0.5s; }
         .discussion-card:nth-child(6) { animation-delay: 0.6s; }
+
+        /* ===== Phase セクション ===== */
+        .phase-section {
+            margin-top: 60px;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .phase-header h2 {
+            font-size: 24px;
+            color: #e6edf3;
+            font-weight: 700;
+        }
+
+        .phase-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .phase-badge.p1 {
+            background: rgba(88,166,255,0.15);
+            color: #58a6ff;
+            border: 1px solid rgba(88,166,255,0.3);
+        }
+
+        .phase-badge.p2 {
+            background: rgba(126,231,135,0.15);
+            color: #7ee787;
+            border: 1px solid rgba(126,231,135,0.3);
+        }
+
+        .phase-description {
+            font-size: 14px;
+            color: #8b949e;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .discussion-card.debate::before {
+            background: linear-gradient(90deg, #f85149, #ffa657, #7ee787);
+        }
     </style>
 </head>
 <body>
@@ -263,7 +313,15 @@
             </div>
         </header>
 
-        <!-- ===== 議論カード ===== -->
+        <!-- ===== Phase 1: 見解集 ===== -->
+        <div class="phase-section">
+            <div class="phase-header">
+                <h2>Phase 1</h2>
+                <span class="phase-badge p1">見解集</span>
+            </div>
+            <p class="phase-description">各メンバーが専門視点から見解を発表。論点の整理と対立ポイントの洗い出し。</p>
+        </div>
+
         <div class="discussion-grid">
 
             <!-- カード1: 減価メカニズム -->
@@ -408,6 +466,109 @@
                     </span>
                 </div>
                 <a href="discussion_multi_wallet.html" class="card-button">議論を読む →</a>
+            </div>
+
+        </div>
+
+        <!-- ===== Phase 2: 本格討論 ===== -->
+        <div class="phase-section">
+            <div class="phase-header">
+                <h2>Phase 2</h2>
+                <span class="phase-badge p2">本格討論</span>
+            </div>
+            <p class="phase-description">Phase 1 の対立ポイントを掘り下げ、三者が本気でぶつかり合う掛け合い形式の討論。合意と残課題を導出。</p>
+        </div>
+
+        <div class="discussion-grid">
+
+            <!-- 討論1: 減価メカニズム -->
+            <div class="discussion-card debate">
+                <div class="card-number">01</div>
+                <h3 class="card-title">減価メカニズムの Sybil 回避問題を解決する</h3>
+                <p class="card-description">
+                    加算モデルの Sybil 分割問題、部分リセット案の依存逆転、vitality_score の報酬構造を三者で攻防。「加速のみ・軽減なし」原則で突破口を開く。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge math"><span class="dot"></span>mathematician</span>
+                    <span class="member-badge econ"><span class="dot"></span>game-economist</span>
+                    <span class="member-badge phil"><span class="dot"></span>philosopher</span>
+                </div>
+                <a href="debate_decay.html" class="card-button">討論を読む →</a>
+            </div>
+
+            <!-- 討論2: 良い循環 -->
+            <div class="discussion-card debate">
+                <div class="card-number">02</div>
+                <h3 class="card-title">「良い循環」の定義と乗算 vs 加算の決着</h3>
+                <p class="card-description">
+                    乗算 AND 条件 vs 加算 OR 条件、グッドハートの法則、ブラックボックス化の是非。「体温計（加算）vs 異常センサー（乗算）」の使い分けで収束。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge math"><span class="dot"></span>mathematician</span>
+                    <span class="member-badge econ"><span class="dot"></span>game-economist</span>
+                    <span class="member-badge phil"><span class="dot"></span>philosopher</span>
+                </div>
+                <a href="debate_circulation.html" class="card-button">討論を読む →</a>
+            </div>
+
+            <!-- 討論3: Mana確率モデル -->
+            <div class="discussion-card debate">
+                <div class="card-number">03</div>
+                <h3 class="card-title">Mana 確率モデルと「雨モデル」均等配分</h3>
+                <p class="card-description">
+                    ポアソン100% vs ハイブリッド、非対称設計の安定性問題、駆け込み需要の是非。「決定論 + 微小ノイズ + Bloom + 雨モデル均等配分」で統合合意。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge math"><span class="dot"></span>mathematician</span>
+                    <span class="member-badge econ"><span class="dot"></span>game-economist</span>
+                    <span class="member-badge phil"><span class="dot"></span>philosopher</span>
+                </div>
+                <a href="debate_mana_probability.html" class="card-button">討論を読む →</a>
+            </div>
+
+            <!-- 討論4: 3軸Sybil対策 -->
+            <div class="discussion-card debate">
+                <div class="card-number">04</div>
+                <h3 class="card-title">三軸から三層へ —— 距離軸廃止と識別より無力化</h3>
+                <p class="card-description">
+                    距離軸のボット問題、農村コミュニティの誤検知、スコアレス設計の透明性矛盾。「三軸→三層」概念転換と「識別より無力化」の設計思想で合意。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge math"><span class="dot"></span>mathematician</span>
+                    <span class="member-badge arch"><span class="dot"></span>architect</span>
+                    <span class="member-badge phil"><span class="dot"></span>philosopher</span>
+                </div>
+                <a href="debate_three_axes.html" class="card-button">討論を読む →</a>
+            </div>
+
+            <!-- 討論5: Proof of Being -->
+            <div class="discussion-card debate">
+                <div class="card-number">05</div>
+                <h3 class="card-title">Proof of Being の二層構造と AI 時代の拡張</h3>
+                <p class="card-description">
+                    掛け算 vs ソフトミンの攻防、PoB と減価の連動問題（死のスパイラル回避）、AI が存在を模倣した場合の「崩壊か拡張か」。二層構造で全問題を統合解決。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge math"><span class="dot"></span>mathematician</span>
+                    <span class="member-badge econ"><span class="dot"></span>game-economist</span>
+                    <span class="member-badge phil"><span class="dot"></span>philosopher</span>
+                </div>
+                <a href="debate_proof_of_being.html" class="card-button">討論を読む →</a>
+            </div>
+
+            <!-- 討論6: 複数ウォレット -->
+            <div class="discussion-card debate">
+                <div class="card-number">06</div>
+                <h3 class="card-title">複数ウォレット —— 静寂閾値と6つの討論の統一原理</h3>
+                <p class="card-description">
+                    企業ウォレット問題、死んだ巣のゴースト、引っ越しの二重ペナルティ、クラスタリングの是非。静寂閾値を導入し、全6討論を貫く統一原理に収束。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge math"><span class="dot"></span>mathematician</span>
+                    <span class="member-badge econ"><span class="dot"></span>game-economist</span>
+                    <span class="member-badge phil"><span class="dot"></span>philosopher</span>
+                </div>
+                <a href="debate_multi_wallet.html" class="card-button">討論を読む →</a>
             </div>
 
         </div>

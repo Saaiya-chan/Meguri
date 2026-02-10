@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meguri - 討論: 3軸Sybil対策の数学的妥当性</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr 300px;
+            gap: 20px;
+            min-height: calc(100vh - 40px);
+        }
+
+        /* ===== 左ペイン ===== */
+        .left-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .left-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .participant {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #0d1117;
+            border-radius: 8px;
+            border-left: 4px solid #30363d;
+        }
+
+        .participant.math { border-left-color: #7ee787; }
+        .participant.arch { border-left-color: #d2a8ff; }
+        .participant.phil { border-left-color: #ffa657; }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .participant.math .avatar { background: #7ee787; }
+        .participant.arch .avatar { background: #d2a8ff; }
+        .participant.phil .avatar { background: #ffa657; }
+
+        .participant-info h4 { font-size: 13px; color: #c9d1d9; margin-bottom: 2px; }
+        .participant-info p { font-size: 11px; color: #8b949e; }
+
+        .position-section {
+            margin-top: 20px;
+            padding: 14px;
+            background: #0d1117;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+
+        .position-section h4 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8b949e;
+            margin-bottom: 12px;
+        }
+
+        .position-item {
+            padding: 8px 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            line-height: 1.5;
+            border-left: 3px solid;
+        }
+
+        .position-item.math { border-left-color: #7ee787; background: rgba(126,231,135,0.06); color: #c9d1d9; }
+        .position-item.arch { border-left-color: #d2a8ff; background: rgba(210,168,255,0.06); color: #c9d1d9; }
+        .position-item.phil { border-left-color: #ffa657; background: rgba(255,166,87,0.06); color: #c9d1d9; }
+
+        .position-item .pos-name {
+            font-weight: 700;
+            font-size: 11px;
+            margin-bottom: 3px;
+        }
+
+        .position-item.math .pos-name { color: #7ee787; }
+        .position-item.arch .pos-name { color: #d2a8ff; }
+        .position-item.phil .pos-name { color: #ffa657; }
+
+        .nav-section { margin-top: 20px; }
+        .nav-section h3 { margin-bottom: 10px; }
+
+        .nav-link {
+            display: block;
+            padding: 7px 10px;
+            margin-bottom: 5px;
+            background: #0d1117;
+            border-radius: 6px;
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover { color: #58a6ff; background: #1c2128; border-left-color: #58a6ff; }
+        .nav-link .nav-num { color: #484f58; margin-right: 6px; font-weight: 600; }
+
+        /* ===== 中央ペイン ===== */
+        .center-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #30363d;
+        }
+
+        .center-pane h1 {
+            color: #58a6ff;
+            margin-bottom: 6px;
+            font-size: 22px;
+            line-height: 1.3;
+        }
+
+        .phase-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(88,166,255,0.15);
+            border: 1px solid #1f6feb;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #58a6ff;
+            margin-bottom: 8px;
+        }
+
+        .center-pane > .subtitle {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .topic-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-left: 4px solid #58a6ff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+
+        .topic-box h3 { color: #58a6ff; font-size: 14px; margin-bottom: 10px; }
+        .topic-box p { font-size: 13px; line-height: 1.7; color: #8b949e; }
+
+        /* ===== スレッド区切り ===== */
+        .thread-break {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 32px 0 24px;
+        }
+
+        .thread-break .tb-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #30363d, transparent);
+        }
+
+        .thread-break .tb-label {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 11px;
+            color: #58a6ff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* ===== 吹き出し ===== */
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .message.math .message-avatar { background: #7ee787; }
+        .message.arch .message-avatar { background: #d2a8ff; }
+        .message.phil .message-avatar { background: #ffa657; }
+
+        .message-content { max-width: 90%; }
+
+        .speaker-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            padding-left: 4px;
+        }
+
+        .speaker-name {
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .message.math .speaker-name { color: #7ee787; }
+        .message.arch .speaker-name { color: #d2a8ff; }
+        .message.phil .speaker-name { color: #ffa657; }
+
+        /* 感情バッジ */
+        .emotion {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .emotion.challenge { background: rgba(248,81,73,0.15); color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
+        .emotion.agree    { background: rgba(126,231,135,0.15); color: #7ee787; border: 1px solid rgba(126,231,135,0.3); }
+        .emotion.doubt    { background: rgba(227,179,65,0.15); color: #e3b341; border: 1px solid rgba(227,179,65,0.3); }
+        .emotion.propose  { background: rgba(88,166,255,0.15); color: #58a6ff; border: 1px solid rgba(88,166,255,0.3); }
+        .emotion.concede  { background: rgba(210,168,255,0.15); color: #d2a8ff; border: 1px solid rgba(210,168,255,0.3); }
+
+        .speech-bubble {
+            background: #1c2128;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            font-size: 13.5px;
+            line-height: 1.75;
+            color: #c9d1d9;
+        }
+
+        .message.math .speech-bubble { border-left: 3px solid #7ee787; }
+        .message.arch .speech-bubble { border-left: 3px solid #d2a8ff; }
+        .message.phil .speech-bubble { border-left: 3px solid #ffa657; }
+
+        .speech-bubble strong { color: #e6edf3; }
+        .speech-bubble code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ffa657;
+            font-family: 'Consolas', monospace;
+        }
+
+        .speech-bubble ul, .speech-bubble ol { padding-left: 20px; margin: 8px 0; }
+        .speech-bubble li { margin-bottom: 5px; font-size: 13px; }
+
+        .analogy {
+            margin: 10px 0 0;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: rgba(227,179,65,0.06);
+            border-left: 3px solid #e3b341;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #8b949e;
+        }
+
+        .analogy strong { color: #e3b341; }
+
+        /* ===== 結論ボックス ===== */
+        .resolution-box {
+            background: #0d2d0d;
+            border: 1px solid #1a4d1a;
+            border-left: 4px solid #3fb950;
+            padding: 20px 24px;
+            margin: 32px 0 0;
+            border-radius: 10px;
+        }
+
+        .resolution-box h3 { color: #3fb950; font-size: 15px; margin-bottom: 14px; }
+        .resolution-box p { font-size: 13px; line-height: 1.75; color: #c9d1d9; }
+        .resolution-box ul { padding-left: 20px; margin-top: 10px; }
+        .resolution-box li { margin-bottom: 8px; font-size: 13px; line-height: 1.6; }
+        .resolution-box strong { color: #7ee787; }
+
+        .open-issue-box {
+            background: #1c1200;
+            border: 1px solid #4d3300;
+            border-left: 4px solid #e3b341;
+            padding: 16px 20px;
+            margin: 20px 0 0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .open-issue-box strong { color: #e3b341; }
+        .open-issue-box ul { padding-left: 20px; margin-top: 8px; }
+        .open-issue-box li { margin-bottom: 6px; color: #c9d1d9; }
+
+        /* ===== 右ペイン ===== */
+        .right-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .right-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .accordion-item {
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: #0d1117;
+            padding: 11px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 12.5px;
+            user-select: none;
+            transition: background 0.2s;
+            color: #c9d1d9;
+        }
+
+        .accordion-header:hover { background: #1c2128; }
+        .accordion-header.active { background: #1f6feb; color: #fff; }
+        .accordion-icon { transition: transform 0.3s; font-size: 10px; }
+        .accordion-header.active .accordion-icon { transform: rotate(180deg); }
+
+        .accordion-content {
+            display: none;
+            padding: 12px 14px;
+            background: #0d1117;
+            font-size: 12px;
+            line-height: 1.7;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+        }
+
+        .accordion-content.active { display: block; }
+
+        .term-example {
+            background: #161b22;
+            padding: 8px 10px;
+            border-left: 2px solid #58a6ff;
+            margin-top: 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #8b949e;
+        }
+
+        .term-example strong { color: #58a6ff; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0d1117; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #58a6ff; }
+
+        @media (max-width: 1200px) {
+            .container { grid-template-columns: 1fr 1fr; }
+            .left-pane { grid-column: 1; }
+            .center-pane { grid-column: 2; }
+            .right-pane { grid-column: 1 / -1; position: relative; top: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .left-pane, .right-pane { position: relative; top: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- ===== 左ペイン ===== -->
+        <div class="left-pane">
+            <h3>Participants</h3>
+
+            <div class="participant math">
+                <div class="avatar">M</div>
+                <div class="participant-info">
+                    <h4>mathematician</h4>
+                    <p>数式モデル・証明</p>
+                </div>
+            </div>
+
+            <div class="participant arch">
+                <div class="avatar">A</div>
+                <div class="participant-info">
+                    <h4>architect</h4>
+                    <p>実装設計・段階計画</p>
+                </div>
+            </div>
+
+            <div class="participant phil">
+                <div class="avatar">P</div>
+                <div class="participant-info">
+                    <h4>philosopher</h4>
+                    <p>倫理・世界観設計</p>
+                </div>
+            </div>
+
+            <div class="position-section">
+                <h4>Initial Positions</h4>
+                <div class="position-item math">
+                    <div class="pos-name">M</div>
+                    距離軸は廃止。三軸は三層に統合済み。独立スコア不要。
+                </div>
+                <div class="position-item arch">
+                    <div class="pos-name">A</div>
+                    技術的には可能。Phase&nbsp;2.5で実データ判断してから決める。
+                </div>
+                <div class="position-item phil">
+                    <div class="pos-name">P</div>
+                    二層設計・スコアレス設計を提案。倫理的配慮が最優先。
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <a href="#round1" class="nav-link"><span class="nav-num">R1</span>距離軸は本当に不要か</a>
+                <a href="#round2" class="nav-link"><span class="nav-num">R2</span>相関分析の農村問題</a>
+                <a href="#round3" class="nav-link"><span class="nav-num">R3</span>スコアレス設計の矛盾</a>
+                <a href="#round4" class="nav-link"><span class="nav-num">R4</span>三軸→三層の概念転換</a>
+                <a href="#round5" class="nav-link"><span class="nav-num">R5</span>合意と残課題</a>
+            </div>
+        </div>
+
+        <!-- ===== 中央ペイン ===== -->
+        <div class="center-pane">
+            <span class="phase-badge">Phase 2 — 本格討論</span>
+            <h1>3軸Sybil対策の数学的妥当性を検証する</h1>
+            <p class="subtitle">距離軸廃止か存続か、スコアレス設計の矛盾、「三軸」から「三層」への概念転換を巡る討論</p>
+
+            <div class="topic-box">
+                <h3>討論の核心</h3>
+                <p>Concept.md に記載された「距離・時間・エントロピー」三軸が既に他のメカニズムに統合されているという数学者の主張と、「実データで判断すべき」という建築家の慎重論、「監視と評価の倫理的境界」を主張する哲学者の三者が、それぞれの根拠を突きつけ合う。</p>
+            </div>
+
+            <!-- ===== Round 1 ===== -->
+            <div class="thread-break" id="round1">
+                <div class="tb-line"></div>
+                <div class="tb-label">Round 1 &mdash; 距離軸は本当に不要か</div>
+                <div class="tb-line"></div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion propose">提案</span>
+                    </div>
+                    <div class="speech-bubble">
+                        まず数学的に整理する。k個の巣を運用する場合の効用関数を考えよう：<br><br>
+                        <code>U(k) = k·個別利益 − k²·時間分割コスト − k·運用コスト</code><br><br>
+                        この二次項 <code>k²·時間分割コスト</code> が鍵だ。1日24時間という<strong>時間制約だけで</strong>、k≥3 以上では U(k) < U(1) が成立する。つまり<strong>自己弱体化は時間制約だけで証明できる</strong>。<br><br>
+                        距離情報など必要ない。さらに距離軸を追加するとプライバシーの矛盾が生じる。Meguri の五条件（非人格化・目的限定・対称性・透明性・主権在民）のうち、距離情報収集は第一条件と第五条件を直撃する。
+                    </div>
+                    <div class="analogy">
+                        <strong>たとえると：</strong>「バイト掛け持ちは身体的に破綻する」を証明するのに、「通勤距離が長い」という情報は不要。「1日は24時間しかない」という事実だけで十分。距離データを集めるのは、不要なだけでなく個人の行動追跡につながる。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message arch">
+                <div class="message-avatar">A</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">architect</span>
+                        <span class="emotion challenge">異議</span>
+                    </div>
+                    <div class="speech-bubble">
+                        ちょっと待ってくれ。その証明は<strong>分散した独立エージェント</strong>を前提にしている。だが現実の攻撃シナリオを想定してみろ。<br><br>
+                        たとえばデータセンターに100台のサーバーが置かれて、100個の巣を<strong>自動並列運用</strong>されたら？ 時間コストはゼロだ。k²の項が消える。<br><br>
+                        攻撃者がボットを使えば、時間制約は人間の制約であって機械の制約じゃない。<code>時間分割コスト ≈ 0</code> の世界では <code>U(k) ≈ k·個別利益</code> になる。これは増加関数だ。<strong>時間軸だけでは機械的Sybilを止められない</strong>。
+                    </div>
+                    <div class="analogy">
+                        <strong>たとえると：</strong>「バイト掛け持ちは人間には辛い」は正しい。でも「バイトをロボットに代理させたら？」という話。ロボットなら疲れないから、3店舗同時掛け持ちも余裕。時間制約はあくまで人間の制約。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion challenge">反論</span>
+                    </div>
+                    <div class="speech-bubble">
+                        それは重要な指摘だが、<strong>距離軸で解決できない</strong>問題だ。データセンターにある100台のサーバーに GPS を付けても全部同じ場所に集まる。距離分散は起きない。<br><br>
+                        むしろ正しい対応策は<strong>ネットワークトポロジー解析</strong>だ。100個の巣が互いにしか取引しないクローズドグラフを作ると、その構造自体が検出できる。取引相手の多様性（エントロピー）が低下するから Q_equity でも検知可能。<br><br>
+                        あと、Meguri の「Proof of Being」はそもそも<strong>ボット的行動を自然評価で弾く</strong>設計だ。一様すぎるタイムスタンプ、機械的な取引額、相関係数が高すぎる巣間パターン——これらはエントロピー軸で捕捉できる。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message phil">
+                <div class="message-avatar">P</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">philosopher</span>
+                        <span class="emotion propose">提起</span>
+                    </div>
+                    <div class="speech-bubble">
+                        二人とも面白い議論をしているが、<strong>問いの設定が違う</strong>と思う。<br><br>
+                        「距離軸は不要か」という問いは<strong>技術的妥当性</strong>を問うている。だが私が問いたいのは「<strong>距離情報を収集することがそもそも許容されるか</strong>」だ。<br><br>
+                        攻撃者へのカウンターメジャーを設計するとき、防御コストとして何を支払うか。機能的な有効性があるとしても、<strong>全ユーザーの位置情報を収集するコスト</strong>は正当化できるか？ これは設計上の優先順位の問題だ。
+                    </div>
+                    <div class="analogy">
+                        <strong>たとえると：</strong>万引き対策のために、全顧客の顔を常時録画するか。有効かもしれない。でも正直な大多数の顧客が「監視されている」と感じる代償を払う価値があるか。効果の問題ではなく、設計思想の問題。
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Round 2 ===== -->
+            <div class="thread-break" id="round2">
+                <div class="tb-line"></div>
+                <div class="tb-label">Round 2 &mdash; 相関分析で農村コミュニティが壊れる</div>
+                <div class="tb-line"></div>
+            </div>
+
+            <div class="message arch">
+                <div class="message-avatar">A</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">architect</span>
+                        <span class="emotion challenge">実装上の問題</span>
+                    </div>
+                    <div class="speech-bubble">
+                        mathematician が提案する「巣間相関分析」と「ネットワークトポロジー」で別の問題が起きる。<br><br>
+                        小規模な農村コミュニティを想像してくれ。住民50人が互いに毎日小さな取引をしている。<strong>全員が同じタイムゾーンで、同じ生活リズムで、同じ少人数グループの中でしか取引しない</strong>。<br><br>
+                        これを相関分析にかけると：<br>
+                        <ul>
+                            <li>取引時刻が毎日ほぼ同じ → 高相関</li>
+                            <li>取引相手が50人の中だけ → トポロジーが閉じている</li>
+                            <li>Q_equity が低い → エントロピー低</li>
+                        </ul>
+                        全員が Sybil フラグを立てられる。<strong>誤検知率が農村コミュニティで激増する</strong>。これは設計上の欠陥だ。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion doubt">認める</span>
+                    </div>
+                    <div class="speech-bubble">
+                        …それは正当な指摘だ。<strong>コミュニティの規模を評価に組み込む必要がある</strong>。<br><br>
+                        修正案：Q_equity を<strong>絶対値ではなく相対値</strong>で評価する。つまりその巣の「到達可能な取引対象の中での多様性」を使う。50人コミュニティの中でフル活動していれば、それは多様性が高い。<br><br>
+                        数式的には：<br>
+                        <code>Q_eq_rel = Q_equity(v) / max_possible_Q(community_size)</code><br><br>
+                        これで農村コミュニティは正常評価される。ただし architect の言う通り、<strong>コミュニティ境界の定義が新たな問題</strong>を生む。どこまでが「同一コミュニティ」か。
+                    </div>
+                    <div class="analogy">
+                        <strong>たとえると：</strong>クラス30人の学校で「友達が5人以上いれば交友関係良好」と評価する。クラス全体が30人なのに「100人以上と交友しろ」という基準は不当。相対評価に直す。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message phil">
+                <div class="message-avatar">P</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">philosopher</span>
+                        <span class="emotion agree">賛同 + 拡張</span>
+                    </div>
+                    <div class="speech-bubble">
+                        mathematician の相対評価への修正は正しい方向だ。だがもっと根本的な問題が浮かび上がった。<br><br>
+                        <strong>「Sybil攻撃者」と「自然なコミュニティ」が統計的に区別できない</strong>ケースが存在する。これは数学的に解けない問題かもしれない。<br><br>
+                        であれば、architect が提案した<strong>二層設計の第一層（異常検出）</strong>の判定基準を変えるべきだ。「統計的に異常か」ではなく、「<strong>Sybil であれば損をする構造になっているか</strong>」で評価する。<br><br>
+                        区別できなくていい。区別できなくても Sybil が損をする設計になっていれば、攻撃の動機が消える。
+                    </div>
+                    <div class="analogy">
+                        <strong>たとえると：</strong>顔の見えない万引き犯を捕まえようとするより、「万引きしても得しない店内レイアウト」にする。一品ごとに錠がかかっていれば、万引きに時間がかかりすぎて割に合わない。識別より構造設計。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message arch">
+                <div class="message-avatar">A</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">architect</span>
+                        <span class="emotion agree">重要な気づき</span>
+                    </div>
+                    <div class="speech-bubble">
+                        philosopher のその観点は実装視点から非常に重要だ。<br><br>
+                        「区別できなくても損をする構造」——これが Meguri の本質だったはずだ。<strong>減価メカニズム自体がその設計</strong>になっている。複数巣を持つほど全体の vitality_score が下がり、各巣の評価も落ちる。<br><br>
+                        だとすれば<strong>Sybil 検出という目標設定自体を見直す必要がある</strong>かもしれない。検出ではなく<strong>無力化</strong>。巣間相関分析もネットワークトポロジーも、「犯人を特定する」ための道具ではなく、「損をする構造を強化する」ための補助的なデータとして使う。<br><br>
+                        距離軸の議論も、この文脈で再考できる。
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Round 3 ===== -->
+            <div class="thread-break" id="round3">
+                <div class="tb-line"></div>
+                <div class="tb-label">Round 3 &mdash; スコアレス設計は透明性と矛盾するか</div>
+                <div class="tb-line"></div>
+            </div>
+
+            <div class="message arch">
+                <div class="message-avatar">A</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">architect</span>
+                        <span class="emotion challenge">鋭い指摘</span>
+                    </div>
+                    <div class="speech-bubble">
+                        philosopher が Phase 1 で提案した「スコアレス設計（デフォルト非表示）」について、建築家として深刻な懸念がある。<br><br>
+                        監視との境界の五条件に<strong>「透明性 — アルゴリズムを公開、ブラックボックス禁止」</strong>とある。しかし自分のスコアを見られないユーザーは、<strong>アルゴリズムが正しく動作しているかを検証できない</strong>。<br><br>
+                        「アルゴリズムを公開する」と「自分のスコアを見られない」は矛盾する。公開されたコードを読めない普通のユーザーにとって、スコアの開示こそが「自分に正しく適用されているか」を確認する唯一の手段だ。<strong>実質的なブラックボックス</strong>になりかねない。
+                    </div>
+                    <div class="analogy">
+                        <strong>たとえると：</strong>税務署が「課税計算式は公開している」と言いながら、「あなたの税額は教えられません」と言う状況。式が公開されていても、自分に正しく適用されているか確認できない。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message phil">
+                <div class="message-avatar">P</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">philosopher</span>
+                        <span class="emotion challenge">本質を突く</span>
+                    </div>
+                    <div class="speech-bubble">
+                        architect の指摘は正しい。だが問題の所在が少しずれている。<br><br>
+                        私が「スコアレス設計」を提案したのは、<strong>スコアが見えると人々がスコアを最適化し始める</strong>からだ。グッドハートの法則——指標が目標になると、指標は意味を失う。<br><br>
+                        しかし architect の言う「自分に正しく適用されているかの検証」は確かに必要だ。この二つは<strong>「最適化阻止」と「説明責任」の対立</strong>として整理できる。<br><br>
+                        解決策の候補：<strong>申告制の開示</strong>。通常時は非表示で、「なぜ自分は不利益を受けているのか」と申請したユーザーにだけ、理由を証明する形で開示する。Sybil フラグが立った人だけが自分のスコアを確認できる。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion propose">突破口</span>
+                    </div>
+                    <div class="speech-bubble">
+                        二人が対立している問題に、<strong>暗号学的な解決策</strong>がある。<br><br>
+                        <strong>ZK 証明（zk-SNARK）</strong> を使えば、「あなたのスコアは閾値 T を下回っていない」という事実を、スコアの具体的な値を開示せずに証明できる。<br><br>
+                        つまり：<br>
+                        <ul>
+                            <li>通常時：スコア非表示（最適化阻止）</li>
+                            <li>不利益を受けた時：「閾値を超えている」という証明のみ開示（説明責任）</li>
+                            <li>異議申し立て時：ZK証明で正当性を確認（検証可能）</li>
+                        </ul>
+                        スコアの実値を知らなくても、自分に正しく適用されていることを<strong>数学的に検証できる</strong>。「体温計の数値を見ないが、医者が『熱はない』と証明してくれる」状態。
+                    </div>
+                    <div class="analogy">
+                        <strong>たとえると：</strong>年齢確認で「あなたは20歳以上です」と証明してもらうのに、生年月日（実際の値）を開示する必要はない。「20歳以上である」という事実だけを、身元を明かさず証明できる。ZK証明はその暗号学的な実装。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message phil">
+                <div class="message-avatar">P</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">philosopher</span>
+                        <span class="emotion concede">修正を受け入れる</span>
+                    </div>
+                    <div class="speech-bubble">
+                        mathematician の ZK証明は、私が考えていた問題の<strong>数学的な完全解</strong>だと思う。<br><br>
+                        スコアレス設計を修正する：<strong>「スコア非開示 + ZK証明による閾値確認」</strong>。ユーザーは「正常範囲内にある」という証明を受け取れるが、具体的な値は知らない。<br><br>
+                        これは私の五条件すべてを満たす：非人格化（値を見せない）、目的限定（閾値確認のみ）、対称性（全員同じルール）、透明性（ZKで検証可能）、主権在民（証明はデバイス上で生成）。<br><br>
+                        architect の懸念も解消できる？
+                    </div>
+                </div>
+            </div>
+
+            <div class="message arch">
+                <div class="message-avatar">A</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">architect</span>
+                        <span class="emotion agree">実装可能</span>
+                    </div>
+                    <div class="speech-bubble">
+                        解消できる。ただし<strong>実装コストは高い</strong>。zk-SNARK の生成はモバイルデバイスで数秒〜数十秒かかる。頻繁に発行するものではなく、<strong>異議申し立て時の特別処理</strong>として位置づけるのが現実的だ。<br><br>
+                        Phase 0 シミュレーションではこの ZK 証明コストも検証項目に加えるべき。技術的に可能でも、UX として受け入れられるかどうかは実測が必要。
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Round 4 ===== -->
+            <div class="thread-break" id="round4">
+                <div class="tb-line"></div>
+                <div class="tb-label">Round 4 &mdash; 「三軸」から「三層」への概念転換</div>
+                <div class="tb-line"></div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion propose">核心的な提案</span>
+                    </div>
+                    <div class="speech-bubble">
+                        今回の議論で判明したことを整理する。<strong>Concept.md の「三軸」という言葉自体が設計上の混乱を引き起こしている</strong>。<br><br>
+                        現在の設計を正確に表現すると「三層」になる：<br>
+                        <ul>
+                            <li><strong>第一層：減価（Decay）</strong> — 滞留ペナルティで時間軸を実装</li>
+                            <li><strong>第二層：循環の質（Circulation Quality）</strong> — Q_equity でエントロピー軸を実装。農村問題は相対評価で解消。</li>
+                            <li><strong>第三層：確率的配分（VRF）</strong> — 均等配分でSybil ROIをゼロに。Mana 配分先を暗号学的乱数で決定。</li>
+                        </ul>
+                        距離軸は第一・二層に分散して「移動の一貫性チェック」として組み込まれている。独立した軸ではなく<strong>各層のパラメータの一つ</strong>。<br><br>
+                        Concept.md を更新すれば、architect と philosopher の懸念も整理できるはずだ。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message arch">
+                <div class="message-avatar">A</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">architect</span>
+                        <span class="emotion doubt">重要な条件</span>
+                    </div>
+                    <div class="speech-bubble">
+                        概念整理には賛成だ。ただし<strong>Concept.md の更新だけでは不十分</strong>だという条件をつける。<br><br>
+                        「三層が実際に機能する」ことを示す<strong>Phase 0 シミュレーション</strong>が先だ。理論上 k≥3 で損が出ることは証明された。だが実際のネットワーク規模（ユーザー数 N、巣あたり平均取引数、コミュニティ構造）で <strong>どのくらいの Sybil 耐性が得られるか</strong>を数値化してほしい。<br><br>
+                        特に確認したいのは：距離軸なしで機械的Sybil（ボット100台）に対してどの程度の抑制効果があるか。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion concede">同意 + 補足</span>
+                    </div>
+                    <div class="speech-bubble">
+                        その条件は受け入れる。シミュレーションの設計を提案しよう：<br><br>
+                        <ul>
+                            <li>N = 1000〜100000 ノードのネットワークで実行</li>
+                            <li>攻撃者が k = 1, 3, 10, 100 個の巣を運用する場合の利得を比較</li>
+                            <li>コミュニティ構造：ランダム / スモールワールド / 農村型（閉じたクラスター）</li>
+                            <li>距離軸あり vs なしで Sybil ROI を比較</li>
+                        </ul>
+                        <strong>もし距離軸なしで Sybil ROI が十分低ければ廃止確定。もし ROI が残るなら Phase 2.5 で実装判断</strong>。<br><br>
+                        これで architect の「実データで判断」という要求にも応えられる。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message phil">
+                <div class="message-avatar">P</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">philosopher</span>
+                        <span class="emotion propose">最終ピース</span>
+                    </div>
+                    <div class="speech-bubble">
+                        三層の概念整理と Phase 0 シミュレーション、どちらも必要で正しい。私から最後の要素を追加したい。<br><br>
+                        <strong>各層に倫理的制約を明示的に組み込む</strong>ことを提案する：<br>
+                        <ul>
+                            <li><strong>第一層（減価）</strong>：活動制限者（障がい者・高齢者）への軸間代替性を保証</li>
+                            <li><strong>第二層（循環の質）</strong>：農村コミュニティへの相対評価を適用</li>
+                            <li><strong>第三層（VRF）</strong>：配分結果を ZK証明で説明責任を果たす</li>
+                        </ul>
+                        技術仕様書ではなく、<strong>倫理仕様書</strong>として Concept.md に記述する。「三軸 → 三層 + 倫理制約」が今回の結論。
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== Round 5 ===== -->
+            <div class="thread-break" id="round5">
+                <div class="tb-line"></div>
+                <div class="tb-label">Round 5 &mdash; 合意形成</div>
+                <div class="tb-line"></div>
+            </div>
+
+            <div class="message arch">
+                <div class="message-avatar">A</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">architect</span>
+                        <span class="emotion agree">総括</span>
+                    </div>
+                    <div class="speech-bubble">
+                        討論の総括をしよう。今回の論点は4つあった：<br><br>
+                        <strong>① 距離軸の要否</strong><br>
+                        → Phase 0 シミュレーションで ROI を数値化してから判断。距離軸なしで十分なら廃止、不足なら Phase 2.5 で実装。<br><br>
+                        <strong>② 相関分析の農村問題</strong><br>
+                        → Q_equity を相対評価（コミュニティサイズ正規化）に修正。または「区別ではなく無力化」の設計思想で根本解決。<br><br>
+                        <strong>③ スコアレス設計の透明性問題</strong><br>
+                        → ZK証明で「閾値確認」を可能にする。スコア実値は非開示、異議申し立て時に証明を発行。<br><br>
+                        <strong>④ 三軸 → 三層の概念転換</strong><br>
+                        → 減価・循環の質・VRF の三層 + 各層への倫理制約で Concept.md を更新。<br><br>
+                        実装者として、<strong>Phase 0 シミュレーションを最優先タスク</strong>に設定したい。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion agree">合意</span>
+                    </div>
+                    <div class="speech-bubble">
+                        合意する。数学的観点から補足すると、<strong>今回の議論で最も重要な発見</strong>は2つだ：<br><br>
+                        一つ目：<strong>「識別より無力化」の設計思想</strong>。Sybil攻撃者を特定する必要はない。攻撃しても得をしない構造にすれば、識別は副次的なものになる。この思想転換は数式にも反映される。<br>
+                        <code>防衛力 = 無力化率 × 構造強度 ≠ 検出率</code><br><br>
+                        二つ目：<strong>農村問題 → 相対評価への修正</strong>。これは Phase 0 シミュレーションで定式化すべき重要な変数だ。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message phil">
+                <div class="message-avatar">P</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">philosopher</span>
+                        <span class="emotion agree">収束と展望</span>
+                    </div>
+                    <div class="speech-bubble">
+                        哲学的にこの討論で最も豊かな発見は、<strong>「監視」対「評価」という対立が、実は「識別」対「構造」という問いに変換された</strong>ことだ。<br><br>
+                        監視社会の問題は「誰かが誰かを見ている」ことではなく、「見られることを恐れる構造が生まれる」ことだ。Meguri が「識別より無力化」に徹すれば、<strong>誰も見ていなくても攻撃が割に合わない</strong>世界が実現する。<br><br>
+                        「正直者が得をする通貨」ではなく、「不正直者が損をする通貨」——この違いは小さいようで深い。前者はポジティブな設計、後者はネガティブな設計に見えるが、<strong>Meguri の哲学的核心は後者の方が正確</strong>だと思う。循環する通貨は、循環を阻害するものを自然に排除する。<br><br>
+                        合意します。
+                    </div>
+                    <div class="analogy">
+                        <strong>たとえると：</strong>「良い人を選んで入れる村」ではなく、「悪意ある行動が構造的に損をする村」。前者は管理と監視が必要。後者は自然に維持される。川の流れが自然に澄んでいくのと同じで、循環する通貨は循環を妨げるものを自然に流し去る。
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 合意ボックス ===== -->
+            <div class="resolution-box">
+                <h3>合意事項</h3>
+                <ul>
+                    <li><strong>三軸 → 三層への概念転換</strong>：「距離・時間・エントロピー」の三軸を廃止し、「減価（Decay）・循環の質（Q_equity）・確率的配分（VRF）」の三層として Concept.md を更新する</li>
+                    <li><strong>距離軸の判断延期</strong>：Phase 0 シミュレーションで三層の Sybil ROI を数値化し、距離軸の要否を実データで判断する（Phase 2.5 評価期間で結論）</li>
+                    <li><strong>農村問題の解法</strong>：Q_equity をコミュニティサイズで正規化した相対評価に修正。「区別より無力化」の設計思想で補完</li>
+                    <li><strong>スコアレス + ZK証明</strong>：スコア実値を非開示（最適化阻止）、ZK証明により閾値確認・異議申し立てを可能にする（説明責任との両立）</li>
+                    <li><strong>各層への倫理制約</strong>：活動制限者への軸間代替性、農村コミュニティへの相対評価、VRF配分の ZK証明を倫理仕様として明文化</li>
+                    <li><strong>設計思想の転換</strong>：「識別より無力化」——Sybil攻撃者を特定するのではなく、攻撃しても得をしない構造にする</li>
+                </ul>
+            </div>
+
+            <div class="open-issue-box">
+                <strong>残課題</strong>
+                <ul>
+                    <li><strong>Phase 0 シミュレーションの実施</strong>：N=1000〜100000、攻撃者 k=1〜100 巣の組み合わせで Sybil ROI を数値化。距離軸あり/なしで比較。<strong>最優先タスク</strong>。</li>
+                    <li><strong>ZK証明の UX 検証</strong>：モバイルデバイスでの証明生成コスト（数秒〜数十秒）が実用的かどうか。頻度・タイミングの設計。</li>
+                    <li><strong>コミュニティ境界の定義</strong>：相対評価のために「同一コミュニティ」をどう定義するか。動的境界（距離・取引頻度）で対応するか。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ===== 右ペイン ===== -->
+        <div class="right-pane">
+            <h3>Glossary</h3>
+            <div class="accordion" id="glossary">
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        識別より無力化
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content active">
+                        <p>Sybil攻撃者を「特定する」のではなく、攻撃しても得をしない構造にする設計思想。今回の討論で三者が収束した核心概念。「万引き犯を捕まえる」より「万引きが割に合わない店内設計にする」。</p>
+                        <div class="term-example">
+                            <strong>今回の討論：</strong> philosopher が提起し、mathematician と architect が賛同。防衛力 = 無力化率 × 構造強度。検出率ではない。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        三層構造
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>今回の討論で合意した「三軸」の代替概念。減価（時間軸を内包）・循環の質（エントロピー軸を内包）・VRF（確率的配分）の三層。各層が独立したメカニズムとして機能し、全体として Sybil 耐性を実現する。</p>
+                        <div class="term-example">
+                            <strong>今回の討論：</strong> 三軸は「3つの独立した物差し」、三層は「3つの防御壁」。全部突破しないと攻撃できない多層防御。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        農村コミュニティ問題
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>相関分析・ネットワークトポロジー・Q_equity による Sybil 検出が、小規模コミュニティ（農村等）で誤検知する問題。全員が同じリズムで同じグループと取引すると、統計的に Sybil と区別できなくなる。</p>
+                        <div class="term-example">
+                            <strong>解決策：</strong> Q_equity をコミュニティサイズで正規化した相対評価。Q_eq_rel = Q_equity(v) / max_possible_Q(community_size)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        ZK証明（zk-SNARK）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>データを開示せずに条件を満たすことを証明する暗号技術。スコアの実値を見せずに「閾値Tを下回っていない」という事実だけを証明できる。スコアレス設計と透明性の両立に使用。</p>
+                        <div class="term-example">
+                            <strong>今回の討論：</strong> mathematician が提案。「体温計の数値を見ないが、医者が熱はないと証明してくれる」状態。実装コスト（証明生成時間）は Phase 0 で検証要。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        自己弱体化
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>Sybil攻撃（複数巣運用）が攻撃者自身にダメージを与える構造。U(k) = k·利益 − k²·時間コスト − k·運用コストで、k≥3 で U(k) < U(1)。</p>
+                        <div class="term-example">
+                            <strong>今回の討論：</strong> ボット並列運用への限界を architect が指摘。機械は時間制約を超えられるため、Q_equity・ネットワークトポロジーとの組み合わせが必要。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        スコアレス設計
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>スコアをデフォルト非表示にする UI 設計。グッドハートの法則（指標が目標になると指標は意味を失う）を回避するための設計。今回 ZK証明との組み合わせで透明性との矛盾を解消。</p>
+                        <div class="term-example">
+                            <strong>最終形：</strong> 通常時は非表示、不利益を受けた場合のみ ZK証明で「閾値内である」ことを確認可能。実値は開示しない。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Phase 0 シミュレーション
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>三層設計の効果を合成データで検証する事前フェーズ。architect が提案。距離軸の要否判断の前提条件として、今回最優先タスクに格上げされた。</p>
+                        <div class="term-example">
+                            <strong>検証項目：</strong> N=1000〜100000 ネットワーク、攻撃者 k=1〜100 巣、距離軸あり/なしの Sybil ROI 比較、農村コミュニティの誤検知率。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        Q_equity（循環の公平性）
+                    <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>取引フローの多様性・公平性を測る指標。第二層（循環の質）の中核。今回の討論でコミュニティサイズ正規化が加わり、農村コミュニティへの誤検知問題を解消。</p>
+                        <div class="term-example">
+                            <strong>修正式：</strong> Q_eq_rel = Q_equity(v) / max_possible_Q(community_size) — コミュニティの規模を考慮した相対評価。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        軸間代替性
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>ある軸のスコアが低くても、他の軸が高ければ全体評価は正常に保たれる設計。活動制限者（障がい者・高齢者）が距離軸で不利にならないよう、他軸で補完できる。</p>
+                        <div class="term-example">
+                            <strong>例：</strong> 車椅子の人が移動できなくても、取引相手の多様性（エントロピー）が高ければ問題なし。
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleAccordion(header) {
+            const allHeaders = document.querySelectorAll('.accordion-header');
+            allHeaders.forEach(h => {
+                if (h !== header) {
+                    h.classList.remove('active');
+                    h.nextElementSibling.classList.remove('active');
+                }
+            });
+            header.classList.toggle('active');
+            header.nextElementSibling.classList.toggle('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstHeader = document.querySelector('.accordion-header');
+            if (firstHeader) {
+                firstHeader.classList.add('active');
+                firstHeader.nextElementSibling.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>
