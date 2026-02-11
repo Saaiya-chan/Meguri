@@ -294,6 +294,16 @@
         .discussion-card.debate::before {
             background: linear-gradient(90deg, #f85149, #ffa657, #7ee787);
         }
+
+        .discussion-card.review-card::before {
+            background: linear-gradient(90deg, #f85149, #da3633);
+        }
+
+        .phase-badge.review {
+            background: rgba(248,81,73,0.15);
+            color: #f85149;
+            border: 1px solid rgba(248,81,73,0.3);
+        }
     </style>
 </head>
 <body>
@@ -309,6 +319,9 @@
                     時間とともに自然に減衰し、良い循環を通じて社会全体に増加する。
                     ウォレットは金庫ではなく「巣」、通貨は生き物のように流れていく——
                     そんな「脱所有」の経済システムを、数学・ゲーム論・哲学の三視点から設計しています。
+                </p>
+                <p style="margin-top: 16px;">
+                    <a href="overview.html" style="color: #7ee787; font-weight: 600; font-size: 15px;">📖 設計概要を読む →</a>
                 </p>
             </div>
         </header>
@@ -571,6 +584,32 @@
                 <a href="discussions/debate_multi_wallet.html" class="card-button">討論を読む →</a>
             </div>
 
+        </div>
+
+        <!-- ===== 外部レビュー ===== -->
+        <div class="phase-section">
+            <div class="phase-header">
+                <h2>外部レビュー</h2>
+                <span class="phase-badge review">指摘事項</span>
+            </div>
+            <p class="phase-description">外部レビュアーによる矛盾点・設計課題の指摘と分析。Phase 3 の討論テーマ候補。</p>
+        </div>
+
+        <div class="discussion-grid">
+            <div class="discussion-card review-card">
+                <div class="card-number" style="color: #f85149; border-color: #f85149;">R</div>
+                <h3 class="card-title">春日（はるひ）の指摘事項</h3>
+                <p class="card-description">
+                    Phase 2 全6討論に対する外部レビュー。雨モデル vs 品質評価のインセンティブ崩壊、AI大量参入による希釈問題、デジタル追放、コミュニティ定義の曖昧さなど7件の指摘。
+                </p>
+                <div class="card-members">
+                    <span class="member-badge" style="border-color: #f85149;">
+                        <span class="dot" style="background: #f85149;"></span>
+                        春日（はるひ）
+                    </span>
+                </div>
+                <a href="discussions/review_kasuga.html" class="card-button" style="background: #da3633;">レビューを読む →</a>
+            </div>
         </div>
 
         <!-- ===== フッター ===== -->
