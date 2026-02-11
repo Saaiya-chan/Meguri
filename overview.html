@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meguri（めぐり）— 設計概要</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -21,8 +26,14 @@
             margin: 0 auto;
         }
 
-        a { color: #58a6ff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
 
         /* ===== ヒーロー ===== */
         .hero {
@@ -177,8 +188,13 @@
             margin-bottom: 16px;
         }
 
-        .comparison-col.old h4 { color: #f8514980; }
-        .comparison-col.new h4 { color: #7ee787; }
+        .comparison-col.old h4 {
+            color: #f8514980;
+        }
+
+        .comparison-col.new h4 {
+            color: #7ee787;
+        }
 
         .comparison-col ul {
             list-style: none;
@@ -252,14 +268,39 @@
             flex-shrink: 0;
         }
 
-        .mechanism:nth-child(1) .mechanism-num { background: rgba(248,81,73,0.15); color: #f85149; }
-        .mechanism:nth-child(2) .mechanism-num { background: rgba(88,166,255,0.15); color: #58a6ff; }
-        .mechanism:nth-child(3) .mechanism-num { background: rgba(126,231,135,0.15); color: #7ee787; }
-        .mechanism:nth-child(4) .mechanism-num { background: rgba(210,168,255,0.15); color: #d2a8ff; }
-        .mechanism:nth-child(5) .mechanism-num { background: rgba(255,166,87,0.15); color: #ffa657; }
-        .mechanism:nth-child(6) .mechanism-num { background: rgba(121,192,255,0.15); color: #79c0ff; }
+        .mechanism:nth-child(1) .mechanism-num {
+            background: rgba(248, 81, 73, 0.15);
+            color: #f85149;
+        }
 
-        .mechanism-info { flex-grow: 1; }
+        .mechanism:nth-child(2) .mechanism-num {
+            background: rgba(88, 166, 255, 0.15);
+            color: #58a6ff;
+        }
+
+        .mechanism:nth-child(3) .mechanism-num {
+            background: rgba(126, 231, 135, 0.15);
+            color: #7ee787;
+        }
+
+        .mechanism:nth-child(4) .mechanism-num {
+            background: rgba(210, 168, 255, 0.15);
+            color: #d2a8ff;
+        }
+
+        .mechanism:nth-child(5) .mechanism-num {
+            background: rgba(255, 166, 87, 0.15);
+            color: #ffa657;
+        }
+
+        .mechanism:nth-child(6) .mechanism-num {
+            background: rgba(121, 192, 255, 0.15);
+            color: #79c0ff;
+        }
+
+        .mechanism-info {
+            flex-grow: 1;
+        }
 
         .mechanism-info h3 {
             font-size: 16px;
@@ -325,7 +366,7 @@
         }
 
         .mech-metaphor {
-            background: rgba(210,168,255,0.08);
+            background: rgba(210, 168, 255, 0.08);
             border-left: 3px solid #d2a8ff;
             border-radius: 0 8px 8px 0;
             padding: 12px 16px;
@@ -373,12 +414,35 @@
             border-left: none;
         }
 
-        .layer-row:nth-child(1) .layer-label { background: #f8514930; color: #f85149; }
-        .layer-row:nth-child(2) .layer-label { background: #58a6ff30; color: #58a6ff; }
-        .layer-row:nth-child(3) .layer-label { background: #7ee78730; color: #7ee787; }
-        .layer-row:nth-child(4) .layer-label { background: #d2a8ff30; color: #d2a8ff; }
-        .layer-row:nth-child(5) .layer-label { background: #ffa65730; color: #ffa657; }
-        .layer-row:nth-child(6) .layer-label { background: #79c0ff30; color: #79c0ff; }
+        .layer-row:nth-child(1) .layer-label {
+            background: #f8514930;
+            color: #f85149;
+        }
+
+        .layer-row:nth-child(2) .layer-label {
+            background: #58a6ff30;
+            color: #58a6ff;
+        }
+
+        .layer-row:nth-child(3) .layer-label {
+            background: #7ee78730;
+            color: #7ee787;
+        }
+
+        .layer-row:nth-child(4) .layer-label {
+            background: #d2a8ff30;
+            color: #d2a8ff;
+        }
+
+        .layer-row:nth-child(5) .layer-label {
+            background: #ffa65730;
+            color: #ffa657;
+        }
+
+        .layer-row:nth-child(6) .layer-label {
+            background: #79c0ff30;
+            color: #79c0ff;
+        }
 
         .layer-arrow {
             text-align: center;
@@ -444,9 +508,17 @@
             flex-shrink: 0;
         }
 
-        .issue-severity.high { background: #f85149; }
-        .issue-severity.mid { background: #ffa657; }
-        .issue-severity.low { background: #58a6ff; }
+        .issue-severity.high {
+            background: #f85149;
+        }
+
+        .issue-severity.mid {
+            background: #ffa657;
+        }
+
+        .issue-severity.low {
+            background: #58a6ff;
+        }
 
         .open-issue h4 {
             font-size: 14px;
@@ -471,363 +543,406 @@
 
         /* ===== レスポンシブ ===== */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 28px; }
-            .philosophy-grid { grid-template-columns: 1fr; }
-            .comparison { grid-template-columns: 1fr; }
-            .comparison-col.old { border-right: none; border-bottom: 1px solid #30363d; }
-            .mechanism-body { padding-left: 24px; }
-            .layer-label { width: 100px; font-size: 11px; }
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .philosophy-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-col.old {
+                border-right: none;
+                border-bottom: 1px solid #30363d;
+            }
+
+            .mechanism-body {
+                padding-left: 24px;
+            }
+
+            .layer-label {
+                width: 100px;
+                font-size: 11px;
+            }
         }
 
         /* ===== アニメーション ===== */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .section {
             animation: fadeIn 0.6s ease backwards;
         }
 
-        .section:nth-child(2) { animation-delay: 0.1s; }
-        .section:nth-child(3) { animation-delay: 0.2s; }
-        .section:nth-child(4) { animation-delay: 0.3s; }
-        .section:nth-child(5) { animation-delay: 0.4s; }
-        .section:nth-child(6) { animation-delay: 0.5s; }
+        .section:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .section:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .section:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .section:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        .section:nth-child(6) {
+            animation-delay: 0.5s;
+        }
     </style>
 </head>
+
 <body>
-<div class="container">
+    <div class="container">
 
-    <!-- ===== ヒーロー ===== -->
-    <div class="hero">
-        <a href="index.html" class="back-link">← 議論ログ一覧に戻る</a>
-        <span class="hero-icon">🌀</span>
-        <h1><span>Meguri</span>（めぐり）</h1>
-        <p class="hero-sub">循環を本質とした仮想通貨の設計概要</p>
-        <div class="hero-tagline">
-            所有しない。溜め込まない。ただ、<em>めぐる</em>。
-        </div>
-    </div>
-
-    <!-- ===== 1. 哲学 ===== -->
-    <div class="section">
-        <h2 class="section-title">Meguri とは何か</h2>
-        <p class="section-lead">Meguri は「所有」ではなく「循環」を本質とする仮想通貨のコンセプトです。</p>
-
-        <div class="philosophy-grid">
-            <div class="philosophy-card">
-                <span class="card-icon">🏠</span>
-                <h3>巣（ウォレット）</h3>
-                <p>ウォレットは金庫ではなく「巣」。通貨が一時的に休む場所であり、留まるための場所ではない。</p>
-            </div>
-            <div class="philosophy-card">
-                <span class="card-icon">🌊</span>
-                <h3>脱所有</h3>
-                <p>通貨は生き物のように流れる。溜め込めば自然に減り、巡らせれば社会全体が潤う。</p>
-            </div>
-            <div class="philosophy-card">
-                <span class="card-icon">🛡️</span>
-                <h3>識別より無力化</h3>
-                <p>悪意ある行動を「見つけて罰する」のではなく、「やっても得しない構造」にする。</p>
+        <!-- ===== ヒーロー ===== -->
+        <div class="hero">
+            <a href="index.html" class="back-link">← 議論ログ一覧に戻る</a>
+            <span class="hero-icon">🌀</span>
+            <h1><span>Meguri</span>（めぐり）</h1>
+            <p class="hero-sub">循環を本質とした仮想通貨の設計概要</p>
+            <div class="hero-tagline">
+                所有しない。溜め込まない。ただ、<em>めぐる</em>。
             </div>
         </div>
-    </div>
 
-    <!-- ===== 2. 従来通貨との比較 ===== -->
-    <div class="section">
-        <h2 class="section-title">従来の通貨との違い</h2>
-        <p class="section-lead">既存の仮想通貨の常識を反転させた設計思想。</p>
+        <!-- ===== 1. 哲学 ===== -->
+        <div class="section">
+            <h2 class="section-title">Meguri とは何か</h2>
+            <p class="section-lead">Meguri は「所有」ではなく「循環」を本質とする仮想通貨のコンセプトです。</p>
 
-        <div class="comparison">
-            <div class="comparison-col old">
-                <h4>従来の仮想通貨</h4>
-                <ul>
-                    <li>持つほど有利（富の蓄積）</li>
-                    <li>計算力 = 信頼（PoW / PoS）</li>
-                    <li>匿名性でSybilと戦う</li>
-                    <li>個人の利益最大化が目的</li>
-                    <li>ウォレット = 金庫</li>
-                </ul>
-            </div>
-            <div class="comparison-col new">
-                <h4>Meguri</h4>
-                <ul>
-                    <li>溜め込むと自然に減る（減価メカニズム）</li>
-                    <li>存在の仕方 = 信頼（Proof of Being）</li>
-                    <li>攻撃を無力化する構造で守る</li>
-                    <li>循環すると社会全体が潤う</li>
-                    <li>ウォレット = 巣（一時的な休息地）</li>
-                </ul>
-            </div>
-        </div>
-        <p class="comparison-caption">※ Meguri は概念設計段階のプロジェクトです</p>
-    </div>
-
-    <!-- ===== 3. 6つのメカニズム ===== -->
-    <div class="section">
-        <h2 class="section-title">6つの主要メカニズム</h2>
-        <p class="section-lead">Phase 2 の討論を経て合意された、Meguri を構成する中核メカニズム。各項目をクリックで詳細を展開できます。</p>
-
-        <div class="mechanism-list">
-
-            <!-- M1: 自然減価 -->
-            <div class="mechanism">
-                <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
-                    <div class="mechanism-num">1</div>
-                    <div class="mechanism-info">
-                        <h3>自然減価 — 溜め込むほど減る</h3>
-                        <p>通貨は時間とともに自然に減少する。大口保有 + 長期滞留 + 低スコアで加速。</p>
-                    </div>
-                    <span class="mechanism-toggle">▼</span>
+            <div class="philosophy-grid">
+                <div class="philosophy-card">
+                    <span class="card-icon">🏠</span>
+                    <h3>巣（ウォレット）</h3>
+                    <p>ウォレットは金庫ではなく「巣」。通貨が一時的に休む場所であり、留まるための場所ではない。</p>
                 </div>
-                <div class="mechanism-body">
-                    <p>通貨が一つの巣に留まると、時間とともに自然に減っていきます。保有量が多いほど、動かさない期間が長いほど、減りが早くなります。</p>
-                    <div class="mech-formula">λ(B, τ, S) = (α + β·B/B_median + γ·f(τ)) · g(S)</div>
+                <div class="philosophy-card">
+                    <span class="card-icon">🌊</span>
+                    <h3>脱所有</h3>
+                    <p>通貨は生き物のように流れる。溜め込めば自然に減り、巡らせれば社会全体が潤う。</p>
+                </div>
+                <div class="philosophy-card">
+                    <span class="card-icon">🛡️</span>
+                    <h3>識別より無力化</h3>
+                    <p>悪意ある行動を「見つけて罰する」のではなく、「やっても得しない構造」にする。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 2. 従来通貨との比較 ===== -->
+        <div class="section">
+            <h2 class="section-title">従来の通貨との違い</h2>
+            <p class="section-lead">既存の仮想通貨の常識を反転させた設計思想。</p>
+
+            <div class="comparison">
+                <div class="comparison-col old">
+                    <h4>従来の仮想通貨</h4>
                     <ul>
-                        <li><strong>B</strong> = 保有量。中央値より多ければ加速</li>
-                        <li><strong>τ</strong> = 最後の取引からの経過時間</li>
-                        <li><strong>g(S)</strong> = スコアに基づく加速。<strong>加速のみ・軽減なし</strong></li>
+                        <li>持つほど有利（富の蓄積）</li>
+                        <li>計算力 = 信頼（PoW / PoS）</li>
+                        <li>匿名性でSybilと戦う</li>
+                        <li>個人の利益最大化が目的</li>
+                        <li>ウォレット = 金庫</li>
                     </ul>
-                    <div class="mech-metaphor">🍂 自然の中で水が流れずに留まると淀むように、通貨も巡らなければ自然に消えていく。</div>
                 </div>
-            </div>
-
-            <!-- M2: 循環品質 -->
-            <div class="mechanism">
-                <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
-                    <div class="mechanism-num">2</div>
-                    <div class="mechanism-info">
-                        <h3>循環品質（Q） — 小川のように流れる</h3>
-                        <p>「良い循環」を測る体温計。多様性・非定型性・連続性の3要素で評価。</p>
-                    </div>
-                    <span class="mechanism-toggle">▼</span>
-                </div>
-                <div class="mechanism-body">
-                    <p>「良い循環」とは何か？ Meguri では<strong>多様性・非定型性・連続性</strong>（小川の比喩）で定義しています。</p>
+                <div class="comparison-col new">
+                    <h4>Meguri</h4>
                     <ul>
-                        <li><strong>多様性</strong> — 色々な相手と取引している</li>
-                        <li><strong>非定型性</strong> — 毎回同じパターンの繰り返しではない</li>
-                        <li><strong>連続性</strong> — 途切れず穏やかに流れ続けている</li>
+                        <li>溜め込むと自然に減る（減価メカニズム）</li>
+                        <li>存在の仕方 = 信頼（Proof of Being）</li>
+                        <li>攻撃を無力化する構造で守る</li>
+                        <li>循環すると社会全体が潤う</li>
+                        <li>ウォレット = 巣（一時的な休息地）</li>
                     </ul>
-                    <p>この指標は<strong>加算モデル</strong>（体温計）で計算され、Mana蓄積速度に接続されます。ただし報酬には直結しません。</p>
-                    <div class="mech-metaphor">🏞️ 細い小川が絶えず流れ続ける姿が、Meguri にとっての「良い循環」。</div>
-                    <p class="mech-note">体温計を温めても恩恵がないので、誰も指標を攻略しようとしない（グッドハートの法則への対策）。</p>
                 </div>
             </div>
-
-            <!-- M3: Mana と Bloom -->
-            <div class="mechanism">
-                <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
-                    <div class="mechanism-num">3</div>
-                    <div class="mechanism-info">
-                        <h3>Mana 蓄積と Bloom — ふっと増える</h3>
-                        <p>ネットワーク全体の循環が閾値を超えると「ふっと」通貨が増える。雨モデルで全員に均等配分。</p>
-                    </div>
-                    <span class="mechanism-toggle">▼</span>
-                </div>
-                <div class="mechanism-body">
-                    <p>Mana はネットワーク全体の循環品質に応じてじわじわ蓄積されます。蓄積量が閾値を超えると、<strong>Bloom（開花）</strong>が発生し、新しい通貨が生まれます。</p>
-                    <ul>
-                        <li><strong>確定部分（75%）</strong> — 毎期ゆっくり増加。心理的な安定を提供</li>
-                        <li><strong>Bloom 部分（25%）</strong> — 非定常ポアソン過程で「ふっと」発生。生命的な驚き</li>
-                    </ul>
-                    <p>配分は <strong>「雨モデル」</strong> を採用。全ての巣に均等（1/N）に配分されます。</p>
-                    <div class="mech-formula">各巣への配分 = ΔM / N（全巣均等）</div>
-                    <div class="mech-metaphor">🌧️ 雨はどの巣にも等しく降る。たくさんの巣を持っても、1つの巣あたりの雨は同じ。</div>
-                    <p class="mech-note">雨モデルにより、複数ウォレットを作っても利益が増えないため、Sybil攻撃の ROI がゼロになる。</p>
-                </div>
-            </div>
-
-            <!-- M4: 三層構造 -->
-            <div class="mechanism">
-                <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
-                    <div class="mechanism-num">4</div>
-                    <div class="mechanism-info">
-                        <h3>三層構造 — 距離軸なき防御</h3>
-                        <p>「距離・時間・エントロピー」三軸から「減価・循環品質・VRF」三層へ概念転換。</p>
-                    </div>
-                    <span class="mechanism-toggle">▼</span>
-                </div>
-                <div class="mechanism-body">
-                    <p>当初の「距離・時間・エントロピー」三軸は、GPS依存や農村部の誤検知問題から、<strong>三層構造</strong>へと再設計されました。</p>
-                    <ul>
-                        <li><strong>第1層: 減価</strong> — 不自然な保有パターンを加速消滅</li>
-                        <li><strong>第2層: 循環品質（Q_equity）</strong> — コミュニティサイズで正規化した相対評価</li>
-                        <li><strong>第3層: VRF</strong> — 検証可能な乱数で予測困難性を確保</li>
-                    </ul>
-                    <p>スコアは非表示。代わりに <strong>zk-SNARK</strong>（ゼロ知識証明）で「閾値を超えているか？」だけを検証可能にし、透明性とスコア攻略防止を両立。</p>
-                    <div class="mech-metaphor">🔍 スコアが見えなければ攻略できない。でもゼロ知識証明で「大丈夫」は誰でも確認できる。</div>
-                </div>
-            </div>
-
-            <!-- M5: Proof of Being -->
-            <div class="mechanism">
-                <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
-                    <div class="mechanism-num">5</div>
-                    <div class="mechanism-info">
-                        <h3>Proof of Being — 存在の証明</h3>
-                        <p>「何をしたか」ではなく「どう存在しているか」。二層構造で厳しさと寛容さを両立。</p>
-                    </div>
-                    <span class="mechanism-toggle">▼</span>
-                </div>
-                <div class="mechanism-body">
-                    <p>PoW（仕事の証明）でもなく、PoS（持ち分の証明）でもない。Meguri は <strong>Proof of Being（存在の証明）</strong>— 自然に存在しているか？ を評価します。</p>
-                    <ul>
-                        <li><strong>第一層（異常検出）</strong> — AND条件の掛け算。1つでもゼロなら全体がゼロ。二値判定（通過 / 不通過）</li>
-                        <li><strong>第二層（恩恵配分）</strong> — ソフトミン方式。最も弱い軸を重視し、不完全な存在にもやさしく</li>
-                    </ul>
-                    <p>減価との連動は<strong>第一層のフラグ（二値）のみ</strong>。連続スコアとは独立させることで「死のスパイラル」を回避。</p>
-                    <div class="mech-metaphor">🌱 存在の「有無」は厳しく（AND条件）。存在の「質」は寛容に（ソフトミン）。正直者にはソフト、攻撃者にはハード。</div>
-                    <p class="mech-note">PoB は「人間性の証明」ではなく「存在の証明」。AI が自然に存在するのであれば、それも受け入れる。</p>
-                </div>
-            </div>
-
-            <!-- M6: 静寂閾値 -->
-            <div class="mechanism">
-                <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
-                    <div class="mechanism-num">6</div>
-                    <div class="mechanism-info">
-                        <h3>静寂閾値 — 放棄された巣の自然消滅</h3>
-                        <p>90日間取引ゼロの巣は「静寂状態」に。分母Nから除外され、減価が加速。</p>
-                    </div>
-                    <span class="mechanism-toggle">▼</span>
-                </div>
-                <div class="mechanism-body">
-                    <p>使われなくなった巣は、雨モデルの分母 N を膨張させてしまいます。静寂閾値はこの問題を解決します。</p>
-                    <ul>
-                        <li><strong>90日間取引ゼロ</strong> → 静寂状態と判定</li>
-                        <li><strong>Mana配分の分母Nから除外</strong> — 活動中の巣の配分が薄まらない</li>
-                        <li><strong>減価加速</strong> — 放棄された巣は自然に消滅へ向かう</li>
-                        <li><strong>復帰可能</strong> — 再び取引すれば静寂状態は解除</li>
-                    </ul>
-                    <p>巣の相続は却下されました（タイムラグ攻撃の脆弱性のため）。</p>
-                    <div class="mech-metaphor">🏚️ 長く空いた巣は森に還る。でも再び住めば、また巣として機能する。</div>
-                </div>
-            </div>
-
+            <p class="comparison-caption">※ Meguri は概念設計段階のプロジェクトです</p>
         </div>
-    </div>
 
-    <!-- ===== 4. 多層防御の全体像 ===== -->
-    <div class="section">
-        <h2 class="section-title">多層防御の全体像</h2>
-        <p class="section-lead">各メカニズムが独立して機能しながら、全体として「正直に生きることが最適戦略になる生態系」を構築。</p>
+        <!-- ===== 3. 6つのメカニズム ===== -->
+        <div class="section">
+            <h2 class="section-title">6つの主要メカニズム</h2>
+            <p class="section-lead">Phase 2 の討論を経て合意された、Meguri を構成する中核メカニズム。各項目をクリックで詳細を展開できます。</p>
 
-        <div class="layer-diagram">
-            <div class="layer-row">
-                <div class="layer-label">減価層</div>
-                <div class="layer-content">不自然な保有パターン → 自動的に加速減衰</div>
-            </div>
-            <div class="layer-arrow">↕</div>
-            <div class="layer-row">
-                <div class="layer-label">循環品質層</div>
-                <div class="layer-content">閉じた取引パターン → Q_equity 低下（コミュニティ相対評価）</div>
-            </div>
-            <div class="layer-arrow">↕</div>
-            <div class="layer-row">
-                <div class="layer-label">Mana配分層</div>
-                <div class="layer-content">雨モデル（1/N均等配分）→ 複数巣化の ROI をゼロに</div>
-            </div>
-            <div class="layer-arrow">↕</div>
-            <div class="layer-row">
-                <div class="layer-label">PoB層</div>
-                <div class="layer-content">第一層: AND異常検知（バイナリ）/ 第二層: ソフトミン配分（連続値）</div>
-            </div>
-            <div class="layer-arrow">↕</div>
-            <div class="layer-row">
-                <div class="layer-label">静寂層</div>
-                <div class="layer-content">90日無活動 → 分母Nから除外 + 減価加速 → 自然消滅</div>
-            </div>
-            <div class="layer-arrow">↕</div>
-            <div class="layer-row">
-                <div class="layer-label">VRF層</div>
-                <div class="layer-content">検証可能な乱数 + zk-SNARK で予測困難性と透明性を両立</div>
+            <div class="mechanism-list">
+
+                <!-- M1: 自然減価 -->
+                <div class="mechanism">
+                    <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="mechanism-num">1</div>
+                        <div class="mechanism-info">
+                            <h3>自然減価 — 溜め込むほど減る</h3>
+                            <p>通貨は時間とともに自然に減少する。大口保有 + 長期滞留 + 低スコアで加速。</p>
+                        </div>
+                        <span class="mechanism-toggle">▼</span>
+                    </div>
+                    <div class="mechanism-body">
+                        <p>通貨が一つの巣に留まると、時間とともに自然に減っていきます。保有量が多いほど、動かさない期間が長いほど、減りが早くなります。</p>
+                        <div class="mech-formula">λ(B, τ, S) = (α + β·B/B_median + γ·f(τ)) · g(S)</div>
+                        <ul>
+                            <li><strong>B</strong> = 保有量。中央値より多ければ加速</li>
+                            <li><strong>τ</strong> = 最後の取引からの経過時間</li>
+                            <li><strong>g(S)</strong> = スコアに基づく加速。<strong>加速のみ・軽減なし</strong></li>
+                        </ul>
+                        <div class="mech-metaphor">🍂 自然の中で水が流れずに留まると淀むように、通貨も巡らなければ自然に消えていく。</div>
+                    </div>
+                </div>
+
+                <!-- M2: 循環品質 -->
+                <div class="mechanism">
+                    <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="mechanism-num">2</div>
+                        <div class="mechanism-info">
+                            <h3>循環品質（Q） — 小川のように流れる</h3>
+                            <p>「良い循環」を測る体温計。多様性・非定型性・連続性の3要素で評価。</p>
+                        </div>
+                        <span class="mechanism-toggle">▼</span>
+                    </div>
+                    <div class="mechanism-body">
+                        <p>「良い循環」とは何か？ Meguri では<strong>多様性・非定型性・連続性</strong>（小川の比喩）で定義しています。</p>
+                        <ul>
+                            <li><strong>多様性</strong> — 色々な相手と取引している</li>
+                            <li><strong>非定型性</strong> — 毎回同じパターンの繰り返しではない</li>
+                            <li><strong>連続性</strong> — 途切れず穏やかに流れ続けている</li>
+                        </ul>
+                        <p>この指標は<strong>加算モデル</strong>（体温計）で計算され、Mana蓄積速度に接続されます。ただし報酬には直結しません。</p>
+                        <div class="mech-metaphor">🏞️ 細い小川が絶えず流れ続ける姿が、Meguri にとっての「良い循環」。</div>
+                        <p class="mech-note">体温計を温めても恩恵がないので、誰も指標を攻略しようとしない（グッドハートの法則への対策）。</p>
+                    </div>
+                </div>
+
+                <!-- M3: Mana と Bloom -->
+                <div class="mechanism">
+                    <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="mechanism-num">3</div>
+                        <div class="mechanism-info">
+                            <h3>Mana 蓄積と Bloom — ふっと増える</h3>
+                            <p>ネットワーク全体の循環が閾値を超えると「ふっと」通貨が増える。雨モデルで全員に均等配分。</p>
+                        </div>
+                        <span class="mechanism-toggle">▼</span>
+                    </div>
+                    <div class="mechanism-body">
+                        <p>Mana はネットワーク全体の循環品質に応じてじわじわ蓄積されます。蓄積量が閾値を超えると、<strong>Bloom（開花）</strong>が発生し、新しい通貨が生まれます。</p>
+                        <ul>
+                            <li><strong>確定部分（75%）</strong> — 毎期ゆっくり増加。心理的な安定を提供</li>
+                            <li><strong>Bloom 部分（25%）</strong> — 非定常ポアソン過程で「ふっと」発生。生命的な驚き</li>
+                        </ul>
+                        <p>配分は <strong>「雨モデル」</strong> を採用。全ての巣に均等（1/N）に配分されます。</p>
+                        <div class="mech-formula">各巣への配分 = ΔM / N（全巣均等）</div>
+                        <div class="mech-metaphor">🌧️ 雨はどの巣にも等しく降る。たくさんの巣を持っても、1つの巣あたりの雨は同じ。</div>
+                        <p class="mech-note">雨モデルにより、複数ウォレットを作っても利益が増えないため、Sybil攻撃の ROI がゼロになる。</p>
+                    </div>
+                </div>
+
+                <!-- M4: 三層構造 -->
+                <div class="mechanism">
+                    <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="mechanism-num">4</div>
+                        <div class="mechanism-info">
+                            <h3>三層構造 — 距離軸なき防御</h3>
+                            <p>「距離・時間・エントロピー」三軸から「減価・循環品質・VRF」三層へ概念転換。</p>
+                        </div>
+                        <span class="mechanism-toggle">▼</span>
+                    </div>
+                    <div class="mechanism-body">
+                        <p>当初の「距離・時間・エントロピー」三軸は、GPS依存や農村部の誤検知問題から、<strong>三層構造</strong>へと再設計されました。</p>
+                        <ul>
+                            <li><strong>第1層: 減価</strong> — 不自然な保有パターンを加速消滅</li>
+                            <li><strong>第2層: 循環品質（Q_equity）</strong> — コミュニティサイズで正規化した相対評価</li>
+                            <li><strong>第3層: VRF</strong> — 検証可能な乱数で予測困難性を確保</li>
+                        </ul>
+                        <p>スコアは非表示。代わりに <strong>zk-SNARK</strong>（ゼロ知識証明）で「閾値を超えているか？」だけを検証可能にし、透明性とスコア攻略防止を両立。</p>
+                        <div class="mech-metaphor">🔍 スコアが見えなければ攻略できない。でもゼロ知識証明で「大丈夫」は誰でも確認できる。</div>
+                    </div>
+                </div>
+
+                <!-- M5: Proof of Being -->
+                <div class="mechanism">
+                    <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="mechanism-num">5</div>
+                        <div class="mechanism-info">
+                            <h3>Proof of Being — 存在の証明</h3>
+                            <p>「何をしたか」ではなく「どう存在しているか」。二層構造で厳しさと寛容さを両立。</p>
+                        </div>
+                        <span class="mechanism-toggle">▼</span>
+                    </div>
+                    <div class="mechanism-body">
+                        <p>PoW（仕事の証明）でもなく、PoS（持ち分の証明）でもない。Meguri は <strong>Proof of Being（存在の証明）</strong>— 自然に存在しているか？
+                            を評価します。</p>
+                        <ul>
+                            <li><strong>第一層（異常検出）</strong> — AND条件の掛け算。1つでもゼロなら全体がゼロ。二値判定（通過 / 不通過）</li>
+                            <li><strong>第二層（恩恵配分）</strong> — ソフトミン方式。最も弱い軸を重視し、不完全な存在にもやさしく</li>
+                        </ul>
+                        <p>減価との連動は<strong>第一層のフラグ（二値）のみ</strong>。連続スコアとは独立させることで「死のスパイラル」を回避。</p>
+                        <div class="mech-metaphor">🌱 存在の「有無」は厳しく（AND条件）。存在の「質」は寛容に（ソフトミン）。正直者にはソフト、攻撃者にはハード。</div>
+                        <p class="mech-note">PoB は「人間性の証明」ではなく「存在の証明」。AI が自然に存在するのであれば、それも受け入れる。</p>
+                    </div>
+                </div>
+
+                <!-- M6: 静寂閾値 -->
+                <div class="mechanism">
+                    <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="mechanism-num">6</div>
+                        <div class="mechanism-info">
+                            <h3>静寂閾値 — 放棄された巣の自然消滅</h3>
+                            <p>90日間取引ゼロの巣は「静寂状態」に。分母Nから除外され、減価が加速。</p>
+                        </div>
+                        <span class="mechanism-toggle">▼</span>
+                    </div>
+                    <div class="mechanism-body">
+                        <p>使われなくなった巣は、雨モデルの分母 N を膨張させてしまいます。静寂閾値はこの問題を解決します。</p>
+                        <ul>
+                            <li><strong>90日間取引ゼロ</strong> → 静寂状態と判定</li>
+                            <li><strong>Mana配分の分母Nから除外</strong> — 活動中の巣の配分が薄まらない</li>
+                            <li><strong>減価加速</strong> — 放棄された巣は自然に消滅へ向かう</li>
+                            <li><strong>復帰可能</strong> — 再び取引すれば静寂状態は解除</li>
+                        </ul>
+                        <p>巣の相続は却下されました（タイムラグ攻撃の脆弱性のため）。</p>
+                        <div class="mech-metaphor">🏚️ 長く空いた巣は森に還る。でも再び住めば、また巣として機能する。</div>
+                    </div>
+                </div>
+
             </div>
         </div>
-    </div>
 
-    <!-- ===== 5. 統一原理 ===== -->
-    <div class="section">
-        <h2 class="section-title">統一原理</h2>
-        <p class="section-lead">Phase 2 全6討論を通じて導かれた、Meguri の設計を貫く一つの原理。</p>
+        <!-- ===== 4. 多層防御の全体像 ===== -->
+        <div class="section">
+            <h2 class="section-title">多層防御の全体像</h2>
+            <p class="section-lead">各メカニズムが独立して機能しながら、全体として「正直に生きることが最適戦略になる生態系」を構築。</p>
 
-        <div class="principle-box">
-            <blockquote>
-                自然に存在するものを自然に守り、<br>
-                不自然なものを自然に排除する。<br>
-                識別せず、罰せず、ただ構造で。
-            </blockquote>
-            <p class="source">— Phase 2 討論06「複数ウォレット」合意より</p>
-        </div>
-    </div>
-
-    <!-- ===== 6. 未解決の課題 ===== -->
-    <div class="section">
-        <h2 class="section-title">未解決の課題</h2>
-        <p class="section-lead">外部レビュー（春日）および討論で残された、今後の検討事項。</p>
-
-        <div class="open-issues">
-            <div class="open-issue">
-                <div class="issue-severity high"></div>
-                <div>
-                    <h4>雨モデル vs Layer 2 のインセンティブ崩壊</h4>
-                    <p>均等配分なら品質スコアを上げる動機がない。Layer 2（ソフトミン）の役割再定義が必要。</p>
+            <div class="layer-diagram">
+                <div class="layer-row">
+                    <div class="layer-label">減価層</div>
+                    <div class="layer-content">不自然な保有パターン → 自動的に加速減衰</div>
                 </div>
-            </div>
-            <div class="open-issue">
-                <div class="issue-severity high"></div>
-                <div>
-                    <h4>AI 大量参入による Mana 希釈</h4>
-                    <p>「AI 受容」と「1/N均等配分」の組み合わせで、AI が巣を大量作成すると人間の取り分が希釈される。</p>
+                <div class="layer-arrow">↕</div>
+                <div class="layer-row">
+                    <div class="layer-label">循環品質層</div>
+                    <div class="layer-content">閉じた取引パターン → Q_equity 低下（コミュニティ相対評価）</div>
                 </div>
-            </div>
-            <div class="open-issue">
-                <div class="issue-severity high"></div>
-                <div>
-                    <h4>部分リセット閾値の恣意性</h4>
-                    <p>「少額取引」の閾値を誰が決めるのか。中央集権的判断と「脱所有」哲学の矛盾。</p>
+                <div class="layer-arrow">↕</div>
+                <div class="layer-row">
+                    <div class="layer-label">Mana配分層</div>
+                    <div class="layer-content">雨モデル（1/N均等配分）→ 複数巣化の ROI をゼロに</div>
                 </div>
-            </div>
-            <div class="open-issue">
-                <div class="issue-severity mid"></div>
-                <div>
-                    <h4>デジタル追放の復帰パス</h4>
-                    <p>病気や災害で長期離脱した場合、静寂閾値 + 減衰加速で復帰困難に。復帰用の猶予期間が未設計。</p>
+                <div class="layer-arrow">↕</div>
+                <div class="layer-row">
+                    <div class="layer-label">PoB層</div>
+                    <div class="layer-content">第一層: AND異常検知（バイナリ）/ 第二層: ソフトミン配分（連続値）</div>
                 </div>
-            </div>
-            <div class="open-issue">
-                <div class="issue-severity low"></div>
-                <div>
-                    <h4>コミュニティ境界の実装定義</h4>
-                    <p>取引グラフによるコミュニティ定義は概念的に合意済みだが、Q_equity 正規化への接続方法が未詳細。</p>
+                <div class="layer-arrow">↕</div>
+                <div class="layer-row">
+                    <div class="layer-label">静寂層</div>
+                    <div class="layer-content">90日無活動 → 分母Nから除外 + 減価加速 → 自然消滅</div>
                 </div>
-            </div>
-            <div class="open-issue">
-                <div class="issue-severity low"></div>
-                <div>
-                    <h4>Phase 0 シミュレーション</h4>
-                    <p>κ・S_threshold の最適値、静寂閾値90日の妥当性、Sybil ROI の定量化など、実データでの検証が必要。</p>
+                <div class="layer-arrow">↕</div>
+                <div class="layer-row">
+                    <div class="layer-label">VRF層</div>
+                    <div class="layer-content">検証可能な乱数 + zk-SNARK で予測困難性と透明性を両立</div>
                 </div>
             </div>
         </div>
+
+        <!-- ===== 5. 統一原理 ===== -->
+        <div class="section">
+            <h2 class="section-title">統一原理</h2>
+            <p class="section-lead">Phase 2 全6討論を通じて導かれた、Meguri の設計を貫く一つの原理。</p>
+
+            <div class="principle-box">
+                <blockquote>
+                    自然に存在するものを自然に守り、<br>
+                    不自然なものを自然に排除する。<br>
+                    識別せず、罰せず、ただ構造で。
+                </blockquote>
+                <p class="source">— Phase 2 討論06「複数ウォレット」合意より</p>
+            </div>
+        </div>
+
+        <!-- ===== 6. 未解決の課題 ===== -->
+        <div class="section">
+            <h2 class="section-title">未解決の課題</h2>
+            <p class="section-lead">外部レビュー（春日）および討論で残された、今後の検討事項。</p>
+
+            <div class="open-issues">
+                <div class="open-issue">
+                    <div class="issue-severity high"></div>
+                    <div>
+                        <h4>雨モデル vs Layer 2 のインセンティブ崩壊</h4>
+                        <p>均等配分なら品質スコアを上げる動機がない。Layer 2（ソフトミン）の役割再定義が必要。</p>
+                    </div>
+                </div>
+                <div class="open-issue">
+                    <div class="issue-severity high"></div>
+                    <div>
+                        <h4>AI 大量参入による Mana 希釈</h4>
+                        <p>「AI 受容」と「1/N均等配分」の組み合わせで、AI が巣を大量作成すると人間の取り分が希釈される。</p>
+                    </div>
+                </div>
+                <div class="open-issue">
+                    <div class="issue-severity high"></div>
+                    <div>
+                        <h4>部分リセット閾値の恣意性</h4>
+                        <p>「少額取引」の閾値を誰が決めるのか。中央集権的判断と「脱所有」哲学の矛盾。</p>
+                    </div>
+                </div>
+                <div class="open-issue">
+                    <div class="issue-severity mid"></div>
+                    <div>
+                        <h4>デジタル追放の復帰パス</h4>
+                        <p>病気や災害で長期離脱した場合、静寂閾値 + 減衰加速で復帰困難に。復帰用の猶予期間が未設計。</p>
+                    </div>
+                </div>
+                <div class="open-issue">
+                    <div class="issue-severity low"></div>
+                    <div>
+                        <h4>コミュニティ境界の実装定義</h4>
+                        <p>取引グラフによるコミュニティ定義は概念的に合意済みだが、Q_equity 正規化への接続方法が未詳細。</p>
+                    </div>
+                </div>
+                <div class="open-issue">
+                    <div class="issue-severity low"></div>
+                    <div>
+                        <h4>Phase 0 シミュレーション</h4>
+                        <p>κ・S_threshold の最適値、静寂閾値90日の妥当性、Sybil ROI の定量化など、実データでの検証が必要。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== フッター ===== -->
+        <footer>
+            <p>🌀 Meguri Project — 循環する通貨、生き物のような経済</p>
+            <p style="margin-top: 8px;">
+                <a href="index.html">議論ログ一覧</a> ｜
+                <a href="discussions/review_haruhi.html">外部レビュー</a> ｜
+                Generated by <a href="https://claude.ai" target="_blank">Claude Code</a>
+            </p>
+        </footer>
+
     </div>
 
-    <!-- ===== フッター ===== -->
-    <footer>
-        <p>🌀 Meguri Project — 循環する通貨、生き物のような経済</p>
-        <p style="margin-top: 8px;">
-            <a href="index.html">議論ログ一覧</a> ｜
-            <a href="discussions/review_kasuga.html">外部レビュー</a> ｜
-            Generated by <a href="https://claude.ai" target="_blank">Claude Code</a>
-        </p>
-    </footer>
-
-</div>
-
-<script>
-// 最初のメカニズムを開いた状態にする
-document.querySelector('.mechanism').classList.add('open');
-</script>
+    <script>
+        // 最初のメカニズムを開いた状態にする
+        document.querySelector('.mechanism').classList.add('open');
+    </script>
 </body>
+
 </html>
