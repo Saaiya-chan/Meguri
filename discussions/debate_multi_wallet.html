@@ -406,7 +406,8 @@
 
         @media (max-width: 768px) {
             .container { grid-template-columns: 1fr; }
-            .left-pane, .right-pane { position: relative; top: 0; }
+            .left-pane, .center-pane, .right-pane { grid-column: auto; position: relative; top: 0; }
+            .center-pane { padding: 20px; }
         }
     </style>
 </head>
