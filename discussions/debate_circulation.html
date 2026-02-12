@@ -125,6 +125,33 @@
         ::-webkit-scrollbar-track { background: #0d1117; }
         ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #58a6ff; }
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .left-pane {
+                grid-column: 1;
+            }
+            .center-pane {
+                grid-column: 2;
+            }
+            .right-pane {
+                grid-column: 1 / -1;
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .left-pane,
+            .right-pane {
+                position: relative;
+                top: 0;
+            }
+        }
     </style>
 </head>
 <body>

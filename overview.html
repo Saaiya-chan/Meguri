@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meguri（めぐり）— 設計概要</title>
+    <title>Meguri（めぐり）ってなに？</title>
     <style>
         * {
             margin: 0;
@@ -18,11 +18,11 @@
             color: #c9d1d9;
             min-height: 100vh;
             padding: 40px 20px;
-            line-height: 1.7;
+            line-height: 1.8;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 860px;
             margin: 0 auto;
         }
 
@@ -44,16 +44,16 @@
         }
 
         .hero-icon {
-            font-size: 64px;
+            font-size: 72px;
             margin-bottom: 16px;
             display: block;
         }
 
         .hero h1 {
-            font-size: 40px;
+            font-size: 36px;
             color: #e6edf3;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .hero h1 span {
@@ -64,20 +64,21 @@
         }
 
         .hero-sub {
-            font-size: 18px;
+            font-size: 17px;
             color: #8b949e;
             margin-bottom: 28px;
+            line-height: 1.8;
         }
 
         .hero-tagline {
             display: inline-block;
-            padding: 10px 24px;
+            padding: 10px 28px;
             background: #161b22;
             border: 1px solid #30363d;
             border-radius: 40px;
-            font-size: 15px;
+            font-size: 16px;
             color: #c9d1d9;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         .hero-tagline em {
@@ -94,67 +95,98 @@
 
         /* ===== セクション共通 ===== */
         .section {
-            margin-bottom: 56px;
+            margin-bottom: 64px;
         }
 
         .section-title {
             font-size: 22px;
             color: #e6edf3;
             font-weight: 700;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .section-title .icon {
-            font-size: 20px;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            flex-shrink: 0;
+            margin-bottom: 12px;
         }
 
         .section-lead {
-            font-size: 14px;
-            color: #8b949e;
-            margin-bottom: 24px;
+            font-size: 15px;
+            color: #c9d1d9;
+            margin-bottom: 28px;
+            line-height: 1.9;
         }
 
-        /* ===== 哲学カード ===== */
-        .philosophy-grid {
+        .section-lead strong {
+            color: #e6edf3;
+        }
+
+        /* ===== イントロカード ===== */
+        .intro-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 16px;
         }
 
-        .philosophy-card {
+        .intro-card {
             background: #161b22;
             border: 1px solid #30363d;
             border-radius: 12px;
             padding: 24px 20px;
-            text-align: center;
         }
 
-        .philosophy-card .card-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
+        .intro-card .card-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
             display: block;
         }
 
-        .philosophy-card h3 {
+        .intro-card h3 {
             font-size: 15px;
             color: #e6edf3;
             margin-bottom: 8px;
         }
 
-        .philosophy-card p {
+        .intro-card p {
             font-size: 13px;
             color: #8b949e;
-            line-height: 1.7;
+            line-height: 1.8;
+        }
+
+        .intro-card.wide {
+            grid-column: 1 / -1;
+        }
+
+        /* ===== ストーリーブロック ===== */
+        .story-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 14px;
+            padding: 32px;
+            margin-bottom: 20px;
+        }
+
+        .story-block h3 {
+            font-size: 18px;
+            color: #e6edf3;
+            margin-bottom: 12px;
+        }
+
+        .story-block p {
+            font-size: 14px;
+            color: #c9d1d9;
+            line-height: 1.9;
+            margin-bottom: 12px;
+        }
+
+        .story-block p:last-child {
+            margin-bottom: 0;
+        }
+
+        .story-metaphor {
+            background: rgba(210, 168, 255, 0.08);
+            border-left: 3px solid #d2a8ff;
+            border-radius: 0 8px 8px 0;
+            padding: 14px 18px;
+            margin: 16px 0;
+            font-size: 14px;
+            color: #d2a8ff;
+            line-height: 1.8;
         }
 
         /* ===== 比較テーブル ===== */
@@ -228,11 +260,11 @@
             text-align: right;
         }
 
-        /* ===== メカニズム ===== */
+        /* ===== しくみアコーディオン ===== */
         .mechanism-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
         .mechanism {
@@ -245,8 +277,8 @@
         .mechanism-header {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 20px 24px;
+            gap: 14px;
+            padding: 18px 24px;
             cursor: pointer;
             user-select: none;
             transition: background 0.2s;
@@ -257,14 +289,14 @@
         }
 
         .mechanism-num {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 15px;
+            font-size: 14px;
             flex-shrink: 0;
         }
 
@@ -303,9 +335,9 @@
         }
 
         .mechanism-info h3 {
-            font-size: 16px;
+            font-size: 15px;
             color: #e6edf3;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .mechanism-info p {
@@ -315,7 +347,7 @@
 
         .mechanism-toggle {
             color: #484f58;
-            font-size: 18px;
+            font-size: 16px;
             transition: transform 0.3s;
         }
 
@@ -325,7 +357,7 @@
 
         .mechanism-body {
             display: none;
-            padding: 0 24px 20px 76px;
+            padding: 0 24px 20px 72px;
         }
 
         .mechanism.open .mechanism-body {
@@ -336,7 +368,7 @@
         .mechanism-body li {
             font-size: 14px;
             color: #c9d1d9;
-            line-height: 1.8;
+            line-height: 1.9;
         }
 
         .mechanism-body ul {
@@ -387,11 +419,11 @@
             align-items: stretch;
             border-radius: 10px;
             overflow: hidden;
-            min-height: 56px;
+            min-height: 52px;
         }
 
         .layer-label {
-            width: 140px;
+            width: 130px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -407,7 +439,7 @@
             flex-grow: 1;
             display: flex;
             align-items: center;
-            padding: 12px 20px;
+            padding: 10px 20px;
             font-size: 13px;
             background: #161b22;
             border: 1px solid #30363d;
@@ -447,8 +479,8 @@
         .layer-arrow {
             text-align: center;
             color: #30363d;
-            font-size: 18px;
-            padding: 2px 0;
+            font-size: 16px;
+            padding: 1px 0;
         }
 
         /* ===== 統一原理 ===== */
@@ -456,7 +488,7 @@
             background: #161b22;
             border: 2px solid #7ee78740;
             border-radius: 16px;
-            padding: 32px;
+            padding: 36px;
             text-align: center;
             position: relative;
         }
@@ -474,7 +506,7 @@
             font-size: 18px;
             color: #e6edf3;
             font-weight: 500;
-            line-height: 2;
+            line-height: 2.2;
             margin-bottom: 16px;
         }
 
@@ -531,6 +563,70 @@
             color: #8b949e;
         }
 
+        /* ===== 呼びかけボックス ===== */
+        .callout {
+            background: linear-gradient(135deg, #161b22, #1a2332);
+            border: 1px solid #30363d;
+            border-radius: 16px;
+            padding: 36px;
+            text-align: center;
+        }
+
+        .callout h3 {
+            font-size: 20px;
+            color: #e6edf3;
+            margin-bottom: 12px;
+        }
+
+        .callout p {
+            font-size: 14px;
+            color: #c9d1d9;
+            line-height: 1.9;
+            margin-bottom: 16px;
+            max-width: 640px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .callout-links {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .callout-link {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .callout-link.primary {
+            background: #1f6feb;
+            color: #fff;
+        }
+
+        .callout-link.primary:hover {
+            background: #388bfd;
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        .callout-link.secondary {
+            background: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+        }
+
+        .callout-link.secondary:hover {
+            background: #30363d;
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
         /* ===== フッター ===== */
         footer {
             text-align: center;
@@ -547,7 +643,7 @@
                 font-size: 28px;
             }
 
-            .philosophy-grid {
+            .intro-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -567,6 +663,11 @@
             .layer-label {
                 width: 100px;
                 font-size: 11px;
+            }
+
+            .callout-links {
+                flex-direction: column;
+                align-items: center;
             }
         }
 
@@ -606,6 +707,14 @@
         .section:nth-child(6) {
             animation-delay: 0.5s;
         }
+
+        .section:nth-child(7) {
+            animation-delay: 0.6s;
+        }
+
+        .section:nth-child(8) {
+            animation-delay: 0.7s;
+        }
     </style>
 </head>
 
@@ -616,41 +725,138 @@
         <div class="hero">
             <a href="index.html" class="back-link">← 議論ログ一覧に戻る</a>
             <span class="hero-icon">🌀</span>
-            <h1><span>Meguri</span>（めぐり）</h1>
-            <p class="hero-sub">循環を本質とした仮想通貨の設計概要</p>
+            <h1><span>Meguri</span> ってなに？</h1>
+            <p class="hero-sub">
+                所有ではなく循環が本質の通貨という名の「喜び」。<br>
+                移りゆくと人々が豊かさの循環を助け、それが喜びとなり、増える。<br>
+                喜びは瞬間的なものであり、時間とともに自然に消えていく。
+            </p>
             <div class="hero-tagline">
                 所有しない。溜め込まない。ただ、<em>めぐる</em>。
             </div>
         </div>
 
-        <!-- ===== 1. 哲学 ===== -->
+        <!-- ===== 1. ざっくりイメージ ===== -->
         <div class="section">
-            <h2 class="section-title">Meguri とは何か</h2>
-            <p class="section-lead">Meguri は「所有」ではなく「循環」を本質とする仮想通貨のコンセプトです。</p>
+            <h2 class="section-title">ざっくりこんな通貨です</h2>
+            <p class="section-lead">
+                Meguri（めぐり）は従来の「所有するお金」ではなく、<strong>「循環そのもの」を本質</strong>とした仮想通貨の構想です。
+                生き物のような性質を持ち、社会の中をめぐることで全体が豊かになっていきます。
+            </p>
 
-            <div class="philosophy-grid">
-                <div class="philosophy-card">
-                    <span class="card-icon">🏠</span>
+            <div class="intro-grid">
+                <div class="intro-card">
+                    <span class="card-icon">🍃</span>
+                    <h3>自然に減っていく</h3>
+                    <p>時間とともに少しずつ自然に減っていきます。富の偏りをやわらげるための仕組みです。</p>
+                </div>
+                <div class="intro-card">
+                    <span class="card-icon">🌱</span>
+                    <h3>めぐると増える</h3>
+                    <p>社会の中でよく循環すると、Meguri 全体の総量がじわっと増えます。個人ではなく、社会全体が豊かになる仕組みです。</p>
+                </div>
+                <div class="intro-card">
+                    <span class="card-icon">🪹</span>
                     <h3>巣（ウォレット）</h3>
-                    <p>ウォレットは金庫ではなく「巣」。通貨が一時的に休む場所であり、留まるための場所ではない。</p>
+                    <p>溜め込む金庫ではなく、Meguri が一時的に立ち寄る「巣」や「休憩所」のようなもの。動かさない時間が長いほど、Meguri は弱っていきます。</p>
                 </div>
-                <div class="philosophy-card">
-                    <span class="card-icon">🌊</span>
-                    <h3>脱所有</h3>
-                    <p>通貨は生き物のように流れる。溜め込めば自然に減り、巡らせれば社会全体が潤う。</p>
-                </div>
-                <div class="philosophy-card">
-                    <span class="card-icon">🛡️</span>
-                    <h3>識別より無力化</h3>
-                    <p>悪意ある行動を「見つけて罰する」のではなく、「やっても得しない構造」にする。</p>
+                <div class="intro-card">
+                    <span class="card-icon">🌍</span>
+                    <h3>全体でひとつの生き物</h3>
+                    <p>個人の残高が直接増えるのではなく、社会全体の Meguri がじわっと増える。全体でもひとつの生き物みたいに。</p>
                 </div>
             </div>
         </div>
 
-        <!-- ===== 2. 従来通貨との比較 ===== -->
+        <!-- ===== 2. 巣のこと ===== -->
         <div class="section">
-            <h2 class="section-title">従来の通貨との違い</h2>
-            <p class="section-lead">既存の仮想通貨の常識を反転させた設計思想。</p>
+            <h2 class="section-title">「巣」ってどんな場所？</h2>
+
+            <div class="story-block">
+                <p>
+                    Meguri の「巣」は、財布や口座ではありません。所有の拠点ではなく、<strong>通過点</strong>として設計されます。
+                    いわば「流れを可視化する場所」です。
+                </p>
+                <p>
+                    だから、長くとどまるほど居心地が悪くなる。動かさない時間が長いほど減価が強くなり、巣に籠もるほど Meguri が弱っていく感じです。
+                </p>
+                <div class="story-metaphor">
+                    🏡 逆に、よく出入りがある巣は「活気がある」。頻繁に Meguri が出入りしている休憩所ほど、全体の生き物（Meguri 総量）が元気になる方向に寄与する。巣そのものが評価されるというより、「そこを通る流れ」が評価されます。
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 3. 減り方と増え方 ===== -->
+        <div class="section">
+            <h2 class="section-title">減り方と増え方</h2>
+
+            <div class="story-block">
+                <h3>🍂 減り方</h3>
+                <p>
+                    滑らかに毎日少しずつ減ります。大口保有者ほど速く減ります。
+                    自然の中で水が流れずに留まると淀むように、通貨もめぐらなければ自然に消えていきます。
+                </p>
+            </div>
+
+            <div class="story-block">
+                <h3>🌸 増え方 — Mana と Bloom</h3>
+                <p>
+                    取引一回ごとに元気になって、あるタイミングで増えます。どこで増えるかはコントロールできません。
+                    決定論的じゃなくて、確率やタイミングの揺らぎを入れています。
+                </p>
+                <div class="story-metaphor">
+                    🧬 まるで、たくさん動いた細胞がある日ふっと分裂するみたいな感じ。人間が「完全に最適化できない余地」をわざと残しています。
+                </div>
+                <p>
+                    流通すると Meguri ネットワーク全体に <strong>Mana（マナ）</strong>がたまり、閾値を超えると <strong>Bloom（開花）</strong>— 新しい Meguri が生まれます。
+                    配分は<strong>「雨モデル」</strong>。すべての巣に等しく降りそそぎます。
+                </p>
+                <div class="story-metaphor">
+                    🌧️ 雨はどの巣にも等しく降る。たくさんの巣を持っても、1つの巣あたりの雨は同じ。だから巣を増やしても意味がない。
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 4. 不正への考え方 ===== -->
+        <div class="section">
+            <h2 class="section-title">不正にどう向き合うか</h2>
+
+            <div class="story-block">
+                <p>
+                    最大の問題は Sybil 攻撃 — 「1人が複数の巣を作り、別人のふりをして有利に振る舞う」こと。
+                    通常は本人確認（KYC）や生体認証で防ぎますが、それは管理者が「人間を管理する」構造。
+                    所有・支配・監視の構図に戻ってしまい、Meguri の世界観と矛盾します。
+                </p>
+                <p>
+                    そこで Meguri では、Sybil を<strong>「排除」するのではなく、「意味がない」構造にする</strong>という発想を取ります。
+                    不自然な存在のしかたを「育たない」構造にする。「1人 = 1巣」を強制するのではなく、<strong>複数の巣を自然に維持すること自体が極端に難しい世界</strong>を作ります。
+                </p>
+                <div class="story-metaphor">
+                    🛡️ 「識別より無力化」— 悪意ある行動を見つけて罰するのではなく、やっても得しない構造にする。攻撃が自己弱体化に変換される世界。
+                </div>
+            </div>
+
+            <div class="story-block">
+                <h3>Proof of Being — 存在の証明</h3>
+                <p>
+                    「何をしたか」ではなく「どう存在しているか」を評価します。
+                    たくさん持つ、たくさん動かす、たくさん稼ぐ——ではなく、
+                    <strong>自然に生きているか、偏らず循環しているか、無理のないリズムを持っているか</strong>が評価されます。
+                </p>
+                <p>
+                    この構造は Proof of Work（仕事の証明）や Proof of Stake（持ち分の証明）とは異なる、
+                    <strong>「Proof of Being（存在の証明）」</strong>とも言える新しいカテゴリです。
+                </p>
+                <div class="story-metaphor">
+                    🌱 存在の「有無」は厳しく。存在の「質」は寛容に。正直者にはソフト、攻撃者にはハード。
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 5. 従来通貨との比較 ===== -->
+        <div class="section">
+            <h2 class="section-title">従来の仮想通貨との違い</h2>
+            <p class="section-lead">常識をひっくり返すような設計です。</p>
 
             <div class="comparison">
                 <div class="comparison-col old">
@@ -658,7 +864,7 @@
                     <ul>
                         <li>持つほど有利（富の蓄積）</li>
                         <li>計算力 = 信頼（PoW / PoS）</li>
-                        <li>匿名性でSybilと戦う</li>
+                        <li>本人確認で不正と戦う</li>
                         <li>個人の利益最大化が目的</li>
                         <li>ウォレット = 金庫</li>
                     </ul>
@@ -666,21 +872,23 @@
                 <div class="comparison-col new">
                     <h4>Meguri</h4>
                     <ul>
-                        <li>溜め込むと自然に減る（減価メカニズム）</li>
+                        <li>溜め込むと自然に減る</li>
                         <li>存在の仕方 = 信頼（Proof of Being）</li>
-                        <li>攻撃を無力化する構造で守る</li>
+                        <li>攻撃しても得しない構造で守る</li>
                         <li>循環すると社会全体が潤う</li>
-                        <li>ウォレット = 巣（一時的な休息地）</li>
+                        <li>ウォレット = 巣（通過点）</li>
                     </ul>
                 </div>
             </div>
             <p class="comparison-caption">※ Meguri は概念設計段階のプロジェクトです</p>
         </div>
 
-        <!-- ===== 3. 6つのメカニズム ===== -->
+        <!-- ===== 6. もう少し詳しく ===== -->
         <div class="section">
-            <h2 class="section-title">6つの主要メカニズム</h2>
-            <p class="section-lead">Phase 2 の討論を経て合意された、Meguri を構成する中核メカニズム。各項目をクリックで詳細を展開できます。</p>
+            <h2 class="section-title">もう少し詳しく知りたい方へ</h2>
+            <p class="section-lead">
+                討論を通じて合意された6つのメカニズム。クリックで詳細を展開できます。
+            </p>
 
             <div class="mechanism-list">
 
@@ -689,8 +897,8 @@
                     <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
                         <div class="mechanism-num">1</div>
                         <div class="mechanism-info">
-                            <h3>自然減価 — 溜め込むほど減る</h3>
-                            <p>通貨は時間とともに自然に減少する。大口保有 + 長期滞留 + 低スコアで加速。</p>
+                            <h3>自然減価</h3>
+                            <p>溜め込むほど減る。大口保有 + 長期滞留 + 低スコアで加速。</p>
                         </div>
                         <span class="mechanism-toggle">▼</span>
                     </div>
@@ -702,7 +910,7 @@
                             <li><strong>τ</strong> = 最後の取引からの経過時間</li>
                             <li><strong>g(S)</strong> = スコアに基づく加速。<strong>加速のみ・軽減なし</strong></li>
                         </ul>
-                        <div class="mech-metaphor">🍂 自然の中で水が流れずに留まると淀むように、通貨も巡らなければ自然に消えていく。</div>
+                        <p class="mech-note">「正直に生きること」が自動的に減価を遅くする。不自然な行動だけが減価を加速させる自然法則的な設計。</p>
                     </div>
                 </div>
 
@@ -711,19 +919,18 @@
                     <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
                         <div class="mechanism-num">2</div>
                         <div class="mechanism-info">
-                            <h3>循環品質（Q） — 小川のように流れる</h3>
+                            <h3>循環品質（Q）</h3>
                             <p>「良い循環」を測る体温計。多様性・非定型性・連続性の3要素で評価。</p>
                         </div>
                         <span class="mechanism-toggle">▼</span>
                     </div>
                     <div class="mechanism-body">
-                        <p>「良い循環」とは何か？ Meguri では<strong>多様性・非定型性・連続性</strong>（小川の比喩）で定義しています。</p>
+                        <p>Meguri が好む「良い循環」を<strong>多様性・非定型性・連続性</strong>で定義しています。</p>
                         <ul>
-                            <li><strong>多様性</strong> — 色々な相手と取引している</li>
+                            <li><strong>多様性</strong> — 色々な相手とやり取りしている</li>
                             <li><strong>非定型性</strong> — 毎回同じパターンの繰り返しではない</li>
                             <li><strong>連続性</strong> — 途切れず穏やかに流れ続けている</li>
                         </ul>
-                        <p>この指標は<strong>加算モデル</strong>（体温計）で計算され、Mana蓄積速度に接続されます。ただし報酬には直結しません。</p>
                         <div class="mech-metaphor">🏞️ 細い小川が絶えず流れ続ける姿が、Meguri にとっての「良い循環」。</div>
                         <p class="mech-note">体温計を温めても恩恵がないので、誰も指標を攻略しようとしない（グッドハートの法則への対策）。</p>
                     </div>
@@ -734,21 +941,19 @@
                     <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
                         <div class="mechanism-num">3</div>
                         <div class="mechanism-info">
-                            <h3>Mana 蓄積と Bloom — ふっと増える</h3>
-                            <p>ネットワーク全体の循環が閾値を超えると「ふっと」通貨が増える。雨モデルで全員に均等配分。</p>
+                            <h3>Mana 蓄積と Bloom</h3>
+                            <p>ネットワーク全体の循環が閾値を超えると「ふっと」通貨が増える。雨モデルで均等配分。</p>
                         </div>
                         <span class="mechanism-toggle">▼</span>
                     </div>
                     <div class="mechanism-body">
-                        <p>Mana はネットワーク全体の循環品質に応じてじわじわ蓄積されます。蓄積量が閾値を超えると、<strong>Bloom（開花）</strong>が発生し、新しい通貨が生まれます。</p>
+                        <p>Mana はネットワーク全体の循環品質に応じて蓄積されます。閾値を超えると Bloom（開花）が発生。</p>
                         <ul>
-                            <li><strong>確定部分（75%）</strong> — 毎期ゆっくり増加。心理的な安定を提供</li>
-                            <li><strong>Bloom 部分（25%）</strong> — 非定常ポアソン過程で「ふっと」発生。生命的な驚き</li>
+                            <li><strong>確定部分（75%）</strong> — 毎期ゆっくり増加。安心感。</li>
+                            <li><strong>Bloom 部分（25%）</strong> — 確率的に「ふっと」発生。生命的な驚き。</li>
                         </ul>
-                        <p>配分は <strong>「雨モデル」</strong> を採用。全ての巣に均等（1/N）に配分されます。</p>
-                        <div class="mech-formula">各巣への配分 = ΔM / N（全巣均等）</div>
-                        <div class="mech-metaphor">🌧️ 雨はどの巣にも等しく降る。たくさんの巣を持っても、1つの巣あたりの雨は同じ。</div>
-                        <p class="mech-note">雨モデルにより、複数ウォレットを作っても利益が増えないため、Sybil攻撃の ROI がゼロになる。</p>
+                        <div class="mech-formula">各巣への配分 = ΔM / N（全巣均等 = 雨モデル）</div>
+                        <p class="mech-note">雨モデルにより、複数の巣を作っても利益が増えない。Sybil攻撃の ROI がゼロに。</p>
                     </div>
                 </div>
 
@@ -757,20 +962,20 @@
                     <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
                         <div class="mechanism-num">4</div>
                         <div class="mechanism-info">
-                            <h3>三層構造 — 距離軸なき防御</h3>
-                            <p>「距離・時間・エントロピー」三軸から「減価・循環品質・VRF」三層へ概念転換。</p>
+                            <h3>三層構造</h3>
+                            <p>「距離・時間・エントロピー」三軸から「減価・循環品質・VRF」三層へ進化。</p>
                         </div>
                         <span class="mechanism-toggle">▼</span>
                     </div>
                     <div class="mechanism-body">
-                        <p>当初の「距離・時間・エントロピー」三軸は、GPS依存や農村部の誤検知問題から、<strong>三層構造</strong>へと再設計されました。</p>
+                        <p>当初の三軸はGPS依存や農村部の誤検知問題から、三層構造へ再設計されました。</p>
                         <ul>
                             <li><strong>第1層: 減価</strong> — 不自然な保有パターンを加速消滅</li>
-                            <li><strong>第2層: 循環品質（Q_equity）</strong> — コミュニティサイズで正規化した相対評価</li>
+                            <li><strong>第2層: 循環品質（Q_equity）</strong> — コミュニティ相対評価</li>
                             <li><strong>第3層: VRF</strong> — 検証可能な乱数で予測困難性を確保</li>
                         </ul>
-                        <p>スコアは非表示。代わりに <strong>zk-SNARK</strong>（ゼロ知識証明）で「閾値を超えているか？」だけを検証可能にし、透明性とスコア攻略防止を両立。</p>
-                        <div class="mech-metaphor">🔍 スコアが見えなければ攻略できない。でもゼロ知識証明で「大丈夫」は誰でも確認できる。</div>
+                        <p>スコアは非表示。<strong>zk-SNARK</strong>（ゼロ知識証明）で「閾値を超えているか」だけ検証可能に。</p>
+                        <div class="mech-metaphor">🔍 スコアが見えなければ攻略できない。でも「大丈夫」は誰でも確認できる。</div>
                     </div>
                 </div>
 
@@ -779,21 +984,18 @@
                     <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
                         <div class="mechanism-num">5</div>
                         <div class="mechanism-info">
-                            <h3>Proof of Being — 存在の証明</h3>
-                            <p>「何をしたか」ではなく「どう存在しているか」。二層構造で厳しさと寛容さを両立。</p>
+                            <h3>Proof of Being（二層構造）</h3>
+                            <p>存在の有無を厳しく（AND条件）、存在の質を寛容に（ソフトミン）。</p>
                         </div>
                         <span class="mechanism-toggle">▼</span>
                     </div>
                     <div class="mechanism-body">
-                        <p>PoW（仕事の証明）でもなく、PoS（持ち分の証明）でもない。Meguri は <strong>Proof of Being（存在の証明）</strong>— 自然に存在しているか？
-                            を評価します。</p>
                         <ul>
-                            <li><strong>第一層（異常検出）</strong> — AND条件の掛け算。1つでもゼロなら全体がゼロ。二値判定（通過 / 不通過）</li>
-                            <li><strong>第二層（恩恵配分）</strong> — ソフトミン方式。最も弱い軸を重視し、不完全な存在にもやさしく</li>
+                            <li><strong>第一層（異常検出）</strong> — AND条件。1つでもゼロなら不通過。バイナリ判定。</li>
+                            <li><strong>第二層（恩恵配分）</strong> — ソフトミン方式。最も弱い軸を重視し、不完全な存在にもやさしく。</li>
                         </ul>
-                        <p>減価との連動は<strong>第一層のフラグ（二値）のみ</strong>。連続スコアとは独立させることで「死のスパイラル」を回避。</p>
-                        <div class="mech-metaphor">🌱 存在の「有無」は厳しく（AND条件）。存在の「質」は寛容に（ソフトミン）。正直者にはソフト、攻撃者にはハード。</div>
-                        <p class="mech-note">PoB は「人間性の証明」ではなく「存在の証明」。AI が自然に存在するのであれば、それも受け入れる。</p>
+                        <p>減価との連動は第一層のフラグ（二値）のみ。連続スコアとは独立させ「死のスパイラル」を回避。</p>
+                        <p class="mech-note">PoB は「人間性の証明」ではなく「存在の証明」。AI が自然に存在するなら、それも受け入れる。</p>
                     </div>
                 </div>
 
@@ -802,20 +1004,18 @@
                     <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
                         <div class="mechanism-num">6</div>
                         <div class="mechanism-info">
-                            <h3>静寂閾値 — 放棄された巣の自然消滅</h3>
+                            <h3>静寂閾値</h3>
                             <p>90日間取引ゼロの巣は「静寂状態」に。分母Nから除外され、減価が加速。</p>
                         </div>
                         <span class="mechanism-toggle">▼</span>
                     </div>
                     <div class="mechanism-body">
-                        <p>使われなくなった巣は、雨モデルの分母 N を膨張させてしまいます。静寂閾値はこの問題を解決します。</p>
                         <ul>
                             <li><strong>90日間取引ゼロ</strong> → 静寂状態と判定</li>
                             <li><strong>Mana配分の分母Nから除外</strong> — 活動中の巣の配分が薄まらない</li>
-                            <li><strong>減価加速</strong> — 放棄された巣は自然に消滅へ向かう</li>
+                            <li><strong>減価加速</strong> — 放棄された巣は自然に消滅へ</li>
                             <li><strong>復帰可能</strong> — 再び取引すれば静寂状態は解除</li>
                         </ul>
-                        <p>巣の相続は却下されました（タイムラグ攻撃の脆弱性のため）。</p>
                         <div class="mech-metaphor">🏚️ 長く空いた巣は森に還る。でも再び住めば、また巣として機能する。</div>
                     </div>
                 </div>
@@ -823,10 +1023,12 @@
             </div>
         </div>
 
-        <!-- ===== 4. 多層防御の全体像 ===== -->
+        <!-- ===== 7. 全体構造 ===== -->
         <div class="section">
-            <h2 class="section-title">多層防御の全体像</h2>
-            <p class="section-lead">各メカニズムが独立して機能しながら、全体として「正直に生きることが最適戦略になる生態系」を構築。</p>
+            <h2 class="section-title">全体の構造</h2>
+            <p class="section-lead">
+                各メカニズムが独立して機能しながら、全体として<strong>「正直に生きることが最適戦略になる生態系」</strong>を構築。
+            </p>
 
             <div class="layer-diagram">
                 <div class="layer-row">
@@ -859,70 +1061,73 @@
                     <div class="layer-content">検証可能な乱数 + zk-SNARK で予測困難性と透明性を両立</div>
                 </div>
             </div>
-        </div>
 
-        <!-- ===== 5. 統一原理 ===== -->
-        <div class="section">
-            <h2 class="section-title">統一原理</h2>
-            <p class="section-lead">Phase 2 全6討論を通じて導かれた、Meguri の設計を貫く一つの原理。</p>
-
-            <div class="principle-box">
+            <div class="principle-box" style="margin-top: 32px;">
                 <blockquote>
                     自然に存在するものを自然に守り、<br>
                     不自然なものを自然に排除する。<br>
                     識別せず、罰せず、ただ構造で。
                 </blockquote>
-                <p class="source">— Phase 2 討論06「複数ウォレット」合意より</p>
+                <p class="source">— 全6討論を貫く Meguri の統一原理</p>
             </div>
         </div>
 
-        <!-- ===== 6. 未解決の課題 ===== -->
+        <!-- ===== 8. まだ解けていないこと ===== -->
         <div class="section">
-            <h2 class="section-title">未解決の課題</h2>
-            <p class="section-lead">外部レビュー（春日）および討論で残された、今後の検討事項。</p>
+            <h2 class="section-title">まだ解けていないこと</h2>
+            <p class="section-lead">Meguri はまだ設計途中です。以下のような課題が残っています。</p>
 
             <div class="open-issues">
                 <div class="open-issue">
                     <div class="issue-severity high"></div>
                     <div>
-                        <h4>雨モデル vs Layer 2 のインセンティブ崩壊</h4>
-                        <p>均等配分なら品質スコアを上げる動機がない。Layer 2（ソフトミン）の役割再定義が必要。</p>
+                        <h4>雨モデルだと、頑張る動機がない？</h4>
+                        <p>全員に均等配分するなら、良い循環を維持する個人的な動機が生まれない。品質評価の役割を再定義する必要がある。</p>
                     </div>
                 </div>
                 <div class="open-issue">
                     <div class="issue-severity high"></div>
                     <div>
-                        <h4>AI 大量参入による Mana 希釈</h4>
-                        <p>「AI 受容」と「1/N均等配分」の組み合わせで、AI が巣を大量作成すると人間の取り分が希釈される。</p>
+                        <h4>AI が大量に参加したら？</h4>
+                        <p>「AI も受け入れる」と「均等配分」を両立すると、AI が巣を大量に作った場合に人間の取り分が希釈されてしまう。</p>
                     </div>
                 </div>
                 <div class="open-issue">
                     <div class="issue-severity high"></div>
                     <div>
-                        <h4>部分リセット閾値の恣意性</h4>
-                        <p>「少額取引」の閾値を誰が決めるのか。中央集権的判断と「脱所有」哲学の矛盾。</p>
+                        <h4>「少額取引」の線引きは誰がする？</h4>
+                        <p>部分リセットの閾値を誰かが決める時点で、中央集権的な判断になり「脱所有」の哲学と矛盾する。</p>
                     </div>
                 </div>
                 <div class="open-issue">
                     <div class="issue-severity mid"></div>
                     <div>
-                        <h4>デジタル追放の復帰パス</h4>
-                        <p>病気や災害で長期離脱した場合、静寂閾値 + 減衰加速で復帰困難に。復帰用の猶予期間が未設計。</p>
+                        <h4>長期離脱からの復帰が難しい</h4>
+                        <p>病気や災害で長期離脱した場合、静寂閾値 + 減衰加速で復帰困難に。復帰の仕組みがまだない。</p>
                     </div>
                 </div>
                 <div class="open-issue">
                     <div class="issue-severity low"></div>
                     <div>
-                        <h4>コミュニティ境界の実装定義</h4>
-                        <p>取引グラフによるコミュニティ定義は概念的に合意済みだが、Q_equity 正規化への接続方法が未詳細。</p>
+                        <h4>コミュニティの境界をどう決める？</h4>
+                        <p>取引グラフでコミュニティを定義する方針は決まったが、具体的なやり方はまだこれから。</p>
                     </div>
                 </div>
-                <div class="open-issue">
-                    <div class="issue-severity low"></div>
-                    <div>
-                        <h4>Phase 0 シミュレーション</h4>
-                        <p>κ・S_threshold の最適値、静寂閾値90日の妥当性、Sybil ROI の定量化など、実データでの検証が必要。</p>
-                    </div>
+            </div>
+        </div>
+
+        <!-- ===== 呼びかけ ===== -->
+        <div class="section">
+            <div class="callout">
+                <h3>みなさんの力を貸してください</h3>
+                <p>
+                    「こんな通貨だったら面白い」「こういう抜け道がありそう」「こんな世界観が合いそう」といった自由な発想を、ぜひ共有していただけたらすごく嬉しいです。
+                    世界観、比喩、物語、ゲーム的ルール、応援メッセージだけなど、どんな形でも大歓迎です。
+                    みなさまの創造力でこの生き物が生まれるのを手伝ってほしいです。
+                </p>
+                <div class="callout-links">
+                    <a href="index.html" class="callout-link primary">議論ログを読む →</a>
+                    <a href="discussions/review_haruhi.html" class="callout-link secondary">外部レビューを見る</a>
                 </div>
             </div>
         </div>
