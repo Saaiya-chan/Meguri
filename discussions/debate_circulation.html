@@ -158,6 +158,8 @@
             }
         }
     </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 <div class="container">
@@ -208,7 +210,7 @@
             <p>Meguri の「良い循環」を測る指標の設計で、3者の立場が鋭く対立している。</p>
             <div class="positions">
                 <div class="position-item math">
-                    <strong>数学者：</strong>Q(t) = Q_spread × Q_equity × Q_activity × Q_depth の乗算モデル。全4軸が同時に必要（AND条件）。Mana 配分は均等 1/n。
+                    <strong>数学者：</strong>$$Q(t) = Q_\text{spread} \times Q_\text{equity} \times Q_\text{activity} \times Q_\text{depth}$$ の乗算モデル。全4軸が同時に必要（AND条件）。Mana 配分は均等 1/n。
                 </div>
                 <div class="position-item econ">
                     <strong>ゲーム経済学者：</strong>CQS = 重み付き加算モデル。弱い軸を強い軸で補える柔軟性あり。Path Diversity を最重視（w=0.30）。配分は貢献反映型。
@@ -459,7 +461,7 @@
                 <div class="speech-bubble">
                     <span class="emotion agree">設計をまとめよう</span>
                     3人の議論を統合すると、こうなる：<br><br>
-                    <strong>Q(t) の役割：</strong><code>dMana/dt = γ · Q(t)</code><br>
+                    <strong>Q(t) の役割：</strong><code>$$\frac{dMana}{dt} = \gamma \cdot Q(t)$$</code><br>
                     ネットワーク全体の「体温計」。Mana 蓄積速度に影響。公開。個人報酬に非連動。<br><br>
                     <strong>Mana 配分：</strong>均等（1/n）<br>
                     個人の操作が不可能。フリーライダー問題が成立しない設計。<br><br>

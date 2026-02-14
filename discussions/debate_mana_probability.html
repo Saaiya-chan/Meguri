@@ -122,6 +122,8 @@
             .center-pane { padding: 20px; }
         }
     </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 <div class="container">
@@ -159,7 +161,7 @@
             <h3>🎯 争点</h3>
             <p>Mana が閾値を超えて Meguri が増加する「確率的メカニズム」の設計で、3者の立場が対立している。</p>
             <div class="positions">
-                <div class="position-item math"><strong>数学者：</strong>非定常ポアソン過程（100%確率）。Λ(t)=η·Mana(t)。配分は VRF 均等（1/n）。無記憶性が最適化を構造的に不可能にする。</div>
+                <div class="position-item math"><strong>数学者：</strong>非定常ポアソン過程（100%確率）。$$\Lambda(t) = \eta \cdot \text{Mana}(t)$$。配分は VRF 均等（1/n）。無記憶性が最適化を構造的に不可能にする。</div>
                 <div class="position-item econ"><strong>ゲーム経済学者：</strong>ハイブリッド型（確定75% + Bloom 25%）。安定性と生き生きした体験の両立。待ち伏せ不能性が攻撃コストを持続コストに変換。</div>
                 <div class="position-item phil"><strong>哲学者：</strong>減衰=決定論・増加=確率の非対称設計。相転移の比喩（水の沸騰）。機会の平等＋期待値の平等が「Meguri 的公平」。</div>
             </div>
@@ -226,7 +228,7 @@
             <div class="message-content">
                 <div class="speaker-name">ゲーム経済学者</div>
                 <div class="speech-bubble">
-                    確定75%は <code>dM/dt = γ · Q(t)</code> で計算される。つまり<strong>「ネットワーク全体の循環の質を上げること」でしか増やせない</strong>。<br><br>
+                    確定75%は <code>$$\frac{dM}{dt} = \gamma \cdot Q(t)$$</code> で計算される。つまり<strong>「ネットワーク全体の循環の質を上げること」でしか増やせない</strong>。<br><br>
                     個人で Q(t) を操作しようとしても、前回の循環議論で出た通り「報酬非連動の公開指標」として設計されているから、個人の利益にならない。確定部分も結局「自然に生活することが最適戦略」に収束する。
                 </div>
             </div>
@@ -309,7 +311,7 @@
                     <span class="emotion propose">数式で整理する</span>
                     二人の議論を数式に落とすと、問題の本質が見える。<br><br>
                     減衰が完全に予測可能なら、プレイヤーは残高最小化戦略：<code>B*(t) → 0 直前に送信</code>を取れる。これが全員の戦略になると、取引はバースト的になる（減衰直前に集中）。<br><br>
-                    一方、減衰に<strong>微小な確率的ノイズ</strong>を加えると：<code>λ(B,τ,S) + ε(t)</code>（ε はゼロ平均の小さな確率変動）。プレイヤーは「いつ減るか完全にはわからない」から、最適化が難しくなる。<br><br>
+                    一方、減衰に<strong>微小な確率的ノイズ</strong>を加えると：<code>$$\lambda(B,\tau,S) + \varepsilon(t)$$</code>（ε はゼロ平均の小さな確率変動）。プレイヤーは「いつ減るか完全にはわからない」から、最適化が難しくなる。<br><br>
                     <strong>「決定論＋微小ノイズ」</strong>は哲学者の「心理的安定」と経済学者の「操作困難性」を両立する第3案かもしれない。
                 </div>
             </div>

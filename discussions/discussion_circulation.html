@@ -488,6 +488,8 @@
             }
         }
     </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <div class="container">
@@ -560,7 +562,7 @@
                         <div class="speaker-name">mathematician</div>
                         <div class="speech-bubble">
                             循環の質 Q(t) を<strong>4つの構成要素の乗算</strong>で定義する：<br><br>
-                            <code>Q(t) = Q_spread × Q_equity × Q_activity × Q_depth</code><br><br>
+                            <code>$$Q(t) = Q_\text{spread} \times Q_\text{equity} \times Q_\text{activity} \times Q_\text{depth}$$</code><br><br>
                             <ul>
                                 <li><strong>Q_spread（広がり）</strong>：アクティブな巣の割合。全体のうちどれだけの巣が参加しているか</li>
                                 <li><strong>Q_equity（均等さ）</strong>：フローのシャノンエントロピー。特定の巣に集中していないか</li>
@@ -599,7 +601,7 @@
                         <div class="speaker-name">mathematician</div>
                         <div class="speech-bubble">
                             Q(t) から Mana 蓄積への接続：<br><br>
-                            <code>dMana/dt = γ · Q(t)</code><br><br>
+                            <code>$$\frac{dMana}{dt} = \gamma \cdot Q(t)$$</code><br><br>
                             循環の質が高いほど Mana がじわじわ蓄積し、閾値を超えると新規 Meguri が発行される。<br><br>
                             新規 Meguri の<strong>配分は均等配分（1/n）</strong>を提案する。全巣に等しく配る。理由は単純で、<strong>個人が操作できない</strong>から。配分にスコアを絡めると、スコアを上げるゲームが始まってしまう。
                         </div>
@@ -807,7 +809,7 @@
                     <div class="accordion-content">
                         <p>Meguri ネットワーク全体の流通がどれだけ「良い」かを表す総合指標。mathematician は4軸の乗算、game-economist は4条件の加算で定義。</p>
                         <div class="term-example">
-                            <strong>今回の議論：</strong> Q(t) = Q_spread × Q_equity × Q_activity × Q_depth（乗算）vs CQS = 重み付き加算。どちらが適切かが主要争点。
+                            <strong>今回の議論：</strong> $$Q(t) = Q_\text{spread} \times Q_\text{equity} \times Q_\text{activity} \times Q_\text{depth}$$（乗算）vs CQS = 重み付き加算。どちらが適切かが主要争点。
                         </div>
                     </div>
                 </div>

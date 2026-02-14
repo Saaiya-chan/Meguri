@@ -332,6 +332,8 @@
             }
         }
     </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 <div class="container">
@@ -415,7 +417,7 @@
                 <div class="speaker-name">数学者</div>
                 <div class="speech-bubble">
                     Phase 1 で提案した統合モデルをもう一度整理する。<br>
-                    <code>dB/dt = −(α + β·B/B_median + γ·f(τ)) · B</code><br>
+                    <code>$$\frac{dB}{dt} = -\left(\alpha + \beta \cdot \frac{B}{B_{\text{median}}} + \gamma \cdot f(\tau)\right) \cdot B$$</code><br>
                     α が基礎減衰、β·B/B_median が残高依存、γ·f(τ) が滞留加速。これで「大口ほど速く」と「放置ほど速く」が同時に表現できる。シンプルで透明性が高い。
                 </div>
             </div>
@@ -607,7 +609,7 @@
                 <div class="speech-bubble">
                     <span class="emotion agree">収束してきた</span>
                     哲学者の「相性」という解釈、数式に落とすとこうなる：<br><br>
-                    <code>λ(B, τ, S) = (α + β·B/B_median + γ·f(τ)) · g(S)</code><br><br>
+                    <code>$$\lambda(B, \tau, S) = \left(\alpha + \beta \cdot \frac{B}{B_{\text{median}}} + \gamma \cdot f(\tau)\right) \cdot g(S)$$</code><br><br>
                     ここで <code>S</code> は三軸評価スコア、<code>g(S)</code> は S が低いと λ を増幅し、S が高いと λ を抑制する関数。<br><br>
                     哲学者が懸念していた「ご褒美構造」にならないよう、<code>g(S)</code> の設計を「加速（不自然な存在への増幅）」のみにして、「軽減（自然な存在へのボーナス）」はゼロにする。基準は「自然な状態」が上限。
                 </div>

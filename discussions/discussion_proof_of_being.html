@@ -493,6 +493,8 @@
             }
         }
     </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <div class="container">
@@ -643,7 +645,7 @@
                             <strong>Step 2: 閾値の導入</strong><br>
                             各軸に最低閾値 <code>&theta;</code> を設定し、閾値未満の軸は <code>&theta;</code> にクランプする。これでゼロ掛け問題を回避。<br><br>
                             <strong>Step 3: ソフトミン合成</strong><br>
-                            <code>S = softmin(d, t, e)</code> ── 最弱の軸に重みを置きつつ、他の軸も考慮する合成関数。これで「1つが極端に弱いと全体も低い」が、ゼロにはならない。<br><br>
+                            <code>$$S = \text{softmin}(d, t, e)$$</code> ── 最弱の軸に重みを置きつつ、他の軸も考慮する合成関数。これで「1つが極端に弱いと全体も低い」が、ゼロにはならない。<br><br>
                             さらに時間軸は、蓄積ではなく<strong>窓関数</strong>にすべき：<br>
                             <code>s(t) = activity_rate(t) &times; freshness(t)</code><br>
                             freshness は直近の活動ほど重みが高い減衰関数。これで長期参加者の過剰優位を防ぐ。

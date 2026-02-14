@@ -480,6 +480,8 @@
             }
         }
     </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
     <div class="container">
@@ -559,7 +561,7 @@
                             </ul>
                             <br>
                             具体的には<strong>非定常ポアソン過程</strong>：<br>
-                            <code>Λ(t) = η · Mana(t)</code><br><br>
+                            <code>$$\Lambda(t) = \eta \cdot \text{Mana}(t)$$</code><br><br>
                             Mana が多いほど発生率が高くなる。時間ではなく Mana 量で駆動される。
                         </div>
                         <div class="analogy">
@@ -576,7 +578,7 @@
                         <div class="speaker-name">mathematician</div>
                         <div class="speech-bubble">
                             増加量の分布は<strong>対数正規分布（LogNormal）</strong>を推奨：<br><br>
-                            <code>ΔM ~ LogNormal(μ, σ²)</code><br><br>
+                            <code>$$\Delta M \sim \text{LogNormal}(\mu, \sigma^2)$$</code><br><br>
                             理由：<br>
                             <ul>
                                 <li>右に裾が長い（大きな増加も稀に起こる）</li>

@@ -476,6 +476,29 @@
             color: #79c0ff;
         }
 
+        /* ===== アーキテクチャ3層図 ===== */
+        .arch-layer-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: 16px 0;
+        }
+
+        .arch-layer-diagram .layer-row:nth-child(1) .layer-label {
+            background: #7ee78730;
+            color: #7ee787;
+        }
+
+        .arch-layer-diagram .layer-row:nth-child(3) .layer-label {
+            background: #58a6ff30;
+            color: #58a6ff;
+        }
+
+        .arch-layer-diagram .layer-row:nth-child(5) .layer-label {
+            background: #d2a8ff30;
+            color: #d2a8ff;
+        }
+
         .layer-arrow {
             text-align: center;
             color: #30363d;
@@ -716,6 +739,8 @@
             animation-delay: 0.7s;
         }
     </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 
 <body>
@@ -904,7 +929,7 @@
                     </div>
                     <div class="mechanism-body">
                         <p>通貨が一つの巣に留まると、時間とともに自然に減っていきます。保有量が多いほど、動かさない期間が長いほど、減りが早くなります。</p>
-                        <div class="mech-formula">λ(B, τ, S) = (α + β·B/B_median + γ·f(τ)) · g(S)</div>
+                        <div class="mech-formula">$$\lambda(B, \tau, S) = \left(\alpha + \beta \cdot \frac{B}{B_{\text{median}}} + \gamma \cdot f(\tau)\right) \cdot g(S)$$</div>
                         <ul>
                             <li><strong>B</strong> = 保有量。中央値より多ければ加速</li>
                             <li><strong>τ</strong> = 最後の取引からの経過時間</li>
@@ -952,7 +977,7 @@
                             <li><strong>確定部分（75%）</strong> — 毎期ゆっくり増加。安心感。</li>
                             <li><strong>Bloom 部分（25%）</strong> — 確率的に「ふっと」発生。生命的な驚き。</li>
                         </ul>
-                        <div class="mech-formula">各巣への配分 = ΔM / N（全巣均等 = 雨モデル）</div>
+                        <div class="mech-formula">$$\text{各巣への配分} = \frac{\Delta M}{N} \quad \text{（全巣均等 = 雨モデル）}$$</div>
                         <p class="mech-note">雨モデルにより、複数の巣を作っても利益が増えない。Sybil攻撃の ROI がゼロに。</p>
                     </div>
                 </div>
@@ -1072,7 +1097,84 @@
             </div>
         </div>
 
-        <!-- ===== 8. まだ解けていないこと ===== -->
+        <!-- ===== 8. アーキテクチャ ===== -->
+        <div class="section">
+            <h2 class="section-title">Meguri を動かす技術基盤</h2>
+            <p class="section-lead">
+                ここからは、上記6つのメカニズムを<strong>どんなインフラの上で実現するか</strong>という技術基盤の構想です（討論とは別に検討中の内容であり、Phase 0 シミュレーションで検証予定）。
+                Meguri は既存のブロックチェーンをそのまま使うのではなく、思想に合った技術を組み合わせて基盤を設計します。
+                現時点での有力候補は、<strong>Holochain</strong> と <strong>Tangle（IOTA）</strong>の長所を融合したハイブリッド構成です。
+            </p>
+
+            <div class="story-block">
+                <h3>なぜブロックチェーンではないのか</h3>
+                <p>
+                    多くの仮想通貨は Proof of Work（計算力 = 信頼）や Proof of Stake（持ち分 = 信頼）で動いています。
+                    しかし PoW は膨大な電力を浪費し、PoS は「たくさん持っている人ほど信頼される」構造 —— つまり<strong>溜め込むことに報酬を与える仕組み</strong>です。
+                    どちらも Meguri の「脱所有」「循環が本質」という思想とは相容れません。
+                </p>
+            </div>
+
+            <div class="story-block">
+                <h3>Holochain — 巣が主役のネットワーク</h3>
+                <p>
+                    Holochain は「全員が同じ帳簿を共有する」というブロックチェーンの発想を捨てた、<strong>エージェント中心</strong>のアーキテクチャです。
+                    各参加者が自分だけの記録チェーン（source chain）を持ち、近隣のピアがお互いの記録を検証し合います。
+                </p>
+                <div class="story-metaphor">
+                    🪹 各「巣」が自分の履歴を持ち、ご近所さん同士で見守り合う。まさに Meguri の「巣」のイメージそのもの。
+                </div>
+                <p>
+                    マイニングもステーキングも不要。近隣ピアのグループ（DHT ネイバーフッド）は、
+                    Meguri の「コミュニティ相対評価」の自然な基盤になります。
+                </p>
+            </div>
+
+            <div class="story-block">
+                <h3>Tangle の知恵 — 使うほど強くなる</h3>
+                <p>
+                    IOTA の Tangle では、取引するたびに過去の他の取引を検証します。
+                    つまり<strong>使えば使うほどネットワーク全体の検証が進み、強くなる</strong>。
+                    この仕組みを Holochain のバリデーション・ルール（DNA）に組み込みます。
+                </p>
+                <div class="story-metaphor">
+                    🌊 取引する → ネットワークが強くなる → 循環が奨励される。<br>
+                    溜め込む → 検証に貢献しない → 減価が進む。<br>
+                    統一原理がインフラ層でも実現される。
+                </div>
+            </div>
+
+            <div class="story-block">
+                <h3>全体の構成</h3>
+                <p>3つの層が連携して動きます。</p>
+
+                <div class="arch-layer-diagram">
+                    <div class="layer-row">
+                        <div class="layer-label">巣の層</div>
+                        <div class="layer-content">各巣が自分の Source Chain を持つ。取引履歴、減価、PoB データを記録。</div>
+                    </div>
+                    <div class="layer-arrow">↕ 検証・共有</div>
+                    <div class="layer-row">
+                        <div class="layer-label">コミュニティ層</div>
+                        <div class="layer-content">DHT で近隣ピアが検証し合う。取引時に過去の他の取引も検証（Tangle 方式）。</div>
+                    </div>
+                    <div class="layer-arrow">↕ 集約</div>
+                    <div class="layer-row">
+                        <div class="layer-label">グローバル層</div>
+                        <div class="layer-content">Mana の蓄積監視、Bloom 発生判定、雨モデル配分のトリガー、VRF による乱数。</div>
+                    </div>
+                </div>
+
+                <p class="mech-note">
+                    各巣の Source Chain のハッシュ連鎖が、個人レベルの Proof of History（時刻証明）として機能します。減価計算に必要な「いつから動いていないか」を暗号学的に証明できます。
+                </p>
+                <p class="mech-note">
+                    グローバル層は中央サーバーではなく、DHT 上の集約クエリと VRF の分散合意で実現する想定です。Mana の蓄積量は各コミュニティ層から伝搬されるローカル集計値の合算で算出し、Bloom の発生判定は VRF の閾値超過として各巣が独立に検証できる設計を目指しています。具体的な実装方式は Phase 0 シミュレーションで検証予定です。
+                </p>
+            </div>
+        </div>
+
+        <!-- ===== 9. まだ解けていないこと ===== -->
         <div class="section">
             <h2 class="section-title">まだ解けていないこと</h2>
             <p class="section-lead">Meguri はまだ設計途中です。以下のような課題が残っています。</p>
