@@ -621,7 +621,7 @@
                             <strong>問題1: ゼロ掛け問題</strong><br>
                             掛け算構造のため、D, T, E のどれか1つがゼロになると全体がゼロになる。引っ越したばかりで距離スコアが低い人は、他の軸がどれだけ良くても評価がゼロに潰れる。<br><br>
                             <strong>問題2: 時間蓄積の矛盾</strong><br>
-                            <code>T = &int; s(t) dt</code> は時間とともに無限に蓄積する。長く活動している人が有利になりすぎて、新規参加者が不利に。<br><br>
+                            $$T = \int s(t) dt$$ は時間とともに無限に蓄積する。長く活動している人が有利になりすぎて、新規参加者が不利に。<br><br>
                             <strong>問題3: スケール不一致</strong><br>
                             D は距離（メートル）、T は時間（秒の積分）、E はエントロピー（bit）。単位も桁もバラバラなものを掛け算すると、特定の軸に引きずられる。
                         </div>
@@ -645,7 +645,7 @@
                             <strong>Step 2: 閾値の導入</strong><br>
                             各軸に最低閾値 <code>&theta;</code> を設定し、閾値未満の軸は <code>&theta;</code> にクランプする。これでゼロ掛け問題を回避。<br><br>
                             <strong>Step 3: ソフトミン合成</strong><br>
-                            <code>$$S = \text{softmin}(d, t, e)$$</code> ── 最弱の軸に重みを置きつつ、他の軸も考慮する合成関数。これで「1つが極端に弱いと全体も低い」が、ゼロにはならない。<br><br>
+                            $$S = \text{softmin}(d, t, e)$$ ── 最弱の軸に重みを置きつつ、他の軸も考慮する合成関数。これで「1つが極端に弱いと全体も低い」が、ゼロにはならない。<br><br>
                             さらに時間軸は、蓄積ではなく<strong>窓関数</strong>にすべき：<br>
                             <code>s(t) = activity_rate(t) &times; freshness(t)</code><br>
                             freshness は直近の活動ほど重みが高い減衰関数。これで長期参加者の過剰優位を防ぐ。
@@ -862,7 +862,7 @@
                     <div class="accordion-content">
                         <p>情報理論における「予測困難性」の指標。PoB の三軸の一つとして、行動パターンのランダム性（自然さ）を評価する。Bot は規則的で低エントロピー、人間は適度に不規則で高エントロピー。</p>
                         <div class="term-example">
-                            <strong>数式：</strong> <code>E = &minus;&Sigma; p&iota; log p&iota;</code> ── 行動の確率分布が均一に近いほどエントロピーが高い。
+                            <strong>数式：</strong> $$E = -\sum_i p_i \log p_i$$ ── 行動の確率分布が均一に近いほどエントロピーが高い。
                         </div>
                     </div>
                 </div>

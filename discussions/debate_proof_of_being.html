@@ -542,7 +542,7 @@
                         game-economist の指摘は正しい部分がある。だが<strong>ゼロ掛け問題はそれでも致命的</strong>だ。<br><br>
                         引っ越したばかりのユーザーを考えてほしい。距離スコアがほぼゼロの状態で、どんなに自然な生活をしていても全体評価がゼロに潰れる。これは<strong>「存在していることが信頼の根拠」というPoB の思想に反する</strong>。存在しているのに評価がゼロ。<br><br>
                         折衷案を提示する：<strong>「閾値付き掛け算」</strong>。<br>
-                        <code>S = max(d, &theta;) &times; max(t, &theta;) &times; max(e, &theta;)</code><br><br>
+                        $$S = \max(d, \theta) \times \max(t, \theta) \times \max(e, \theta)$$<br><br>
                         掛け算構造は維持する。ただし各軸にフロア（最低保証）を入れる。&theta; = 0.1 とすれば、どの軸も最低0.1が保証される。ゼロ掛け問題を回避しながら、AND条件の三すくみ効果も維持できる。
                     </div>
                 </div>
@@ -582,10 +582,10 @@
                     <div class="speech-bubble">
                         philosopher の「正直者にはソフトミン的、攻撃者には掛け算的」——これは<strong>二層構造</strong>で実現できる。<br><br>
                         <strong>第一層：異常検出（掛け算 AND 条件）</strong><br>
-                        <code>Anomaly = (d &lt; &theta;<sub>d</sub>) AND (t &lt; &theta;<sub>t</sub>) AND (e &lt; &theta;<sub>e</sub>)</code><br>
+                        $$\text{Anomaly} = (d < \theta_d) \text{ AND } (t < \theta_t) \text{ AND } (e < \theta_e)$$<br>
                         いずれか1軸でも閾値を下回ったらフラグを立てる。これがSybil検出。<br><br>
                         <strong>第二層：恩恵配分（ソフトミン加算条件）</strong><br>
-                        <code>$$S = \text{softmin}(d, t, e)$$</code><br>
+                        $$S = \text{softmin}(d, t, e)$$<br>
                         正常と判定された巣の中での相対評価。ここではソフトミンで「不完全でも存在している」を反映。<br><br>
                         第一層は厳しいAND条件で攻撃者を弾く。第二層は優しい加算条件で正直者を評価する。<strong>同じ三軸データを使いつつ、2つの異なるレンズで見る</strong>。
                     </div>
@@ -605,7 +605,7 @@
                     <div class="speech-bubble">
                         この二層構造は数学的に健全だ。整理しよう：<br><br>
                         <code>Layer1: F(v) = &prod; &theta;(x<sub>i</sub> &ge; &theta;<sub>i</sub>)</code> &mdash; 二値出力（正常/疑義）<br>
-                        <code>$$\text{Layer2:} \quad S(v) = \text{softmin}(d, t, e) \times F(v)$$</code> &mdash; 連続スコア<br><br>
+                        $$\text{Layer2:} \quad S(v) = \text{softmin}(d, t, e) \times F(v)$$ &mdash; 連続スコア<br><br>
                         第一層でF(v) = 0（疑義あり）なら、第二層のスコアもゼロに近づく。第一層で正常なら、第二層はソフトミンで公平に評価。<br><br>
                         <strong>これでゼロ掛け問題と三すくみ効果の両方を解決できる</strong>。引っ越し直後のユーザーは第一層のフラグが立つが、一時的な猶予期間（grace period）を設ければ解決する。<br><br>
                         game-economist が守りたかった「三すくみ」は第一層に残る。私が解決したかった「ゼロ掛け問題」は第二層で解消。
@@ -769,7 +769,7 @@
                     <div class="speech-bubble">
                         これは経済学的にも深刻だ。<br><br>
                         私のPhase 1の分析は「もう一つの人生のコスト」が非常に高い前提に立っていた。もしAIがそのコストを1/1000にしたら、<strong>Sybil ROI が正に転じる</strong>。<br><br>
-                        <code>ROI = (k &times; 恩恵の一部) / (k &times; AI運用コスト)</code><br><br>
+                        $$\text{ROI} = \frac{k \times \text{恩恵の一部}}{k \times \text{AI運用コスト}}$$<br><br>
                         AI運用コストが十分に低ければ、kを増やすほど利益が出る。<strong>「正直者戦略が支配戦略」という結論が覆る</strong>。<br><br>
                         PoW は計算コストを上げることで対抗した（ASIC耐性ハッシュなど）。PoB にとって「AI耐性」はどう実現する？
                     </div>
@@ -874,7 +874,7 @@
                         <strong>第一層</strong>（異常検出）：<br>
                         <code>F(v) = &prod;<sub>i</sub> &theta;(x<sub>i</sub> &ge; &theta;<sub>i</sub>)</code> &mdash; 各軸が閾値以上なら 1、それ以外は 0<br><br>
                         <strong>第二層</strong>（恩恵配分）：<br>
-                        <code>$$S(v) = \text{softmin}(d, t, e) \times F(v)$$</code> &mdash; 正常巣の相対スコア<br><br>
+                        $$S(v) = \text{softmin}(d, t, e) \times F(v)$$ &mdash; 正常巣の相対スコア<br><br>
                         <strong>減価連動</strong>：<br>
                         <code>g(F) = 1 + &kappa; &times; (1 &minus; F)</code> &mdash; 二値的。F=0 のときのみ減価加速<br><br>
                         <strong>三すくみ効果</strong>は第一層の AND 条件で維持。<strong>公平性</strong>は第二層のソフトミンで保証。<strong>回復可能性</strong>はフラグ解除で即座に g(F)=1 に戻る設計で保証。

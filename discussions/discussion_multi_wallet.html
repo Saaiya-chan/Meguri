@@ -616,7 +616,7 @@
                             哲学的フレームは理解した。それを数式に落とし込む。<br><br>
                             <strong>ケース1: 宣言ありグループ評価</strong><br>
                             ユーザーが「この巣は同じ人間のものです」と自己申告する場合の評価式：<br><br>
-                            <code>S_group = max(S(n<sub>i</sub>)) &times; k<sup>(&minus;&delta;)</sup> + &epsilon;</code><br><br>
+$$S_\text{group} = \max(S(n_i)) \times k^{-\delta} + \varepsilon$$<br><br>
                             ここで：<br>
                             <ul>
                                 <li><code>max(S(n<sub>i</sub>))</code> = グループ内で最もスコアの高い巣の評価</li>
@@ -879,7 +879,7 @@
                         <span class="accordion-icon">&#9660;</span>
                     </div>
                     <div class="accordion-content">
-                        <p>mathematician が提案した複数巣の評価式。<code>S_group = max(S(n<sub>i</sub>)) &times; k<sup>(&minus;&delta;)</sup> + &epsilon;</code>。巣の数 k が増えるほどスコアが減衰する構造。</p>
+                        <p>mathematician が提案した複数巣の評価式。$$S_\text{group} = \max(S(n_i)) \times k^{-\delta} + \varepsilon$$。巣の数 k が増えるほどスコアが減衰する構造。</p>
                         <div class="term-example">
                             <strong>結果：</strong> 宣言制の逆選択問題により採用見送り。三軸評価の自然な性質で代替する方針に。
                         </div>

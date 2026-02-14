@@ -562,7 +562,7 @@
                         <div class="speaker-name">mathematician</div>
                         <div class="speech-bubble">
                             循環の質 Q(t) を<strong>4つの構成要素の乗算</strong>で定義する：<br><br>
-                            <code>$$Q(t) = Q_\text{spread} \times Q_\text{equity} \times Q_\text{activity} \times Q_\text{depth}$$</code><br><br>
+                            $$Q(t) = Q_\text{spread} \times Q_\text{equity} \times Q_\text{activity} \times Q_\text{depth}$$<br><br>
                             <ul>
                                 <li><strong>Q_spread（広がり）</strong>：アクティブな巣の割合。全体のうちどれだけの巣が参加しているか</li>
                                 <li><strong>Q_equity（均等さ）</strong>：フローのシャノンエントロピー。特定の巣に集中していないか</li>
@@ -601,7 +601,7 @@
                         <div class="speaker-name">mathematician</div>
                         <div class="speech-bubble">
                             Q(t) から Mana 蓄積への接続：<br><br>
-                            <code>$$\frac{dMana}{dt} = \gamma \cdot Q(t)$$</code><br><br>
+                            $$\frac{dMana}{dt} = \gamma \cdot Q(t)$$<br><br>
                             循環の質が高いほど Mana がじわじわ蓄積し、閾値を超えると新規 Meguri が発行される。<br><br>
                             新規 Meguri の<strong>配分は均等配分（1/n）</strong>を提案する。全巣に等しく配る。理由は単純で、<strong>個人が操作できない</strong>から。配分にスコアを絡めると、スコアを上げるゲームが始まってしまう。
                         </div>
@@ -624,7 +624,7 @@
                         <div class="speaker-name">game-economist</div>
                         <div class="speech-bubble">
                             循環の質を<strong>重み付き加算</strong>の Circulation Quality Score で定義する：<br><br>
-                            <code>CQS = w₁·Reach + w₂·PathDiversity + w₃·FlowPersistence + w₄·ValueDistribution</code><br><br>
+$$\text{CQS} = w_1 \cdot \text{Reach} + w_2 \cdot \text{PathDiversity} + w_3 \cdot \text{FlowPersistence} + w_4 \cdot \text{ValueDistribution}$$<br><br>
                             <ul>
                                 <li><strong>Reach（到達範囲）</strong> w₁=0.25：Meguri がどれだけ広い範囲の巣に届いているか</li>
                                 <li><strong>Path Diversity（経路多様性）</strong> w₂=0.30：取引経路がどれだけ多様か。<strong>最重要軸、Sybil 検知力が最も高い</strong></li>

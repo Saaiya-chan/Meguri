@@ -819,7 +819,7 @@
                     <div class="speech-bubble">
                         Phase 1 で philosopher が提案した「巣のクラスタリング」について。<strong>同一人物の巣を統計的に検出する技術</strong>は実装可能だ。<br><br>
                         具体的には、巣間の行動パターンのコサイン類似度を計算し、閾値を超えたら「同一クラスタ」と判定する。<br>
-                        <code>$$\text{similarity}(v_1, v_2) = \cos(\text{pattern}(v_1), \text{pattern}(v_2)) > \theta_\text{cluster}$$</code><br><br>
+                        $$\text{similarity}(v_1, v_2) = \cos(\text{pattern}(v_1), \text{pattern}(v_2)) > \theta_\text{cluster}$$<br><br>
                         これをスコア計算に組み込めば、「同一人物の複数巣」を検出してペナルティを課すことができる。<strong>検出精度が上がれば、攻撃者への抑止力が増す</strong>。<br><br>
                         組み込むべきかどうか。意見を聞きたい。
                     </div>
