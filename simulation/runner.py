@@ -34,6 +34,7 @@ class SimulationRunner:
                             grace_period: int = 30,
                             community_cycle: int = 30,
                             enable_community: bool = True,
+                            use_network_distance: bool = False,
                             verbose: bool = True) -> Dict:
         """
         Run a single test case with all mechanisms integrated.
@@ -113,7 +114,8 @@ class SimulationRunner:
 
             # 3. Calculate all scores
             scores = scoring_engine.calculate_all_scores(
-                state, day, kappa=kappa, theta=theta, beta=beta
+                state, day, kappa=kappa, theta=theta, beta=beta,
+                use_network_distance=use_network_distance
             )
 
             # 4. Apply community normalization to scores
@@ -174,6 +176,7 @@ class SimulationRunner:
             'deterministic_ratio': deterministic_ratio,
             'grace_period': grace_period,
             'community_cycle': community_cycle,
+            'use_network_distance': use_network_distance,
         }
 
         # Save results
