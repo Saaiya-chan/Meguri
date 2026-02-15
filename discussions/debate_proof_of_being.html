@@ -906,18 +906,21 @@
                 <h3>合意事項</h3>
                 <ul>
                     <li><strong>二層構造で数式問題を解決</strong>：第一層（異常検出）= 掛け算AND条件で三すくみ効果を維持。第二層（恩恵配分）= ソフトミンで公平性を保証。ゼロ掛け問題と攻撃耐性を同時に解決</li>
-                    <li><strong>PoB と減価の連動</strong>：第一層の二値フラグとのみ連動。連続スコアとは独立。フラグ解除後の回復を保証</li>
+                    <li><strong>PoB と減価の連動</strong>：第一層の二値フラグ F(v) は配分資格を判定。第二層の連続スコア S(v) は配分額には反映されず、<strong>減価加速 g(S) に反映</strong>される。高スコア巣 → 減衰が遅い → 長期的に有利。この「見えない有利さ」が内発的動機づけになる（脱所有理念と整合）</li>
                     <li><strong>PoB の二段階定義</strong>：哲学的定義「存在の生態が信頼の根拠」+ 技術的定義「二値判定 + 連続評価で構造的無力化」</li>
-                    <li><strong>AI時代への対応</strong>：PoB は「人間性の証明」ではなく「存在の証明」。AI の参加を排除せず、構造的無力化（ROI ≤ 0）で対応。物理デバイス紐づけ + 雨モデルの希釈効果</li>
+                    <li><strong>AI時代への対応（第4軸の導入）</strong>：PoB は「人間性の証明」ではなく「存在の証明」。AI の参加を排除せず、<strong>「一つの存在が複数を偽装すること」のみを構造的に無力化</strong>。方法：<strong>プラットフォーム固有の安全な識別機構と巣を紐づけ。1デバイス = 1主要な巣</strong>。複数の独立した巣を運用するには複数の物理デバイスが必須であり、計算コストが k² で増大 → 質量参入による Mana 希釈問題を解決。PC（TPM/Secure Boot）、iPhone（Secure Enclave）、Android（TEE/Keystore）など全プラットフォーム対応</li>
                     <li><strong>正直者戦略の維持</strong>：二層構造でも「自然に生きる」が支配戦略であることをゲーム論的に確認</li>
+                    <li><strong>評価と報酬の分離設計</strong>：Layer 2 の連続スコアは「品質の測定」であって「報酬の根拠」ではない。配分は全巣均等（ΔM/n）。スコアを高く保つ動機は「報酬を得たいから」ではなく、「長く健康に Meguri を保ちたいから」（内発的動機づけ）。Meguri の脱所有理念を完成させる</li>
                 </ul>
             </div>
 
             <div class="open-issue-box">
                 <strong>残課題</strong>
                 <ul>
+                    <li><strong>配分メカニズムとの統合確認</strong>：Phase 2-03 と Phase 2-05 の統合。全巣に ΔM/n を均等配分するメカニズムが、Layer 2 スコアと干渉していないことを確認。スコアは減価に反映されるのみ（Phase 2-01 との連携）</li>
                     <li><strong>閾値 &theta; の最適化</strong>：第一層の各軸閾値を Phase 0 シミュレーションで決定。低すぎると攻撃者を通し、高すぎると正直者を弾く。</li>
                     <li><strong>猶予期間（grace period）の設計</strong>：新規参入・引っ越し時に第一層フラグが一時的に立つ問題。猶予期間の長さと悪用防止のバランス。</li>
+                    <li><strong>第4軸：プラットフォーム別デバイス識別の実装設計</strong>：AI 大量参入による Mana 希釈問題への対策。PC（TPM/Secure Boot）、iPhone（Secure Enclave）、Android（TEE/Keystore）など各プラットフォームの安全な識別機構を活用。デバイス移行時（機器交換、引越し）のアカウント紐づけ変更プロセス。プラットフォーム横断ユーザー（複数デバイス所有者）の巣管理ルール。<strong>実装時に決定：デバイス識別機構をプラグイン化（差し替え可能）する vs 仕様として固定する</strong>。</li>
                     <li><strong>AI検出のメタ評価</strong>：AI が生成する行動パターンの統計的シグネチャを検出する手法。Phase 0 で合成データ vs AIデータの弁別テストが必要。</li>
                     <li><strong>&kappa; パラメータの探索</strong>：異常フラグ時の減価加速係数。大きすぎると構造的排除、小さすぎると防御不足。</li>
                 </ul>
@@ -1009,13 +1012,18 @@
 
                 <div class="accordion-item">
                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                        AI耐性
+                        AI耐性（第4軸：物理デバイス紐づけ）
                         <span class="accordion-icon">&#9660;</span>
                     </div>
                     <div class="accordion-content">
-                        <p>AIが人間の存在パターンを模倣した場合のPoB防御策。PoB は「人間性の証明」ではなく「存在の証明」であり、AI の参加自体は排除しない。構造的無力化（ROI ≤ 0）で対応。</p>
+                        <p>AIが人間の存在パターンを模倣した場合のPoB防御策。PoB は「人間性の証明」ではなく「存在の証明」であり、AI の参加自体は排除しない。代わりに<strong>一つの AI が複数の「独立した存在」を偽装することを物理的に防ぐ</strong>。</p>
                         <div class="term-example">
-                            <strong>防御層：</strong> (1) 物理デバイス紐づけ, (2) 雨モデルの希釈効果, (3) AI行動パターンのメタ評価。
+                            <strong>第4軸：プラットフォーム固有の安全な識別機構と巣を紐づけ</strong><br>
+                            • PC: TPM 2.0 / Secure Boot / CPU シリアル<br>
+                            • iPhone: Secure Enclave / Keychain<br>
+                            • Android: TEE (Trusted Execution Environment) / Hardware Keystore<br><br>
+                            1物理デバイス = 最大1主要な巣。複数の独立した巣を運用するには複数の物理デバイスが必須。<br><br>
+                            <strong>結果：</strong> AI が1体参入 → ROI = 1/N（雨モデル）。AI が100体参入しようとする → 100個のデバイスが必要 → 計算コストが k² で増大 → ROI ≤ 0。「正直に1体だけ存在する」が支配戦略。
                         </div>
                     </div>
                 </div>

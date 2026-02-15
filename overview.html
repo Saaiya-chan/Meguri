@@ -1021,6 +1021,16 @@
                         </ul>
                         <p>減価との連動は第一層のフラグ（二値）のみ。連続スコアとは独立させ「死のスパイラル」を回避。</p>
                         <p class="mech-note">PoB は「人間性の証明」ではなく「存在の証明」。AI が自然に存在するなら、それも受け入れる。</p>
+
+                        <h4 style="margin-top: 16px; margin-bottom: 8px; color: #c9d1d9;">対応デバイスと識別機構（第4軸）</h4>
+                        <p>Meguri はあらゆるプラットフォームでの利用を想定しています。各デバイスのハードウェアセキュリティ機能を活用して、「1デバイス = 1主要な巣」の原則を実装：</p>
+                        <ul>
+                            <li><strong>PC / Windows / macOS</strong> — TPM 2.0（Trusted Platform Module）/ Secure Boot / CPU シリアルナンバー</li>
+                            <li><strong>iPhone / iPad</strong> — Secure Enclave / Keychain（Apple のハードウェアセキュリティ）</li>
+                            <li><strong>Android スマートフォン / タブレット</strong> — TEE（Trusted Execution Environment）/ Hardware Keystore</li>
+                            <li><strong>Linux など</strong> — TPM 2.0 或いは同等の認証機構</li>
+                        </ul>
+                        <p class="mech-note" style="margin-top: 12px;">複数の物理デバイスを持つ人が複数の巣を運用することは可能（PC + iPhone で巣A と巣B など）。ただし1デバイスで複数の主要な巣を作ることは不可能。これにより AI による大量の「独立した存在」の偽装を、物理的コストで無力化します。</p>
                     </div>
                 </div>
 
@@ -1042,6 +1052,30 @@
                             <li><strong>復帰可能</strong> — 再び取引すれば静寂状態は解除</li>
                         </ul>
                         <div class="mech-metaphor">🏚️ 長く空いた巣は森に還る。でも再び住めば、また巣として機能する。</div>
+                    </div>
+                </div>
+
+                <!-- M7: 復帰パス -->
+                <div class="mechanism">
+                    <div class="mechanism-header" onclick="this.parentElement.classList.toggle('open')">
+                        <div class="mechanism-num">7</div>
+                        <div class="mechanism-info">
+                            <h3>復帰パス（Restoration Path）</h3>
+                            <p>病気・災害による長期離脱からの復帰を、デバイス紐づけで本人確認しながら保護する。</p>
+                        </div>
+                        <span class="mechanism-toggle">▼</span>
+                    </div>
+                    <div class="mechanism-body">
+                        <p>Meguri は「自然に存在するものを保護する」という原則を貫く。病気や災害で90日以上動けなかった人が、復帰しても通貨がゼロに近い状態では、実質的なデジタル追放になってしまう。しかし、「復帰です」という詐称を許してはいけない。</p>
+                        <p style="margin-top: 12px;"><strong>解決：デバイス紐づけ + 段階的 Grace Period</strong></p>
+                        <ul>
+                            <li><strong>デバイス確認</strong> — 復帰申請時、デバイス固有ID（TPM / Secure Enclave など）が巣の記録と一致するか確認。一致すれば本人確認完了</li>
+                            <li><strong>Grace Period（30日）</strong> — 復帰確認後、1回限り30日間の完全な配分保障。この間に正常な活動に戻れば、その後は通常に復帰</li>
+                            <li><strong>デバイス交換対応</strong> — 最後の取引から30日以内の新デバイスからの申請なら、デバイス紐づけを更新して grace period を付与</li>
+                            <li><strong>反復濫用防止</strong> — Grace period は巣ごとに1回限り。「離脱・復帰」を何度も繰り返す攻略法を防止</li>
+                        </ul>
+                        <div class="mech-metaphor">🌱 倒れた人が目覚めて、一息ついて、また歩き始める。Meguri はそれを応援する。でも、わざと倒れるふりをして特典を受け取ろうとする人は、構造的に得できない。</div>
+                        <p class="mech-note" style="margin-top: 12px;">複数デバイスでの巣量産は Phase 2-02（第4軸：1デバイス = 1主要な巣）で既に防止済み。Grace period の濫用も1回限りで防ぐため、Sybil 攻撃の合算効果は生じない。</p>
                     </div>
                 </div>
 

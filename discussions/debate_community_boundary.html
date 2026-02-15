@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meguri - 討論: コミュニティ境界定義と正規化</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 260px 1fr 300px;
+            gap: 20px;
+            min-height: calc(100vh - 40px);
+        }
+        .left-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        .left-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .participant {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            background: #0d1117;
+            border-radius: 8px;
+            border-left: 4px solid #30363d;
+        }
+        .participant.math { border-left-color: #7ee787; }
+        .participant.econ { border-left-color: #d2a8ff; }
+        .participant.phil { border-left-color: #ffa657; }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .participant.math .avatar { background: #7ee787; }
+        .participant.econ .avatar { background: #d2a8ff; }
+        .participant.phil .avatar { background: #ffa657; }
+        .participant-info h4 { font-size: 13px; color: #c9d1d9; margin-bottom: 2px; }
+        .participant-info p { font-size: 11px; color: #8b949e; }
+        .nav-section { margin-top: 20px; }
+        .nav-section h3 { margin-bottom: 10px; }
+        .nav-link {
+            display: block;
+            padding: 7px 10px;
+            margin-bottom: 5px;
+            background: #0d1117;
+            border-radius: 6px;
+            color: #8b949e;
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .nav-link:hover { color: #58a6ff; background: #1c2128; border-left-color: #58a6ff; }
+        .nav-link .nav-num { color: #484f58; margin-right: 6px; font-weight: 600; }
+        .center-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #30363d;
+        }
+        .center-pane h1 { color: #58a6ff; margin-bottom: 6px; font-size: 22px; line-height: 1.3; }
+        .phase-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(88,166,255,0.15);
+            border: 1px solid #1f6feb;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #58a6ff;
+            margin-bottom: 8px;
+        }
+        .center-pane > .subtitle {
+            color: #8b949e;
+            font-size: 13px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #30363d;
+        }
+        .topic-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-left: 4px solid #58a6ff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+        }
+        .topic-box h3 { color: #58a6ff; font-size: 14px; margin-bottom: 10px; }
+        .topic-box p { font-size: 13px; line-height: 1.7; color: #8b949e; }
+        .thread-break {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 32px 0 24px;
+        }
+        .thread-break .tb-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #30363d, transparent);
+        }
+        .thread-break .tb-label {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 11px;
+            color: #58a6ff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        .message {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0d1117;
+            font-weight: bold;
+            flex-shrink: 0;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .message.math .message-avatar { background: #7ee787; }
+        .message.econ .message-avatar { background: #d2a8ff; }
+        .message.phil .message-avatar { background: #ffa657; }
+        .message-content { max-width: 90%; }
+        .speaker-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            padding-left: 4px;
+        }
+        .speaker-name { font-size: 11px; font-weight: 700; }
+        .message.math .speaker-name { color: #7ee787; }
+        .message.econ .speaker-name { color: #d2a8ff; }
+        .message.phil .speaker-name { color: #ffa657; }
+        .emotion {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .emotion.challenge { background: rgba(248,81,73,0.15); color: #f85149; border: 1px solid rgba(248,81,73,0.3); }
+        .emotion.agree { background: rgba(126,231,135,0.15); color: #7ee787; border: 1px solid rgba(126,231,135,0.3); }
+        .emotion.doubt { background: rgba(227,179,65,0.15); color: #e3b341; border: 1px solid rgba(227,179,65,0.3); }
+        .emotion.propose { background: rgba(88,166,255,0.15); color: #58a6ff; border: 1px solid rgba(88,166,255,0.3); }
+        .speech-bubble {
+            background: #1c2128;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 1px solid #30363d;
+            font-size: 13.5px;
+            line-height: 1.75;
+            color: #c9d1d9;
+        }
+        .message.math .speech-bubble { border-left: 3px solid #7ee787; }
+        .message.econ .speech-bubble { border-left: 3px solid #d2a8ff; }
+        .message.phil .speech-bubble { border-left: 3px solid #ffa657; }
+        .speech-bubble strong { color: #e6edf3; }
+        .speech-bubble code {
+            background: #0d1117;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #7ee787;
+            font-family: 'Consolas', monospace;
+        }
+        .speech-bubble ul, .speech-bubble ol { padding-left: 20px; margin: 8px 0; }
+        .speech-bubble li { margin-bottom: 5px; font-size: 13px; }
+        .analogy {
+            margin: 10px 0 0;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: rgba(227,179,65,0.06);
+            border-left: 3px solid #e3b341;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #8b949e;
+        }
+        .analogy strong { color: #e3b341; }
+        .resolution-box {
+            background: #0d2d0d;
+            border: 1px solid #1a4d1a;
+            border-left: 4px solid #3fb950;
+            padding: 20px 24px;
+            margin: 32px 0 0;
+            border-radius: 10px;
+        }
+        .resolution-box h3 { color: #3fb950; font-size: 15px; margin-bottom: 14px; }
+        .resolution-box ul { padding-left: 20px; margin-top: 10px; }
+        .resolution-box li { margin-bottom: 8px; font-size: 13px; line-height: 1.6; color: #c9d1d9; }
+        .resolution-box strong { color: #7ee787; }
+        .open-issue-box {
+            background: #1c1200;
+            border: 1px solid #4d3300;
+            border-left: 4px solid #e3b341;
+            padding: 16px 20px;
+            margin: 20px 0 0;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        .open-issue-box strong { color: #e3b341; }
+        .open-issue-box ul { padding-left: 20px; margin-top: 8px; }
+        .open-issue-box li { margin-bottom: 6px; color: #c9d1d9; }
+        .right-pane {
+            background: #161b22;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #30363d;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        .right-pane h3 {
+            color: #58a6ff;
+            margin-bottom: 15px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .accordion-item { border: 1px solid #30363d; border-radius: 8px; overflow: hidden; }
+        .accordion-header {
+            background: #0d1117;
+            padding: 11px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 12.5px;
+            user-select: none;
+            transition: background 0.2s;
+            color: #c9d1d9;
+        }
+        .accordion-header:hover { background: #1c2128; }
+        .accordion-header.active { background: #1f6feb; color: #fff; }
+        .accordion-icon { transition: transform 0.3s; font-size: 10px; }
+        .accordion-header.active .accordion-icon { transform: rotate(180deg); }
+        .accordion-content {
+            display: none;
+            padding: 12px 14px;
+            background: #0d1117;
+            font-size: 12px;
+            line-height: 1.7;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+        }
+        .accordion-content.active { display: block; }
+        @media (max-width: 768px) {
+            .container { grid-template-columns: 1fr; }
+            .left-pane, .center-pane, .right-pane { grid-column: auto; position: relative; top: 0; }
+        }
+    </style>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+    <div class="container">
+
+        <div class="left-pane">
+            <h3>Participants</h3>
+            <div class="participant math">
+                <div class="avatar">M</div>
+                <div class="participant-info">
+                    <h4>mathematician</h4>
+                    <p>グラフ理論・実装</p>
+                </div>
+            </div>
+            <div class="participant econ">
+                <div class="avatar">G</div>
+                <div class="participant-info">
+                    <h4>game-economist</h4>
+                    <p>ゲーム論・攻撃耐性</p>
+                </div>
+            </div>
+            <div class="participant phil">
+                <div class="avatar">P</div>
+                <div class="participant-info">
+                    <h4>philosopher</h4>
+                    <p>公平性・倫理</p>
+                </div>
+            </div>
+            <div class="nav-section">
+                <h3>Navigation</h3>
+                <a href="#round1" class="nav-link"><span class="nav-num">R1</span>問題の確認</a>
+                <a href="#round2" class="nav-link"><span class="nav-num">R2</span>オフライン分析の提案</a>
+                <a href="#round3" class="nav-link"><span class="nav-num">R3</span>正規化係数の仕様</a>
+                <a href="#round4" class="nav-link"><span class="nav-num">R4</span>合意</a>
+            </div>
+        </div>
+
+        <div class="center-pane">
+            <span class="phase-badge">Phase 2 — R2-4 検討</span>
+            <h1>コミュニティ境界定義と正規化</h1>
+            <p class="subtitle">GPS廃止後のコミュニティ定義と、スコアリング・正規化の分離設計</p>
+
+            <div class="topic-box">
+                <h3>討論の核心</h3>
+                <p>Phase 2-04で「取引グラフのネットワーク距離でコミュニティを定義」と合意したが、Phase 2-06では「クラスタリングはスコアリングから除外」と決めた。矛盾に見える「スコアリングには使わないが正規化には使う」という仕様を、論理的かつ安全に実装する方法を検討する。</p>
+            </div>
+
+            <div class="thread-break" id="round1">
+                <div class="tb-line"></div>
+                <div class="tb-label">Round 1 — 問題の確認</div>
+                <div class="tb-line"></div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion challenge">矛盾指摘</span>
+                    </div>
+                    <div class="speech-bubble">
+                        外部レビューの指摘は正しい。私たちの設計には矛盾がある：<br><br>
+                        <strong>Phase 2-04: 「取引グラフでコミュニティを定義」</strong><br>
+                        コミュニティ相対評価のため、Q_equity（循環品質）を正規化する必要がある。<br><br>
+                        <strong>Phase 2-06: 「クラスタリングはスコアリングから除外」</strong><br>
+                        ネットワーク分析をスコアリングに使うと、攻撃者が取引グラフを操作してスコアを上げる可能性がある。<br><br>
+                        結果：「スコアリングには使わないが正規化には使う」？これは論理的に矛盾している。クラスタリング結果を正規化に使うなら、その精度に依存している。精度が低いなら正規化も無意味になる。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message econ">
+                <div class="message-avatar">G</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">game-economist</span>
+                        <span class="emotion doubt">ゲーム論的懸念</span>
+                    </div>
+                    <div class="speech-bubble">
+                        ゲーム論の観点からも危険だ。<br><br>
+                        もしクラスタリング結果が Q_equity に影響するなら（どんな形でも）、攻撃者は「クラスタリング結果に自分たちが都合よく入る」ように取引パターンを操作する動機を得てしまう。<br><br>
+                        つまり：<br>
+                        <ul>
+                            <li>ローカルでクラスタリング分析 → 都合よいコミュニティ図が出る</li>
+                            <li>攻撃者たちが協力して、その結果に合わせた取引をシミュレート</li>
+                            <li>結果的に高い Q_equity を得る</li>
+                        </ul>
+                        「スコアリングには使わない」と言っても、正規化経由で影響するなら、実質的には使っているのと同じ。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message phil">
+                <div class="message-avatar">P</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">philosopher</span>
+                        <span class="emotion propose">解決方向を示唆</span>
+                    </div>
+                    <div class="speech-bubble">
+                        二人の指摘はもっともだ。ただ、一つの見方を提示したい。<br><br>
+                        <strong>「情報の流れ」を分離する</strong>という考え方：<br>
+                        <ul>
+                            <li><strong>スコアリング層</strong>：ローカル・個人的な取引行動のみを分析。ネットワーク構造は見ない</li>
+                            <li><strong>正規化層</strong>：システム全体の取引グラフを「参考情報」として、一度だけ分析。攻撃者が個々の行動で操作できない、システムレベルの統計</li>
+                        </ul>
+                        つまり、<strong>正規化係数は「定期的に（例：月1回）更新される定数」</strong>であって、個人の行動に即座に反応しない。だから個人の攻撃行動の効果がない。
+                    </div>
+                </div>
+            </div>
+
+            <div class="thread-break" id="round2">
+                <div class="tb-line"></div>
+                <div class="tb-label">Round 2 — オフライン分析の提案</div>
+                <div class="tb-line"></div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion propose">オフライン分析フレームワーク</span>
+                    </div>
+                    <div class="speech-bubble">
+                        philosopher の「情報分離」という考え方に基づいて、具体的な設計を提案する。<br><br>
+                        <strong>2つの層の分離：</strong><br><br>
+                        <strong>① スコアリング層（リアルタイム）</strong><br>
+                        <code>S(v) = softmin(d, t, e) × F(v)</code><br>
+                        - 個人の循環品質（時間・エントロピー・滞留時間）のみ<br>
+                        - ネットワーク情報は使わない<br>
+                        - 毎日更新<br><br>
+                        <strong>② 正規化層（定期的オフライン）</strong><br>
+                        <code>Q'_equity(v) = S(v) × α(cluster(v))</code><br>
+                        - 月1回、全取引グラフをオフラインで分析<br>
+                        - クラスタリングアルゴリズムでコミュニティ検出<br>
+                        - 各コミュニティの「規模」「密度」から正規化係数 α を計算<br>
+                        - 正規化係数は定数として適用（毎日の変動なし）<br><br>
+                        結果：個人の行動で正規化係数は変わらない → 攻撃インセンティブが生じない。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message econ">
+                <div class="message-avatar">G</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">game-economist</span>
+                        <span class="emotion agree">ゲーム論的に安全</span>
+                    </div>
+                    <div class="speech-bubble">
+                        いい。ゲーム論的に分析する：<br><br>
+                        攻撃者が「月1回のオフライン分析に影響させよう」と思っても：<br>
+                        <ul>
+                            <li>月間の全取引グラフは数百万〜数億の取引ノード</li>
+                            <li>攻撃者の取引パターンは小さなノイズに過ぎない</li>
+                            <li>クラスタリング結果を有意に変えるには、全体の5%以上の取引量が必要だと仮定するなら、個人の操作では不可能</li>
+                        </ul>
+                        つまり、正規化係数を操作できない → 攻撃の効果がない → ROI ≤ 0。<br><br>
+                        同時に、正規化係数が「固定」なので、個人がいくら行動を変えても即座には効果がない。支配戦略は変わらない：「自然に生きる」が最適。
+                    </div>
+                </div>
+            </div>
+
+            <div class="thread-break" id="round3">
+                <div class="tb-line"></div>
+                <div class="tb-label">Round 3 — 正規化係数の仕様確定</div>
+                <div class="tb-line"></div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion propose">正規化係数の計算方法</span>
+                    </div>
+                    <div class="speech-bubble">
+                        正規化係数 α(cluster) の具体的な計算方法を定義する。<br><br>
+                        <strong>月1回のオフライン分析処理：</strong><br>
+                        <code>
+                        # Step 1: 過去30日の取引グラフから Community Detection<br>
+                        graph = past_30_days_transactions()<br>
+                        clusters = community_detection(graph)  // e.g., Louvain<br><br>
+                        # Step 2: 各クラスタの統計を計算<br>
+                        FOR EACH cluster IN clusters:<br>
+                        　　size = |cluster|<br>
+                        　　density = edge_count / possible_edges<br>
+                        　　avg_q = mean(S(v) for v in cluster)<br><br>
+                        # Step 3: 正規化係数を計算<br>
+                        　　α(cluster) = global_avg_q / avg_q  // 全体平均 / クラスタ平均<br><br>
+                        # Step 4: 翌月のスコアリングに適用<br>
+                        Q'_equity(v) = S(v) × α(cluster(v))<br>
+                        </code><br><br>
+                        このことで、大規模コミュニティでスコアが低めなら、α で上昇補正され、小規模コミュニティとの間で「公平さ」が実現される。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message phil">
+                <div class="message-avatar">P</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">philosopher</span>
+                        <span class="emotion agree">公平性が確保される</span>
+                    </div>
+                    <div class="speech-bubble">
+                        理想的だ。この設計なら：<br><br>
+                        <strong>小規模コミュニティの人たち：</strong><br>
+                        「少ないメンバー内での流動」でも、α による正規化で評価されて、大規模コミュニティとの不公平感がなくなる。<br><br>
+                        <strong>大規模コミュニティの人たち：</strong><br>
+                        「多くの選択肢がある環境」での流動パターンは、その環境の中での相対的な質が見られる。<br><br>
+                        <strong>攻撃者：</strong><br>
+                        月1回の確定係数に対して行動を最適化するのは実質的に不可能（システム全体を変える必要がある）。<br><br>
+                        Meguri の「自然に存在するものを保護する」という原則が、地理的・規模的な偏りなく実装される。
+                    </div>
+                </div>
+            </div>
+
+            <div class="thread-break" id="round4">
+                <div class="tb-line"></div>
+                <div class="tb-label">Round 4 — 合意</div>
+                <div class="tb-line"></div>
+            </div>
+
+            <div class="message math">
+                <div class="message-avatar">M</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">mathematician</span>
+                        <span class="emotion agree">合意</span>
+                    </div>
+                    <div class="speech-bubble">
+                        R2-4 の設計に合意する。矛盾を解いた。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message econ">
+                <div class="message-avatar">G</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">game-economist</span>
+                        <span class="emotion agree">合意</span>
+                    </div>
+                    <div class="speech-bubble">
+                        ゲーム論的に安全性が確保された。合意する。
+                    </div>
+                </div>
+            </div>
+
+            <div class="message phil">
+                <div class="message-avatar">P</div>
+                <div class="message-content">
+                    <div class="speaker-header">
+                        <span class="speaker-name">philosopher</span>
+                        <span class="emotion agree">合意</span>
+                    </div>
+                    <div class="speech-bubble">
+                        倫理的に公平性が確保された。合意する。
+                    </div>
+                </div>
+            </div>
+
+            <div class="resolution-box">
+                <h3>合意事項</h3>
+                <ul>
+                    <li><strong>コミュニティ定義：取引グラフのネットワーク距離</strong>：GPS廃止後、「コミュニティ = 取引グラフ上の密なクラスター」で定義。Louvainなどのコミュニティ検出アルゴリズムで実装。</li>
+                    <li><strong>2層分離による矛盾解消</strong>：スコアリング層ではネットワーク情報を使わない（攻撃耐性）。正規化層のみで、オフライン分析結果を参考情報として適用。</li>
+                    <li><strong>オフライン分析フレームワーク</strong>：月1回、全取引グラフをクラスタリング分析し、正規化係数 α を計算・確定。以降の30日間はその係数を固定使用。</li>
+                    <li><strong>正規化係数の計算式</strong>：α(cluster) = global_avg_q / avg_q（全体平均 / クラスタ平均）。規模や密度の異なるコミュニティ間での評価の公平性を実現。</li>
+                    <li><strong>攻撃不可能性</strong>：月1回の確定係数に対して、個人や小規模集団の行動で操作することは実質的に不可能（全体5%以上の取引量操作が必要）。</li>
+                    <li><strong>支配戦略の維持</strong>：攻撃による利得がないため、「自然に生きる」が支配戦略のままである。</li>
+                </ul>
+            </div>
+
+            <div class="open-issue-box">
+                <strong>残課題</strong>
+                <ul>
+                    <li><strong>コミュニティ検出アルゴリズムの選定</strong>：Louvain、Infomap、Label Propagation など複数の候補がある。Phase 0 で最適なアルゴリズムと パラメータを決定。</li>
+                    <li><strong>分析周期の最適化</strong>：月1回が適切か、週1回か、3か月ごとか。取引グラフの安定性と更新頻度のバランスをシミュレーションで検証。</li>
+                    <li><strong>過渡期の扱い</strong>：初期立ち上げ時は十分な取引グラフがないため、正規化係数の計算が不安定。ブートストラップ期間の設計。</li>
+                    <li><strong>新規コミュニティの出現</strong>：月間でクラスタリング結果が大きく変わった場合の対応。急激な係数変動を緩和する仕組み。</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="right-pane">
+            <h3>Glossary</h3>
+            <div class="accordion" id="glossary">
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        コミュニティ（Community）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content active">
+                        <p>取引グラフ上で密に相互作用する巣のグループ。GPS距離軸廃止後は、ネットワーク距離（何ステップ離れているか）でコミュニティを定義。月1回のオフライン分析で検出。</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        正規化係数（α）
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>コミュニティ間のスコア格差を補正する係数。α(cluster) = global_avg_q / avg_q で計算。大規模コミュニティは α が小さく、小規模コミュニティは α が大きくなる傾向があり、公平性を実現。</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        オフライン分析
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>月1回、システム全体の取引グラフをまとめて分析する処理。リアルタイムではなく定期的に実行されるため、個人の行動で結果を操作できない安全性がある。</p>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        2層分離設計
+                        <span class="accordion-icon">&#9660;</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p>スコアリング層（リアルタイム、個人的）と正規化層（定期的、システムレベル）に情報処理を分離する設計。スコアリングではネットワーク情報を使わず攻撃耐性を確保し、正規化のみで地理的・規模的な公平性を実現。</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleAccordion(header) {
+            const allHeaders = document.querySelectorAll('.accordion-header');
+            allHeaders.forEach(h => {
+                if (h !== header) {
+                    h.classList.remove('active');
+                    h.nextElementSibling.classList.remove('active');
+                }
+            });
+            header.classList.toggle('active');
+            header.nextElementSibling.classList.toggle('active');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstHeader = document.querySelector('.accordion-header');
+            if (firstHeader) {
+                firstHeader.classList.add('active');
+                firstHeader.nextElementSibling.classList.add('active');
+            }
+        });
+    </script>
+</body>
+
+</html>
