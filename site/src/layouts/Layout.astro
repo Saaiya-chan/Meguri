@@ -179,6 +179,12 @@ article li { margin-bottom: 0.3rem; }
 }
 .speaker-other .speaker-content { border-left: 3px solid #6e7681; }
 
+/* ===== Mobile responsive ===== */
+@media (max-width: 600px) {
+  .speaker-block { flex-direction: column; gap: 0.4rem; }
+  .speaker-label { width: auto; align-self: flex-start; margin-top: 0; }
+}
+
 /* ===== Blockquotes (たとえ話) ===== */
 .speaker-content blockquote,
 article > blockquote {
