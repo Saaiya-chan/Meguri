@@ -9,17 +9,15 @@ Runs k = [1, 5, 10, 20, 50] with N=1000 for speed.
 """
 
 import json
-import sys
-import numpy as np
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from .runner import SimulationRunner
+from .config import TestCase
 
-from simulation.runner import SimulationRunner
-from simulation.config import TestCase
+_DEFAULT_RESULTS_DIR = str(Path(__file__).parent.parent / "results")
 
 
-def run_t010(output_dir: str = "/Users/kunimitsu/Projects/Meguri_pre3/results",
+def run_t010(output_dir: str = _DEFAULT_RESULTS_DIR,
              kappa: float = 1.5,
              theta: float = 0.45,
              beta: float = 1.0,

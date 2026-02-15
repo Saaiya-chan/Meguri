@@ -1,7 +1,7 @@
 # Phase 0 シミュレーション 進捗状況レポート
 
 **更新日：** 2026-02-15（Stage 3 完了）
-**詳細レポート：** [`results/final_report.md`](results/final_report.md)
+**詳細レポート：** [`simulation/results/final_report.md`](results/final_report.md)
 
 ---
 
@@ -11,18 +11,18 @@
 
 | モジュール | ファイル | 内容 | Stage |
 |---|---|---|---|
-| ネットワーク生成 | `simulation/network_generator.py` | Watts-Strogatz小世界ネットワーク | 1 |
-| 取引シミュレーション | `simulation/transaction_engine.py` | Poisson(λ=2) 日次取引、攻撃者戦略3種 | 1 |
-| スコアリング | `simulation/scoring.py` | Bell-Curve T(v)、Partner-Diversity E(v)、D(v)、softmin | 1+**3改** |
-| Mana配分 | `simulation/mana_distributor.py` | 75%均等 + 25% VRF Bloom、DecayEngine | 2 |
-| コミュニティ検出 | `simulation/community_detector.py` | Louvain月次、α(c)正規化 | 2 |
-| 評価指標 | `simulation/metrics.py` | Sybil ROI, TPR/FPR, Gini, VRF公平性 | 2 |
-| 実行基盤 | `simulation/runner.py` | 180日ループ、全シナリオ、距離軸オプション | 2+**3改** |
-| DoEオプティマイザ | `simulation/doe_optimizer.py` | L16直交表、16実験自動実行 | **3新** |
+| ネットワーク生成 | `simulation/src/network_generator.py` | Watts-Strogatz小世界ネットワーク | 1 |
+| 取引シミュレーション | `simulation/src/transaction_engine.py` | Poisson(λ=2) 日次取引、攻撃者戦略3種 | 1 |
+| スコアリング | `simulation/src/scoring.py` | Bell-Curve T(v)、Partner-Diversity E(v)、D(v)、softmin | 1+**3改** |
+| Mana配分 | `simulation/src/mana_distributor.py` | 75%均等 + 25% VRF Bloom、DecayEngine | 2 |
+| コミュニティ検出 | `simulation/src/community_detector.py` | Louvain月次、α(c)正規化 | 2 |
+| 評価指標 | `simulation/src/metrics.py` | Sybil ROI, TPR/FPR, Gini, VRF公平性 | 2 |
+| 実行基盤 | `simulation/src/runner.py` | 180日ループ、全シナリオ、距離軸オプション | 2+**3改** |
+| DoEオプティマイザ | `simulation/src/doe_optimizer.py` | L16直交表、16実験自動実行 | **3新** |
 | T010スクリプト | `simulation/scenario_t010.py` | 3層 vs 4層 距離軸比較 | **3新** |
-| Notebook（Stage 1） | `notebooks/01_basic_simulation.ipynb` | MVP検証、スコア分布 | 1 |
-| Notebook（Stage 2） | `notebooks/02_scenario_testing.ipynb` | T001〜T010実行、全指標可視化 | 2 |
-| Notebook（Stage 3） | `notebooks/03_parameter_optimization.ipynb` | DoE分析、感度分析、T010比較 | **3新** |
+| Notebook（Stage 1） | `simulation/notebooks/01_basic_simulation.ipynb` | MVP検証、スコア分布 | 1 |
+| Notebook（Stage 2） | `simulation/notebooks/02_scenario_testing.ipynb` | T001〜T010実行、全指標可視化 | 2 |
+| Notebook（Stage 3） | `simulation/notebooks/03_parameter_optimization.ipynb` | DoE分析、感度分析、T010比較 | **3新** |
 
 ### ❌ 未実施（Phase 1 以降）
 

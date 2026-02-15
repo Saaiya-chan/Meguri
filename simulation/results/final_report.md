@@ -165,16 +165,16 @@ Bloom イベントの集中配分と初期残高の分散が主因。
 
 | ファイル | 内容 | 状態 |
 |---|---|---|
-| `simulation/config.py` | パラメータ定義・T001〜T010 | ✅ |
-| `simulation/network_generator.py` | Watts-Strogatz + SimulationState | ✅ |
-| `simulation/transaction_engine.py` | Poisson取引・攻撃者戦略 | ✅ |
-| `simulation/scoring.py` | 3軸 T/E/D・softmin・Bell-Curve（Stage 3強化）| ✅ |
-| `simulation/mana_distributor.py` | 75/25 Mana + VRF Bloom | ✅ |
-| `simulation/community_detector.py` | Louvain・α(c)正規化 | ✅ |
-| `simulation/metrics.py` | 全評価指標 | ✅ |
-| `simulation/runner.py` | 180日ループ・全シナリオ | ✅ |
-| `simulation/doe_optimizer.py` | L16 DoE 最適化 | ✅ |
+| `simulation/src/config.py` | パラメータ定義・T001〜T010 | ✅ |
+| `simulation/src/network_generator.py` | Watts-Strogatz + SimulationState | ✅ |
+| `simulation/src/transaction_engine.py` | Poisson取引・攻撃者戦略 | ✅ |
+| `simulation/src/scoring.py` | 3軸 T/E/D・softmin・Bell-Curve（Stage 3強化）| ✅ |
+| `simulation/src/mana_distributor.py` | 75/25 Mana + VRF Bloom | ✅ |
+| `simulation/src/community_detector.py` | Louvain・α(c)正規化 | ✅ |
+| `simulation/src/metrics.py` | 全評価指標 | ✅ |
+| `simulation/src/runner.py` | 180日ループ・全シナリオ | ✅ |
+| `simulation/src/doe_optimizer.py` | L16 DoE 最適化 | ✅ |
 | `simulation/scenario_t010.py` | T010 距離軸比較 | ✅ |
-| `notebooks/01_basic_simulation.ipynb` | Stage 1 MVP | ✅ |
-| `notebooks/02_scenario_testing.ipynb` | Stage 2 全シナリオ | ✅ |
-| `notebooks/03_parameter_optimization.ipynb` | Stage 3 DoE分析 | ✅ |
+| `simulation/notebooks/01_basic_simulation.ipynb` | Stage 1 MVP | ✅ |
+| `simulation/notebooks/02_scenario_testing.ipynb` | Stage 2 全シナリオ | ✅ |
+| `simulation/notebooks/03_parameter_optimization.ipynb` | Stage 3 DoE分析 | ✅ |

@@ -20,7 +20,9 @@ from .config import MeguriPhase0Config, TestCase
 class SimulationRunner:
     """Orchestrates Phase 0 simulation with all 7 mechanisms integrated."""
 
-    def __init__(self, output_dir: str = "/Users/kunimitsu/Projects/Meguri_pre3/results"):
+    def __init__(self, output_dir: str = None):
+        if output_dir is None:
+            output_dir = str(Path(__file__).parent.parent / "results")
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True, parents=True)
         self.config = MeguriPhase0Config()

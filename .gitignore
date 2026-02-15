@@ -34,7 +34,7 @@ __pycache__/
 *.ipynb_checkpoints
 
 # Simulation outputs (generated files - exclude from repo)
-results/scores/
-results/communities/
-results/stage1_*.png
-results/stage2_*.png
+simulation/results/scores/
+simulation/results/communities/
+simulation/results/stage1_*.png
+simulation/results/stage2_*.png

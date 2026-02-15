@@ -22,11 +22,8 @@ import pyDOE2
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-import sys
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
-from simulation.runner import SimulationRunner
-from simulation.config import TestCase
+from .runner import SimulationRunner
+from .config import TestCase
 
 
 # ------------------------------------------------------------------ #
@@ -88,7 +85,10 @@ def objective(metrics_list: List[Dict]) -> float:
     return total / len(metrics_list)
 
 
-def run_doe_l16(output_dir: str = "/Users/kunimitsu/Projects/Meguri_pre3/results") -> List[Dict]:
+_DEFAULT_RESULTS_DIR = str(Path(__file__).parent.parent / "results")
+
+
+def run_doe_l16(output_dir: str = _DEFAULT_RESULTS_DIR) -> List[Dict]:
     """
     Run L16 fractional factorial design and return ranked results.
     """
@@ -160,7 +160,7 @@ def run_doe_l16(output_dir: str = "/Users/kunimitsu/Projects/Meguri_pre3/results
 
 
 def run_grace_period_scan(best_params: Dict,
-                          output_dir: str = "/Users/kunimitsu/Projects/Meguri_pre3/results") -> Dict:
+                          output_dir: str = _DEFAULT_RESULTS_DIR) -> Dict:
     """Scan grace_period {14, 30, 60} with the best params from L16."""
     runner = SimulationRunner(output_dir=output_dir)
     doe_dir = Path(output_dir) / "doe"
