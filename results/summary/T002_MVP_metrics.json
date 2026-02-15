@@ -1,0 +1,13 @@
+{
+  "test_id": "T002_MVP",
+  "scenario": "A",
+  "network_size": 1000,
+  "attacker_count": 10,
+  "honest_total_balance": 16239.446192873605,
+  "attacker_total_balance": 140.3553816189368,
+  "honest_avg_balance": 16.40348100290263,
+  "attacker_avg_balance": 14.03553816189368,
+  "sybil_roi": 0.8556438818937311,
+  "tpr": 0.1,
+  "fpr": 0.00909090909090909
+}

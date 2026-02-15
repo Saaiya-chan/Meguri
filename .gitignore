@@ -20,3 +20,21 @@
 *.log
 *.tmp
 .cache/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Simulation outputs (generated files - exclude from repo)
+results/scores/
+results/communities/
+results/stage1_*.png
+results/stage2_*.png

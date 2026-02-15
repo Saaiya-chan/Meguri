@@ -1,0 +1,13 @@
+{
+  "test_id": "T002_QUICK_TEST",
+  "scenario": "A",
+  "network_size": 500,
+  "attacker_count": 5,
+  "honest_total_balance": 8094.499095562296,
+  "attacker_total_balance": 95.4125886281756,
+  "honest_avg_balance": 16.352523425378376,
+  "attacker_avg_balance": 19.08251772563512,
+  "sybil_roi": 1.1669463622978162,
+  "tpr": 0.0,
+  "fpr": 0.012121212121212121
+}
