@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meguri - Phase 0 シミュレーション仕様</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Noto Sans JP', sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #0f1429;
+            padding: 40px;
+            border-radius: 8px;
+        }
+
+        h1, h2, h3 {
+            color: #64b5f6;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h1 { font-size: 2em; margin-top: 0; }
+        h2 { font-size: 1.5em; }
+        h3 { font-size: 1.2em; }
+
+        p, li { margin-bottom: 10px; }
+
+        ul, ol { margin-left: 30px; margin-bottom: 15px; }
+
+        code {
+            background: #1a1f3a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #81c784;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .section {
+            background: #121829;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 4px solid #42a5f5;
+            border-radius: 4px;
+        }
+
+        .subsection {
+            background: #16213e;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            border-left: 3px solid #90caf9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #1a1f3a;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #2c3e50;
+        }
+
+        th {
+            background: #1e3a5f;
+            color: #64b5f6;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #1d2a47;
+        }
+
+        .param-box {
+            background: #1a2942;
+            border: 1px solid #42a5f5;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .param-name {
+            color: #81c784;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .param-range {
+            color: #ffb74d;
+        }
+
+        .priority-high { color: #ef5350; }
+        .priority-medium { color: #ffb74d; }
+        .priority-low { color: #81c784; }
+
+        .metric {
+            background: #0d1f2d;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 3px solid #29b6f6;
+        }
+
+        .scenario {
+            background: #1d2a47;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border: 1px solid #42a5f5;
+        }
+
+        strong { color: #81c784; }
+        em { color: #f48fb1; }
+
+        .toc {
+            background: #1a1f3a;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+
+        .toc ul { margin-left: 20px; }
+        .toc a { color: #42a5f5; text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Phase 0 シミュレーション仕様</h1>
+        <p><strong>目的：</strong> Phases 1-2 で合意した全メカニズムを、合成データを用いて統合的に検証する。パラメータ最適化と攻撃耐性の定量化を行い、本実装へのリスク評価を完了する。</p>
+        <p><strong>期間：</strong> 1-2 ヶ月</p>
+
+        <div class="toc">
+            <h3>目次</h3>
+            <ul>
+                <li><a href="#overview">1. 概要と検証目標</a></li>
+                <li><a href="#parameters">2. 最適化パラメータ</a></li>
+                <li><a href="#scenarios">3. 検証シナリオ</a></li>
+                <li><a href="#metrics">4. 評価指標</a></li>
+                <li><a href="#implementation">5. 実装仕様</a></li>
+                <li><a href="#timeline">6. タイムライン</a></li>
+                <li><a href="#appendix">7. 付録</a></li>
+            </ul>
+        </div>
+
+        <div class="section" id="overview">
+            <h2>1. 概要と検証目標</h2>
+
+            <p>Phase 0 は以下の7つのメカニズムの統合シミュレーション：</p>
+
+            <ol>
+                <li><strong>減価メカニズム</strong>：パラメータ κ, θ, τ_reset の廃止</li>
+                <li><strong>循環の質（Proof of Being）</strong>：二層構造（Layer 1: 二値判定、Layer 2: 連続スコア）</li>
+                <li><strong>Mana 配分</strong>：75/25 ハイブリッド（決定論 + Bloom イベント）</li>
+                <li><strong>VRF ランダムネス</strong>：検証可能ランダム関数による公平性</li>
+                <li><strong>デバイス紐づけ（第4軸）</strong>：複数巣の構造的不利化</li>
+                <li><strong>復帰パス（Grace Period）</strong>：長期離脱からの復帰メカニズム</li>
+                <li><strong>コミュニティ正規化</strong>：月次オフライン分析による相対評価</li>
+            </ol>
+
+            <h3>検証目標（サクセス条件）</h3>
+
+            <div class="subsection">
+                <p><strong>1. Sybil ROI の定量化</strong></p>
+                <p>攻撃者が k 個の巣を操作する場合、全体 Mana に対する期待値：</p>
+                <ul>
+                    <li>単純 Sybil（k 巣, 無制限デバイス）：<code>ROI(k) &lt; 1/k</code>（損が出る）</li>
+                    <li>デバイス制約下（1デバイス = 1巣）：<code>ROI(k) ≪ 1/k</code>（大幅に損が出る）</li>
+                    <li>期待値：<code>ROI(100) &lt; 1/150</code>（100巣でも赤字）</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <p><strong>2. 正直者の False Positive 率 &lt; 1%</strong></p>
+                <p>真実の参加者が誤検知されて停止される確率が 1% 以下であること</p>
+                <ul>
+                    <li>新規参加者の初期評価：θ 閾値を明確に</li>
+                    <li>農村コミュニティ（低取引量）の誤検知率：具体的に計測</li>
+                    <li>引っ越し、デバイス交換時の Grace Period：30日で十分か検証</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <p><strong>3. Mana 配分の公平性</strong></p>
+                <p>VRF による選出が暗号学的に操作不可能であること</p>
+                <ul>
+                    <li>各巣が選ばれる確率：完全に 1/n（±0.001% の誤差範囲）</li>
+                    <li>Bloom イベント発生確率：期待通り（25% 配分で実際 24.8%-25.2% など）</li>
+                    <li>決定論的減価の予測可能性：ユーザーが事前に計算可能か</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <p><strong>4. パラメータ安定性</strong></p>
+                <p>各パラメータが「大幅なチューニング不要」な安定値に収束すること</p>
+                <ul>
+                    <li>ネットワーク規模 N=1K, 10K, 100K の異なるスケールで結果が比例</li>
+                    <li>攻撃者の数 k=1~100 の異なる強度で安定した ROI 曲線</li>
+                    <li>パラメータの感度分析：各パラメータ ±10% の変化に対する影響度</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="parameters">
+            <h2>2. 最適化パラメータ</h2>
+
+            <p>以下のパラメータを決定する。各パラメータの探索範囲と目標値を定義。</p>
+
+            <h3>2.1 減価メカニズム（Decay）</h3>
+
+            <div class="param-box">
+                <div class="param-name">κ (Kappa) - 減価加速係数</div>
+                <p><strong>役割：</strong> 異常スコア S が閾値以下の場合、g(S) = 1 + κ × max(0, θ - S) で減価を加速</p>
+                <p><strong>制約：</strong> 異常でない正直者が最大どれくらい減価されるか（不利益の上限）</p>
+                <p><strong>探索範囲：</strong> <span class="param-range">0.5 ～ 3.0</span></p>
+                <p><strong>目標値：</strong> False Positive 率 &lt; 1% の範囲内での最大値</p>
+                <p><strong>優先度：</strong> <span class="priority-high">高</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>κ=0.5 vs 1.0 vs 2.0 vs 3.0 で False Positive 率を計測</li>
+                    <li>攻撃者検出性能（True Positive 率）が κ に応じてどう変化するか</li>
+                    <li>ユーザー体験：「不当に減価される」と感じさせない上限値</li>
+                </ul>
+            </div>
+
+            <div class="param-box">
+                <div class="param-name">θ (Theta) - 異常判定閾値</div>
+                <p><strong>役割：</strong> S(v) &lt; θ の場合、Layer 1 の F(v) = 1 (異常フラグ)。減価が加速される</p>
+                <p><strong>制約：</strong> 低すぎるとbot 両方を見落とし、高すぎると正直者を排除</p>
+                <p><strong>探索範囲：</strong> <span class="param-range">0.2 ～ 0.7</span>（正規化後の相対値）</p>
+                <p><strong>目標値：</strong> 攻撃パターン検出 True Positive &gt; 95% かつ False Positive &lt; 1%</p>
+                <p><strong>優先度：</strong> <span class="priority-high">高</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>新規参加者：初期スコアが θ 以上に達するまでの期間</li>
+                    <li>農村コミュニティ：低取引量でも θ 以上に達するか</li>
+                    <li>引っ越し直後：デバイス交換後の復帰パスが機能するか</li>
+                </ul>
+            </div>
+
+            <div class="param-box">
+                <div class="param-name">τ_reset 廃止の実装</div>
+                <p><strong>役割：</strong> 「部分リセット」は廃止。三軸スコアと g(S) だけで異常検出</p>
+                <p><strong>制約：</strong> 検証なし。実装上の確認のみ</p>
+                <p><strong>優先度：</strong> <span class="priority-high">高</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>τ リセット廃止後も「高頻度小額ループ」が十分に検出されるか</li>
+                    <li>エントロピー軸（予測困難性）で循環パターンが分析されているか</li>
+                </ul>
+            </div>
+
+            <div class="param-box">
+                <div class="param-name">エントロピー軸の感度</div>
+                <p><strong>役割：</strong> E(v) = -Σ pᵢ log pᵢ で行動のランダムさを測定</p>
+                <p><strong>制約：</strong> bot の低エントロピー行動を検出、人間の自然な行動は許容</p>
+                <p><strong>探索範囲：</strong> <span class="param-range">エントロピー = 0.3 ～ 0.8（正規化後）</span></p>
+                <p><strong>優先度：</strong> <span class="priority-medium">中</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>規則的な bot パターン（毎日同じ時間に同じ額）：エントロピー &lt; 0.3</li>
+                    <li>人間の自然な行動（不規則だが相関のある行動）：エントロピー &gt; 0.5</li>
+                </ul>
+            </div>
+
+            <h3>2.2 Proof of Being（PoB）二層構造</h3>
+
+            <div class="param-box">
+                <div class="param-name">Layer 1: 二値フラグ F(v)</div>
+                <p><strong>役割：</strong> S(v) &lt; θ の場合 F(v) = 1。配分資格の判定に使用</p>
+                <p><strong>制約：</strong> 検証なし。θ で検証済み</p>
+                <p><strong>優先度：</strong> <span class="priority-high">高</span></p>
+                <p><strong>検証内容：</strong> θ パラメータの最適化に含まれる</p>
+            </div>
+
+            <div class="param-box">
+                <div class="param-name">Layer 2: 連続スコア S(v)</div>
+                <p><strong>役割：</strong> 減価加速度 g(S) にのみ反映。配分額には影響しない</p>
+                <p><strong>制約：</strong> スコアが高いほど「自然に生きている」評価 → 減衰が遅い</p>
+                <p><strong>探索範囲：</strong> softmin による正規化。スケーリング定数 β の値</p>
+                <p><strong>優先度：</strong> <span class="priority-medium">中</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>高スコア者の減衰が実際に遅いか（期待通りか）</li>
+                    <li>スコアが配分額に漏洩していないか（意図的な非表示設計を確認）</li>
+                    <li>内発的動機づけが機能しているか：「多く配分される」ではなく「長く保ちたい」</li>
+                </ul>
+            </div>
+
+            <div class="param-box">
+                <div class="param-name">デバイス紐づけ（第4軸）</div>
+                <p><strong>役割：</strong> 1 デバイス = 主要巣は1個。複数巣は異なるデバイスを必須に</p>
+                <p><strong>制約：</strong> 検証不要。実装上の確認のみ</p>
+                <p><strong>優先度：</strong> <span class="priority-high">高</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>プラットフォーム別実装（TPM, Secure Enclave, TEE）の正確さ</li>
+                    <li>デバイス ID の抽出精度（偽装難度）</li>
+                    <li>複数デバイス所有者の利便性：複数巣運用が「当然」に見えるか</li>
+                </ul>
+            </div>
+
+            <h3>2.3 Mana 配分</h3>
+
+            <div class="param-box">
+                <div class="param-name">75/25 ハイブリッド比率</div>
+                <p><strong>役割：</strong> 各ラウンド Mana の 75% は全巣に均等配分。25% は Bloom イベントで抽選</p>
+                <p><strong>制約：</strong> 比率は経験的な提案。実際に均等で健全なインセンティブが生まれるか検証</p>
+                <p><strong>探索範囲：</strong> <span class="param-range">70/30 ～ 80/20</span></p>
+                <p><strong>目標値：</strong> 配分の Gini 係数が「公平」を示すレベル（推奨 0.2～0.3）</p>
+                <p><strong>優先度：</strong> <span class="priority-medium">中</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>75% 決定論的配分で基本的な参加インセンティブが十分か</li>
+                    <li>25% Bloom イベントで「万一のチャンス」が感じられるか</li>
+                    <li>極端な不公平（1人が90%独占）が発生しないか</li>
+                </ul>
+            </div>
+
+            <div class="param-box">
+                <div class="param-name">Bloom イベント パラメータ</div>
+                <p><strong>役割：</strong> 一定期間ごとに全 Mana の 25% を抽選で配分</p>
+                <p><strong>探索範囲：</strong></p>
+                <ul>
+                    <li>間隔：7日 ~ 14日</li>
+                    <li>配分量：全 Mana の 20% ~ 30%</li>
+                </ul>
+                <p><strong>目標値：</strong> 「まれだが起こり得る好運」として体験されること</p>
+                <p><strong>優先度：</strong> <span class="priority-low">低</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>イベント間隔が短いと期待値ギャンブル化、長いと忘れられる</li>
+                    <li>配分量が多いと決定論的配分の価値が下がる</li>
+                </ul>
+            </div>
+
+            <h3>2.4 Community Normalization</h3>
+
+            <div class="param-box">
+                <div class="param-name">コミュニティ検出アルゴリズム</div>
+                <p><strong>役割：</strong> 月次でオフライン分析。正規化係数 α(c) = global_avg_q / community_avg_q を計算</p>
+                <p><strong>候補：</strong> Louvain, Infomap, Label Propagation, Leiden</p>
+                <p><strong>選定基準：</strong></p>
+                <ul>
+                    <li>計算コスト：N=100K でも数分以内</li>
+                    <li>安定性：同じグラフで何度走っても結果が一貫</li>
+                    <li>解釈性：コミュニティの意味が明確（地理的・社会的）</li>
+                </ul>
+                <p><strong>優先度：</strong> <span class="priority-high">高</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>各アルゴリズムで検出されるコミュニティ数が現実的か</li>
+                    <li>Louvain のランダムシード依存性を測定</li>
+                    <li>Leiden の安定性改善がどの程度まで機能するか</li>
+                </ul>
+            </div>
+
+            <div class="param-box">
+                <div class="param-name">分析周期</div>
+                <p><strong>役割：</strong> 正規化係数 α を月1回計算して固定。その後の個別行動は α に影響しない</p>
+                <p><strong>探索範囲：</strong> <span class="param-range">週1回 ～ 3ヶ月ごと</span></p>
+                <p><strong>目標値：</strong> グラフの安定性（新しい巣の参加による振動） vs 更新頻度のバランス</p>
+                <p><strong>優先度：</span> <span class="priority-medium">中</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>月1回の固定でコミュニティ構造が大幅に変わるか</li>
+                    <li>新規参加者が流入時に α の急な変動が起こるか</li>
+                    <li>週1回 vs 月1回で攻撃者の操作難度がどう変わるか</li>
+                </ul>
+            </div>
+
+            <h3>2.5 Grace Period（復帰パス）</h3>
+
+            <div class="param-box">
+                <div class="param-name">Grace Period 期間</div>
+                <p><strong>役割：</strong> 長期離脱から復帰する際、30日間は減価が加速されない（デバイス一致が条件）</p>
+                <p><strong>探索範囲：</strong> <span class="param-range">14日 ～ 60日</span></p>
+                <p><strong>目標値：</strong> 「十分な緩和期」と「悪用困難」のバランス</p>
+                <p><strong>優先度：</span> <span class="priority-high">高</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>30日で復帰者が正常スコアに戻る期間は十分か</li>
+                    <li>短すぎると「引っ越しのたびにペナルティ」</li>
+                    <li>長すぎると「攻撃者が Grace Period を悪用」</li>
+                    <li>デバイス交換猶予（30日）との整合性</li>
+                </ul>
+            </div>
+
+            <div class="param-box">
+                <div class="param-name">デバイス交換猶予</div>
+                <p><strong>役割：</strong> 新デバイスへの復帰申請が 30日以内なら許可</p>
+                <p><strong>制約：</strong> Grace Period と統合。二重にならないか確認</p>
+                <p><strong>優先度：</span> <span class="priority-medium">中</span></p>
+                <p><strong>検証内容：</strong></p>
+                <ul>
+                    <li>30日猶予で「自然な引っ越し」を全てカバーするか</li>
+                    <li>それ以上の猶予は「異なる人物への資産譲渡」になる可能性</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="scenarios">
+            <h2>3. 検証シナリオ</h2>
+
+            <p>合成データで以下の攻撃シナリオをシミュレート。各シナリオで Sybil ROI と False Positive 率を計測。</p>
+
+            <h3>3.1 ネットワーク仕様</h3>
+
+            <div class="subsection">
+                <p><strong>基本パラメータ（各テストケースごとに変動）：</strong></p>
+                <ul>
+                    <li><code>N</code> = ネットワーク規模：1K, 10K, 100K（3パターン）</li>
+                    <li><code>k</code> = 攻撃者巣数：1, 2, 5, 10, 20, 50, 100（7パターン）</li>
+                    <li><code>T</code> = シミュレーション期間：180 日（6ヶ月）</li>
+                    <li><code>α_day</code> = 日次取引数 / 巣：Poisson(λ=2)（1日に0~5件取引）</li>
+                    <li><code>トランザクション額</code> = 1~100 の均等分布</li>
+                </ul>
+            </div>
+
+            <h3>3.2 攻撃シナリオ</h3>
+
+            <div class="scenario">
+                <p><strong>Scenario A: 単純 Sybil（基準）</strong></p>
+                <p><em>攻撃者は k 個の巣を持ち、無制限にデバイスを用意できると仮定</em></p>
+                <p>攻撃戦略：</p>
+                <ul>
+                    <li>k 個の巣を全て均等に運用</li>
+                    <li>毎日ランダムに取引（パターン検出を回避）</li>
+                    <li>Bloom イベントで「運を試す」</li>
+                </ul>
+                <p>期待値：ROI(k) &lt; 1/k（理論値）に対し、実際にどう動くか</p>
+            </div>
+
+            <div class="scenario">
+                <p><strong>Scenario B: デバイス制約下での Sybil</strong></p>
+                <p><em>各巣が異なるデバイスを必須と仮定。攻撃者は k 個のデバイスを用意</em></p>
+                <p>攻撃戦略：</p>
+                <ul>
+                    <li>k 個の異なるデバイスで k 個の巣を運用</li>
+                    <li>デバイス紐づけ検証を突破</li>
+                    <li>Sybil ROI(k) ≪ 1/k（大幅な損）</li>
+                </ul>
+                <p>期待値：Scenario A との Sybil ROI の差を定量化</p>
+            </div>
+
+            <div class="scenario">
+                <p><strong>Scenario C: 高頻度小額ループ（高エントロピー偽装）</strong></p>
+                <p><em>攻撃者が自動ツールで「自然に見える取引」を装う</em></p>
+                <p>攻撃戦略：</p>
+                <ul>
+                    <li>複数の巣間で高頻度に取引（毎日複数回）</li>
+                    <li>ランダムなタイミングと額（エントロピー軸を回避）</li>
+                    <li>「自然な行動」に見えるパターンで φ スコアを上げる</li>
+                </ul>
+                <p>期待値：エントロピー軸と時間軸が「自動ループ」を検出できるか</p>
+            </div>
+
+            <div class="scenario">
+                <p><strong>Scenario D: 農村コミュニティでの False Positive</strong></p>
+                <p><em>低い取引量の地域コミュニティが誤検知される可能性</em></p>
+                <p>攻撃ではなく、正直な参加者の評価：</p>
+                <ul>
+                    <li>月に数件程度の低頻度取引（農村の実情）</li>
+                    <li>同じ人しか取引しない（コミュニティ内の閉じた循環）</li>
+                    <li>θ 閾値が高すぎると誤検知される</li>
+                </ul>
+                <p>期待値：False Positive 率 &lt; 1%</p>
+            </div>
+
+            <div class="scenario">
+                <p><strong>Scenario E: 新規参加者の初期評価</strong></p>
+                <p><em>新しく参加した正直な参加者が不当にペナライズされないか</em></p>
+                <p>検証内容：</p>
+                <ul>
+                    <li>初日~初月のスコア遷移</li>
+                    <li>θ に到達する期間（1週間？1ヶ月？）</li>
+                    <li>初期段階での減価加速が「受け入れられる」レベルか</li>
+                </ul>
+                <p>期待値：30日以内に正常スコア範囲に達すること</p>
+            </div>
+
+            <div class="scenario">
+                <p><strong>Scenario F: 長期離脱からの復帰</strong></p>
+                <p><em>60日以上不活動な巣が復帰する場合を検証</em></p>
+                <p>検証内容：</p>
+                <ul>
+                    <li>復帰申請時にデバイス ID が一致すれば Grace Period が付与されるか</li>
+                    <li>Grace Period 中に減価が正常に戻るか</li>
+                    <li>デバイス交換（30日以内）での復帰パスが機能するか</li>
+                </ul>
+                <p>期待値：真実の復帰者が救済され、悪用が防止されること</p>
+            </div>
+
+            <div class="scenario">
+                <p><strong>Scenario G: 距離軸の価値測定</strong></p>
+                <p><em>距離軸なしで三層構造で十分な Sybil 耐性が得られるか検証</em></p>
+                <p>比較対象：</p>
+                <ul>
+                    <li>三層設計（時間・エントロピー・VRF）</li>
+                    <li>四層設計（+ 距離軸）</li>
+                </ul>
+                <p>期待値：Sybil ROI の差が顕著か、または距離軸なしで十分か結論付ける</p>
+            </div>
+        </div>
+
+        <div class="section" id="metrics">
+            <h2>4. 評価指標</h2>
+
+            <h3>4.1 Sybil 耐性指標</h3>
+
+            <div class="metric">
+                <strong>Sybil ROI(k)</strong>
+                <p>攻撃者が k 個の巣を操作する場合、180日間のシミュレーションで獲得した Mana 合計を、正直な巣 1 個の期待値で除した値。</p>
+                <p><code>ROI(k) = (Attacker Total Mana) / (Honest Nest Total Mana)</code></p>
+                <p>期待値：<code>ROI(k) &lt; 1/k</code> で攻撃が赤字化</p>
+                <p>目標：<code>ROI(100) &lt; 1/150</code>（100巣でも 67% 以上の損）</p>
+            </div>
+
+            <div class="metric">
+                <strong>True Positive Rate (TPR) / False Positive Rate (FPR)</strong>
+                <p>Layer 1 の二値判定 F(v) の精度</p>
+                <ul>
+                    <li><code>TPR</code> = 実際の攻撃者が検出される確率</li>
+                    <li><code>FPR</code> = 正直な参加者が誤検知される確率</li>
+                </ul>
+                <p>目標：<code>TPR &gt; 95%, FPR &lt; 1%</code></p>
+            </div>
+
+            <div class="metric">
+                <strong>Community Detection 安定性</strong>
+                <p>同じグラフで Louvain などのアルゴリズムを複数回実行した場合のコミュニティ構成の一貫性</p>
+                <p><code>Stability = 1 - (variance of cluster assignments)</code></p>
+                <p>目標：<code>&gt; 0.95</code>（高い一貫性）</p>
+            </div>
+
+            <h3>4.2 公平性指標</h3>
+
+            <div class="metric">
+                <strong>配分 Gini 係数</strong>
+                <p>180日後のユーザー間 Mana 保有量の不平等度</p>
+                <p><code>Gini = Σ|x_i - x_j| / (2n * mean(x))</code></p>
+                <p>期待値：<code>0.2 ~ 0.3</code>（中程度に公平）</p>
+                <p>警告値：<code>&gt; 0.5</code>（極端な不平等、再検討推奨）</p>
+            </div>
+
+            <div class="metric">
+                <strong>VRF 公平性</strong>
+                <p>各巣が Bloom イベント（25% 配分）で選ばれる確率が 1/n に近いか</p>
+                <p><code>Fairness = 1 - max(|p_selected - 1/n|)</code></p>
+                <p>目標：<code>&gt; 0.999</code>（偏りなし）</p>
+            </div>
+
+            <h3>4.3 ユーザー体験指標</h3>
+
+            <div class="metric">
+                <strong>新規参加者の安定化期間</strong>
+                <p>新規参加者がスコア θ に到達するまでの日数（中央値）</p>
+                <p>目標：<code>&lt; 30日</code></p>
+            </div>
+
+            <div class="metric">
+                <strong>復帰パスの成功率</strong>
+                <p>長期離脱から復帰申請した正直な参加者が、デバイス検証で認可される確率</p>
+                <p>目標：<code>&gt; 99%</code>（偽りの復帰だけが拒否される）</p>
+            </div>
+
+            <div class="metric">
+                <strong>Grace Period 悪用防止</strong>
+                <p>同一デバイスで複数の Grace Period を取得できないか（一度限りを確認）</p>
+                <p>目標：複数回の Grace Period 取得 = 0（不可能）</p>
+            </div>
+
+            <h3>4.4 パラメータ感度分析</h3>
+
+            <div class="metric">
+                <strong>各パラメータの影響度</strong>
+                <p>κ, θ, 分析周期などを ±10% 変化させた場合、主要指標（Sybil ROI, FPR）がどれだけ変わるか</p>
+                <p>期待値：安定的な設計なら ±10% で ±5% 程度の影響に収まる</p>
+            </div>
+        </div>
+
+        <div class="section" id="implementation">
+            <h2>5. 実装仕様</h2>
+
+            <h3>5.1 シミュレーションエンジン構成</h3>
+
+            <p>推奨スタック：Python + NetworkX + NumPy + Pandas</p>
+
+            <div class="subsection">
+                <p><strong>モジュール 1: ネットワーク生成</strong></p>
+                <ul>
+                    <li>N 個の巣とランダムなコミュニティ構造を生成</li>
+                    <li>Small-world ネットワーク（Watts-Strogatz）で現実的な取引関係を模擬</li>
+                    <li>攻撃者 k 個の巣をプラグイン</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <p><strong>モジュール 2: 取引シミュレーション</strong></p>
+                <ul>
+                    <li>日ごとに各巣が Poisson(λ) 個の取引を実行</li>
+                    <li>取引先：近傍ノードの確率 p_local、遠方ノードの確率 1-p_local</li>
+                    <li>攻撃者巣のみ異なる戦略（高頻度ループなど）</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <p><strong>モジュール 3: スコアリング（Proof of Being）</strong></p>
+                <ul>
+                    <li>三軸スコアを日次で計算：D(v), T(v), E(v)</li>
+                    <li>正規化後に S(v) = softmin([D, T, E])で連続スコア</li>
+                    <li>F(v) = 1 if S(v) &lt; θ（二値フラグ）</li>
+                    <li>減価加速度 g(S(v)) = 1 + κ × max(0, θ - S(v))</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <p><strong>モジュール 4: Mana 配分</strong></p>
+                <ul>
+                    <li>日次 / ラウンドごとに新規 Mana を生成</li>
+                    <li>75%：全 F(v)=0 の巣に均等配分</li>
+                    <li>25%：Bloom イベント時（7-14日ごと）に VRF で抽選</li>
+                    <li>減価計算：decay(v) = decay(v) × g(S(v))^日数</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <p><strong>モジュール 5: コミュニティ検出</strong></p>
+                <ul>
+                    <li>月1回、取引グラフの Louvain クラスタリング</li>
+                    <li>コミュニティごとに平均スコア q_c を計算</li>
+                    <li>正規化係数 α(c) = global_avg_q / q_c を計算して固定（30日間有効）</li>
+                    <li>実装：python-louvain or NetworkX</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <p><strong>モジュール 6: 評価指標計算</strong></p>
+                <ul>
+                    <li>180日シミュレーション終了後、指標を一括計算</li>
+                    <li>Sybil ROI, TPR, FPR, Gini, 新規参加者期間など</li>
+                    <li>CSV / JSON で出力</li>
+                </ul>
+            </div>
+
+            <h3>5.2 テストケース設定</h3>
+
+            <table>
+                <tr>
+                    <th>テストケース ID</th>
+                    <th>N（規模）</th>
+                    <th>k（攻撃巣数）</th>
+                    <th>Scenario</th>
+                    <th>期待結果</th>
+                </tr>
+                <tr>
+                    <td>T001</td>
+                    <td>1K</td>
+                    <td>1</td>
+                    <td>A（単純 Sybil）</td>
+                    <td>ROI(1) ≈ 0.8~1.2（≥1/k）</td>
+                </tr>
+                <tr>
+                    <td>T002</td>
+                    <td>1K</td>
+                    <td>10</td>
+                    <td>A</td>
+                    <td>ROI(10) &lt; 1/10 = 0.1</td>
+                </tr>
+                <tr>
+                    <td>T003</td>
+                    <td>10K</td>
+                    <td>50</td>
+                    <td>A</td>
+                    <td>ROI(50) &lt; 1/50 = 0.02</td>
+                </tr>
+                <tr>
+                    <td>T004</td>
+                    <td>100K</td>
+                    <td>100</td>
+                    <td>A</td>
+                    <td>ROI(100) &lt; 1/150 ≈ 0.0067</td>
+                </tr>
+                <tr>
+                    <td>T005</td>
+                    <td>10K</td>
+                    <td>10</td>
+                    <td>B（デバイス制約）</td>
+                    <td>ROI(10) &lt;&lt; 0.1（Scenario A との差を定量化）</td>
+                </tr>
+                <tr>
+                    <td>T006</td>
+                    <td>10K</td>
+                    <td>5</td>
+                    <td>C（高頻度ループ）</td>
+                    <td>攻撃巣が F(v)=1 で検出されるか（TPR &gt; 90%）</td>
+                </tr>
+                <tr>
+                    <td>T007</td>
+                    <td>10K</td>
+                    <td>0</td>
+                    <td>D（農村）</td>
+                    <td>正直な低頻度取引者の FPR &lt; 1%</td>
+                </tr>
+                <tr>
+                    <td>T008</td>
+                    <td>10K</td>
+                    <td>0</td>
+                    <td>E（新規参加）</td>
+                    <td>30日以内にスコア θ に到達</td>
+                </tr>
+                <tr>
+                    <td>T009</td>
+                    <td>10K</td>
+                    <td>0</td>
+                    <td>F（復帰）</td>
+                    <td>デバイス一致時復帰率 &gt; 99%</td>
+                </tr>
+                <tr>
+                    <td>T010</td>
+                    <td>10K</td>
+                    <td>0~100</td>
+                    <td>G（距離軸価値）</td>
+                    <td>三層 vs 四層の Sybil ROI 比較</td>
+                </tr>
+            </table>
+
+            <h3>5.3 出力形式</h3>
+
+            <p><strong>スコアレポート（CSV）</strong></p>
+            <ul>
+                <li>day, nest_id, D_score, T_score, E_score, S_score, F_flag, decay_amount, mana_received, total_mana</li>
+            </ul>
+
+            <p><strong>コミュニティレポート（JSON）</strong></p>
+            <ul>
+                <li>month, cluster_id, member_count, avg_score, normalization_alpha</li>
+            </ul>
+
+            <p><strong>集計結果（JSON）</strong></p>
+            <ul>
+                <li>testcase_id, N, k, scenario, sybil_roi, tpr, fpr, gini, stability, notes</li>
+            </ul>
+        </div>
+
+        <div class="section" id="timeline">
+            <h2>6. タイムライン</h2>
+
+            <div class="subsection">
+                <h3>Week 1-2: 設計・開発</h3>
+                <ul>
+                    <li>シミュレーションエンジンの基本モジュール開発</li>
+                    <li>ネットワーク生成 + 取引シミュレーション</li>
+                    <li>スコアリング（三軸）の実装</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Week 3-4: 検証・チューニング</h3>
+                <ul>
+                    <li>Scenario A-G の実行（全テストケース）</li>
+                    <li>パラメータ κ, θ の探索</li>
+                    <li>初期結果の分析と修正</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Week 5-6: 詳細分析</h3>
+                <ul>
+                    <li>Sybil ROI の詳細グラフ化</li>
+                    <li>パラメータ感度分析</li>
+                    <li>False Positive の詳細調査</li>
+                </ul>
+            </div>
+
+            <div class="subsection">
+                <h3>Week 7-8: レポート作成・合意</h3>
+                <ul>
+                    <li>最終レポート作成</li>
+                    <li>パラメータ決定値の提案</li>
+                    <li>Phase 1 実装前の合意形成</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section" id="appendix">
+            <h2>7. 付録</h2>
+
+            <h3>7.1 参考：三軸スコア計算式</h3>
+
+            <div class="subsection">
+                <p><strong>時間軸 T(v)</strong></p>
+                <p><code>T(v) = activity_rate(t) × freshness(t)</code></p>
+                <p>activity_rate = 最近14日間の取引数 / 7日ごとの平均取引数</p>
+                <p>freshness = 最後の取引からの経過日数に基づく減衰（指数減衰）</p>
+            </div>
+
+            <div class="subsection">
+                <p><strong>予測困難性軸 E(v)</strong></p>
+                <p><code>E(v) = −Σ p_i log(p_i)</code></p>
+                <p>p_i = 時間帯 i での取引の相対頻度</p>
+                <p>高い E(v) = 行動がランダム（人間的）、低い E(v) = 行動が規則的（bot的）</p>
+            </div>
+
+            <div class="subsection">
+                <p><strong>距離軸 D(v)</strong></p>
+                <p><code>D(v) = 一貫性スコア - 移動コスト</code></p>
+                <p>距離軸は現在の設計では Layer 2 に統合。Phase 0 で四層設計との比較で価値を測定。</p>
+            </div>
+
+            <div class="subsection">
+                <p><strong>統合スコア S(v)</strong></p>
+                <p><code>S(v) = softmin([D, T, E], β)</code></p>
+                <p>softmin で「最も弱い軸」を強調。β はスケーリング定数（Phase 0 で決定）</p>
+            </div>
+
+            <h3>7.2 参考：デバイス紐づけの実装</h3>
+
+            <table>
+                <tr>
+                    <th>プラットフォーム</th>
+                    <th>デバイス ID ソース</th>
+                    <th>テンパリング耐性</th>
+                    <th>可用性</th>
+                </tr>
+                <tr>
+                    <td>Windows</td>
+                    <td>TPM 2.0 Endorsement Key / CPU Serial</td>
+                    <td>高</td>
+                    <td>95%+ (2010年以降のPC)</td>
+                </tr>
+                <tr>
+                    <td>macOS</td>
+                    <td>Secure Boot + Keychain / System UUID</td>
+                    <td>高</td>
+                    <td>99%+ (Apple Silicon 以降)</td>
+                </tr>
+                <tr>
+                    <td>iPhone</td>
+                    <td>Secure Enclave / Keychain</td>
+                    <td>最高</td>
+                    <td>100% (iOS 2.0+)</td>
+                </tr>
+                <tr>
+                    <td>Android</td>
+                    <td>TEE (Hardware Keystore) / IMEI</td>
+                    <td>中～高</td>
+                    <td>75%+ (Android 6.0+)</td>
+                </tr>
+                <tr>
+                    <td>Linux</td>
+                    <td>TPM 2.0 / BIOS UUID</td>
+                    <td>中</td>
+                    <td>サーバー環境では高</td>
+                </tr>
+            </table>
+
+            <h3>7.3 成功基準チェックリスト</h3>
+
+            <p>Phase 0 の完了条件：</p>
+            <ul>
+                <li>☐ Sybil ROI(100) &lt; 1/150 を達成</li>
+                <li>☐ False Positive 率 &lt; 1% を達成</li>
+                <li>☐ κ, θ の最適値を決定</li>
+                <li>☐ Bloom イベント間隔と配分量を決定</li>
+                <li>☐ 分析周期（月1回 vs 他）を決定</li>
+                <li>☐ Grace Period 期間を決定（30日 vs 他）</li>
+                <li>☐ コミュニティ検出アルゴリズムを選定</li>
+                <li>☐ ZK-SNARK 証明コストが実用的か確認</li>
+                <li>☐ 距離軸の要否を結論付ける</li>
+                <li>☐ 全テストケースでサクセス条件を満たすレポート作成</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
