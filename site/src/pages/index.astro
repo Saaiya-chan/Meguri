@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+const discussions = await getCollection('discussions');
+const sorted = discussions.sort((a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf());
+---
+<Layout title="Meguri" description="Meguri Project — 議論と仕様">
+  <h1>Meguri</h1>
+  <p>議論ドキュメント一覧</p>
+  <ul>
+    {sorted.map((entry) => (
+      <li>
+        <a href={`/discussions/${entry.slug}/`}>{entry.data.title}</a>
+        <span style="color: #8b949e; font-size: 0.9rem;"> — {entry.data.date}</span>
+        {entry.data.description && <p style="margin: 0.25rem 0 0.75rem; color: #8b949e; font-size: 0.9rem;">{entry.data.description}</p>}
+      </li>
+    ))}
+  </ul>
+</Layout>

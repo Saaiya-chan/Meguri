@@ -1,0 +1,319 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="春日レビューへの対応 — Meguri" description="7件の指摘事項と解決状況">
+  <style>
+    .response-item {
+      background: #121829;
+      border: 1px solid #42a5f5;
+      border-left: 4px solid #42a5f5;
+      padding: 25px;
+      margin: 25px 0;
+      border-radius: 4px;
+    }
+    .response-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .issue-id {
+      background: #81c784;
+      color: #0f1429;
+      width: 54px;
+      height: 54px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .issue-title { flex: 1; }
+    .issue-title h3 { color: #81c784; margin-bottom: 5px; font-size: 17px; }
+    .issue-title p { color: #b0bec5; font-size: 13px; }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #1b5e20;
+      color: #81c784;
+      white-space: nowrap;
+      margin-top: 4px;
+    }
+    .issue-problem {
+      background: #1a2942;
+      border-left: 3px solid #f48fb1;
+      padding: 14px;
+      margin: 14px 0;
+      border-radius: 4px;
+    }
+    .issue-problem h4 { color: #f48fb1; margin-bottom: 8px; font-size: 13px; }
+    .issue-problem p { color: #c9d1d9; font-size: 14px; margin: 0; }
+    .solution {
+      background: #0d2e4a;
+      border-left: 3px solid #81c784;
+      padding: 14px;
+      margin: 14px 0;
+      border-radius: 4px;
+    }
+    .solution h4 { color: #81c784; margin-bottom: 8px; font-size: 13px; }
+    .solution ul { margin-left: 18px; color: #c9d1d9; font-size: 14px; }
+    .solution li { margin-bottom: 7px; }
+    .ref-link {
+      color: #42a5f5;
+      text-decoration: none;
+      font-size: 13px;
+      margin-top: 10px;
+      margin-right: 14px;
+      display: inline-block;
+    }
+    .ref-link:hover { text-decoration: underline; }
+    .summary-section {
+      margin-top: 40px;
+      padding-top: 28px;
+      border-top: 2px solid #42a5f5;
+    }
+    .summary-section h2 { color: #64b5f6; font-size: 22px; margin-bottom: 18px; border: none; padding: 0; }
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #121829;
+    }
+    .summary-table th {
+      background: #1e3a5f;
+      color: #64b5f6;
+      padding: 11px;
+      text-align: left;
+    }
+    .summary-table td { padding: 11px; border-bottom: 1px solid #2c3e50; font-size: 14px; }
+    .summary-table tr:hover { background: #1d2a47; }
+    .st-resolved {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      background: #1b5e20;
+      color: #81c784;
+    }
+    .page-title { color: #64b5f6; font-size: 2rem; margin-bottom: 6px; }
+    .page-subtitle { color: #90caf9; font-size: 15px; margin-bottom: 2rem; }
+  </style>
+
+  <h1 class="page-title">春日（はるひ）レビューへの対応</h1>
+  <p class="page-subtitle">7件の指摘事項と解決状況</p>
+
+  <!-- R1-1 -->
+  <div class="response-item">
+    <div class="response-header">
+      <div class="issue-id">R1-1</div>
+      <div class="issue-title">
+        <h3>部分リセット閾値の恣意性</h3>
+        <p>Phase 1-01 減価メカニズム</p>
+      </div>
+      <span class="status-badge">解決済み</span>
+    </div>
+    <div class="issue-problem">
+      <h4>🔴 元の指摘</h4>
+      <p>「少額取引」って誰が決めるの？ その閾値自体がシステムの恣意的な設計。閾値を操作する権力が生まれる時点で「脱所有」の理念に矛盾していないか。</p>
+    </div>
+    <div class="solution">
+      <h4>✅ 対応方法</h4>
+      <ul>
+        <li><strong>部分リセット（τのリセット）を廃止</strong>した</li>
+        <li>恣意的な「小額判定」の閾値自体を設計から排除</li>
+        <li>代わりに<strong>エントロピー軸で自動的に異常パターンを検知</strong>（bot的な「高頻度小額ループ」は低エントロピーで自動検出）</li>
+        <li>「権力的な判定」ではなく「数学的な検知」に転換</li>
+      </ul>
+    </div>
+    <a href="/discussions/debate_decay/" class="ref-link">→ Phase 1-01 討論内容を確認</a>
+  </div>
+
+  <!-- R1-2 -->
+  <div class="response-item">
+    <div class="response-header">
+      <div class="issue-id">R1-2</div>
+      <div class="issue-title">
+        <h3>「加速のみ」原則は社会的弱者を不利にする</h3>
+        <p>Phase 1-01 減価メカニズム</p>
+      </div>
+      <span class="status-badge">解決済み</span>
+    </div>
+    <div class="issue-problem">
+      <h4>🔴 元の指摘</h4>
+      <p>取引しない人（高齢者、障がい者、社会的孤立者）は一方的に減衰が加速される。「自然に存在する」だけじゃダメってこと？ それって排除の設計ではないか。</p>
+    </div>
+    <div class="solution">
+      <h4>✅ 対応方法</h4>
+      <ul>
+        <li><strong>コミュニティ相対評価を導入</strong>（Phase 1-04「三層構造」で実装）</li>
+        <li>小規模コミュニティの低頻度取引パターンを「自然な存在」として正当に評価</li>
+        <li>月1回のオフライン分析で正規化係数 α を計算 → 地域・規模による相対評価で公平性を実現</li>
+        <li>「取引しない」ことが自動的に排除されない設計に転換</li>
+      </ul>
+    </div>
+    <a href="/discussions/debate_three_axes/" class="ref-link">→ Phase 1-04 討論内容を確認</a>
+  </div>
+
+  <!-- R1-3 -->
+  <div class="response-item">
+    <div class="response-header">
+      <div class="issue-id">R1-3</div>
+      <div class="issue-title">
+        <h3>グッドハートの法則は本当に解決していない</h3>
+        <p>Phase 1-01 減価メカニズム</p>
+      </div>
+      <span class="status-badge">解決済み</span>
+    </div>
+    <div class="issue-problem">
+      <h4>🔴 元の指摘</h4>
+      <p>「スコアを非公開にすれば攻略できない」って言うけど、AIは自然なパターンを学習して模倣できる。非公開にしたところで本質的な解決ではないか。</p>
+    </div>
+    <div class="solution">
+      <h4>✅ 対応方法</h4>
+      <ul>
+        <li><strong>「AI の排除」ではなく「AI の受容」へ哲学転換</strong>（Phase 1-05）</li>
+        <li>「人間性の証明」から「存在の証明（Proof of Being）」へ再定義</li>
+        <li>AI が「自然な行動パターン」を模倣しても、継続的な行動維持コスト（複数巣管理の時間・デバイスコスト）は排除できない</li>
+        <li>AI の自動化は物理制約（デバイス紐づけ）を回避できないため、自然と不利化される</li>
+      </ul>
+    </div>
+    <a href="/discussions/debate_proof_of_being/" class="ref-link">→ Phase 1-05 討論内容を確認</a>
+  </div>
+
+  <!-- R2-1 -->
+  <div class="response-item">
+    <div class="response-header">
+      <div class="issue-id">R2-1</div>
+      <div class="issue-title">
+        <h3>雨モデル（均等配分）と品質評価（Layer 2）のインセンティブ崩壊</h3>
+        <p>Phase 1-03 雨モデル × Phase 1-05 二層構造</p>
+      </div>
+      <span class="status-badge">解決済み</span>
+    </div>
+    <div class="issue-problem">
+      <h4>🔴 元の指摘</h4>
+      <p>雨モデルで全員に1/N均等配分するなら、Layer 2 の softmin スコアが高くても何の得もない。誰がわざわざ「良い循環」をするの？ インセンティブが完全に崩壊している。</p>
+    </div>
+    <div class="solution">
+      <h4>✅ 対応方法</h4>
+      <ul>
+        <li><strong>「配分額への影響」ではなく「減価加速度への影響」として Layer 2 を機能させる</strong></li>
+        <li>High Score → 減価が遅い → 長期的に保有できる → 内発的動機づけ</li>
+        <li>配分額に直結しないため、「評価の目標化」（Goodhart）を回避しながら自然な行動を促進</li>
+        <li>「評価と報酬の分離」原則で内発的動機づけを実現</li>
+      </ul>
+    </div>
+    <a href="/discussions/debate_mana_probability/" class="ref-link">→ Phase 1-03 討論内容を確認</a>
+    <a href="/discussions/debate_proof_of_being/" class="ref-link">→ Phase 1-05 討論内容を確認</a>
+  </div>
+
+  <!-- R2-2 -->
+  <div class="response-item">
+    <div class="response-header">
+      <div class="issue-id">R2-2</div>
+      <div class="issue-title">
+        <h3>AI 大量参入による人間の Mana 希釈問題</h3>
+        <p>Phase 1-05 AI受容 × Phase 1-03 雨モデル</p>
+      </div>
+      <span class="status-badge">解決済み</span>
+    </div>
+    <div class="issue-problem">
+      <h4>🔴 元の指摘</h4>
+      <p>「AIも存在するなら受け入れる」と言ったが、雨モデルは1/N均等配分。AI が巣を100万個作ったら人間の取り分は100万分の1に希釈される。</p>
+    </div>
+    <div class="solution">
+      <h4>✅ 対応方法</h4>
+      <ul>
+        <li><strong>デバイス紐づけ（第4軸）で AI 大量参入を構造的に困難に</strong></li>
+        <li>1デバイス = 主要巣1個の制約 → AI が k 個の巣を作るには k 個のデバイス必須 → コスト = k² に爆発</li>
+        <li>「識別」ではなく「無力化」：AI も参加できるが、複数巣は自動的に不利化される</li>
+        <li>Layer 1 異常検知・Layer 2 品質スコア・VRF ランダムネスで多重防御</li>
+      </ul>
+    </div>
+    <a href="/discussions/debate_proof_of_being/" class="ref-link">→ Phase 1-05 討論内容を確認</a>
+  </div>
+
+  <!-- R2-3 -->
+  <div class="response-item">
+    <div class="response-header">
+      <div class="issue-id">R2-3</div>
+      <div class="issue-title">
+        <h3>静寂閾値 + 減衰加速 = デジタル追放（復帰不能）</h3>
+        <p>Phase 1-06 静寂閾値 × Phase 1-01 減衰加速</p>
+      </div>
+      <span class="status-badge">解決済み</span>
+    </div>
+    <div class="issue-problem">
+      <h4>🔴 元の指摘</h4>
+      <p>90日動かなかったら分母Nから除外 + 減衰加速。病気や災害で長期離脱した人は通貨がゼロ近くまで減って、復帰しても取り戻す手段がない。事実上のデジタル追放。</p>
+    </div>
+    <div class="solution">
+      <h4>✅ 対応方法</h4>
+      <ul>
+        <li><strong>復帰パス（Grace Period）を設計</strong>：30日間の一度限りの猶予期間</li>
+        <li>同じデバイスからの復帰申請なら grace_remaining = 30日 を付与</li>
+        <li>Grace Period 中は減価加速が緩和 → スコアが正常に戻る期間を確保</li>
+        <li>一度限りの制約 → 攻撃者の悪用（復帰詐称）を防止</li>
+      </ul>
+    </div>
+    <a href="/discussions/debate_long_absence/" class="ref-link">→ R2-3 専用討論ページを確認</a>
+  </div>
+
+  <!-- R2-4 -->
+  <div class="response-item">
+    <div class="response-header">
+      <div class="issue-id">R2-4</div>
+      <div class="issue-title">
+        <h3>距離軸廃止後のコミュニティ境界定義の曖昧さ</h3>
+        <p>Phase 1-04 距離軸廃止 × Phase 1-02 循環品質</p>
+      </div>
+      <span class="status-badge">解決済み</span>
+    </div>
+    <div class="issue-problem">
+      <h4>🔴 元の指摘</h4>
+      <p>GPS距離軸を廃止したのはいい。でもコミュニティ相対評価を導入するなら、「コミュニティの境界」をどう決めるのか。Phase 1-06 でクラスタリングはスコアリングから除外した。矛盾していないか。</p>
+    </div>
+    <div class="solution">
+      <h4>✅ 対応方法</h4>
+      <ul>
+        <li><strong>2層分離設計で矛盾を解決</strong></li>
+        <li><strong>実時間スコアリング層</strong>：ネットワーク分析を一切使用しない（攻撃耐性）。Layer 1/2 は個別スコアのみ</li>
+        <li><strong>月次オフライン正規化層</strong>：Louvain クラスタリングで自動検出。正規化係数 α(c) を30日間有効な固定値として算出</li>
+        <li>結果：GPS不要、スコアリングに攻撃可能性なし、かつ地域差を相対評価で吸収</li>
+      </ul>
+    </div>
+    <a href="/discussions/debate_community_boundary/" class="ref-link">→ R2-4 専用討論ページを確認</a>
+  </div>
+
+  <!-- サマリー -->
+  <div class="summary-section">
+    <h2>対応状況サマリー</h2>
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>指摘事項</th>
+          <th>対象</th>
+          <th>状態</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>R1-1</strong></td><td>部分リセット閾値の恣意性</td><td>Phase 1-01</td><td><span class="st-resolved">✅ 解決済み</span></td></tr>
+        <tr><td><strong>R1-2</strong></td><td>「加速のみ」原則と社会的弱者</td><td>Phase 1-01 → 04</td><td><span class="st-resolved">✅ 解決済み</span></td></tr>
+        <tr><td><strong>R1-3</strong></td><td>グッドハートの法則（AI模倣）</td><td>Phase 1-01 → 05</td><td><span class="st-resolved">✅ 解決済み</span></td></tr>
+        <tr><td><strong>R2-1</strong></td><td>雨モデル vs Layer 2 インセンティブ崩壊</td><td>Phase 1-03 × 05</td><td><span class="st-resolved">✅ 解決済み</span></td></tr>
+        <tr><td><strong>R2-2</strong></td><td>AI 大量参入による Mana 希釈</td><td>Phase 1-05 × 03</td><td><span class="st-resolved">✅ 解決済み</span></td></tr>
+        <tr><td><strong>R2-3</strong></td><td>静寂閾値 + 減衰 = デジタル追放</td><td>Phase 1-06 × 01</td><td><span class="st-resolved">✅ 解決済み</span></td></tr>
+        <tr><td><strong>R2-4</strong></td><td>コミュニティ境界定義の曖昧さ</td><td>Phase 1-04 × 02</td><td><span class="st-resolved">✅ 解決済み</span></td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top: 18px; color: #90caf9; text-align: center;">
+      <strong>全7件の指摘事項が解決済み。</strong><br>
+      Phase 2 シミュレーションで、パラメータ最適化と攻撃耐性の定量化を実施済み。
+    </p>
+  </div>
+</Layout>

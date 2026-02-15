@@ -1,0 +1,109 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const discussions = await getCollection('discussions');
+  return discussions.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+<Layout title={entry.data.title} description={entry.data.description}>
+  <article>
+    <h1>{entry.data.title}</h1>
+    <p>{entry.data.date}</p>
+    <Content />
+  </article>
+</Layout>
+
+<script is:inline>
+(function () {
+  var article = document.querySelector('article');
+  if (!article) return;
+
+  var speakerMap = {
+    '数学者': 'mathematician',
+    'ゲーム経済学者': 'economist',
+    '哲学者': 'philosopher',
+    'アーキテクト': 'architect',
+    'architect': 'architect',
+    '議事録係': 'other',
+    '春日': 'other',
+  };
+
+  var nodes = Array.from(article.childNodes);
+  var frag = document.createDocumentFragment();
+  var speakerContent = null;
+  var inGlossary = false;
+  var glossarySection = null;
+  var glossaryItem = null;
+
+  nodes.forEach(function (el) {
+    if (el.nodeType !== 1) return; // skip text nodes
+    var tag = el.tagName;
+    var txt = el.textContent.trim();
+
+    if (tag === 'H2') {
+      speakerContent = null; glossaryItem = null;
+
+      if (/^Round\s*\d+/.test(txt) || /^最終結論/.test(txt)) {
+        el.classList.add('round-divider');
+        inGlossary = false;
+        frag.appendChild(el);
+      } else if (txt === '用語集') {
+        glossarySection = document.createElement('div');
+        glossarySection.className = 'glossary-section';
+        var gh = el.cloneNode(true);
+        glossarySection.appendChild(gh);
+        frag.appendChild(glossarySection);
+        inGlossary = true;
+      } else {
+        inGlossary = false;
+        frag.appendChild(el);
+      }
+
+    } else if (tag === 'H3') {
+      if (inGlossary && glossarySection) {
+        glossaryItem = document.createElement('div');
+        glossaryItem.className = 'glossary-item';
+        glossaryItem.appendChild(el);
+        glossarySection.appendChild(glossaryItem);
+        speakerContent = glossaryItem;
+      } else {
+        var speakerKey = null;
+        Object.keys(speakerMap).forEach(function (k) {
+          if (txt.indexOf(k) !== -1) speakerKey = k;
+        });
+        var cls = speakerKey ? speakerMap[speakerKey] : 'other';
+        var block = document.createElement('div');
+        block.className = 'speaker-block speaker-' + cls;
+        var label = document.createElement('div');
+        label.className = 'speaker-label';
+        label.textContent = speakerKey || txt;
+        speakerContent = document.createElement('div');
+        speakerContent.className = 'speaker-content';
+        block.appendChild(label);
+        block.appendChild(speakerContent);
+        frag.appendChild(block);
+      }
+
+    } else {
+      if (speakerContent) {
+        speakerContent.appendChild(el);
+      } else if (inGlossary && glossarySection) {
+        glossarySection.appendChild(el);
+      } else {
+        frag.appendChild(el);
+      }
+    }
+  });
+
+  article.innerHTML = '';
+  article.appendChild(frag);
+})();
+</script>
