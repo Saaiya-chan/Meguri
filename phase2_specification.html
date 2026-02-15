@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meguri - Phase 0 シミュレーション仕様</title>
+    <title>Meguri - Phase 2 シミュレーション仕様</title>
     <style>
         * {
             margin: 0;
@@ -143,8 +143,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Phase 0 シミュレーション仕様</h1>
-        <p><strong>目的：</strong> Phases 1-2 で合意した全メカニズムを、合成データを用いて統合的に検証する。パラメータ最適化と攻撃耐性の定量化を行い、本実装へのリスク評価を完了する。</p>
+        <h1>Phase 2 シミュレーション仕様</h1>
+        <p><strong>目的：</strong> Phase 1 で合意した全メカニズムを、合成データを用いて統合的に検証する。パラメータ最適化と攻撃耐性の定量化を行い、本実装へのリスク評価を完了する。</p>
         <p><strong>期間：</strong> 1-2 ヶ月</p>
 
         <div class="toc">
@@ -163,7 +163,7 @@
         <div class="section" id="overview">
             <h2>1. 概要と検証目標</h2>
 
-            <p>Phase 0 は以下の7つのメカニズムの統合シミュレーション：</p>
+            <p>Phase 2 は以下の7つのメカニズムの統合シミュレーション：</p>
 
             <ol>
                 <li><strong>減価メカニズム</strong>：パラメータ κ, θ, τ_reset の廃止</li>
@@ -795,7 +795,7 @@
                 <ul>
                     <li>最終レポート作成</li>
                     <li>パラメータ決定値の提案</li>
-                    <li>Phase 1 実装前の合意形成</li>
+                    <li>Phase 3 実装前の合意形成</li>
                 </ul>
             </div>
         </div>
@@ -822,13 +822,13 @@
             <div class="subsection">
                 <p><strong>距離軸 D(v)</strong></p>
                 <p><code>D(v) = 一貫性スコア - 移動コスト</code></p>
-                <p>距離軸は現在の設計では Layer 2 に統合。Phase 0 で四層設計との比較で価値を測定。</p>
+                <p>距離軸は現在の設計では Layer 2 に統合。Phase 2 で四層設計との比較で価値を測定。</p>
             </div>
 
             <div class="subsection">
                 <p><strong>統合スコア S(v)</strong></p>
                 <p><code>S(v) = softmin([D, T, E], β)</code></p>
-                <p>softmin で「最も弱い軸」を強調。β はスケーリング定数（Phase 0 で決定）</p>
+                <p>softmin で「最も弱い軸」を強調。β はスケーリング定数（Phase 2 で決定）</p>
             </div>
 
             <h3>7.2 参考：デバイス紐づけの実装</h3>
@@ -874,7 +874,7 @@
 
             <h3>7.3 成功基準チェックリスト</h3>
 
-            <p>Phase 0 の完了条件：</p>
+            <p>Phase 2 の完了条件：</p>
             <ul>
                 <li>☐ Sybil ROI(100) &lt; 1/150 を達成</li>
                 <li>☐ False Positive 率 &lt; 1% を達成</li>

@@ -1,4 +1,4 @@
-# Phase 0 シミュレーション 進捗状況レポート
+# Phase 2 シミュレーション 進捗状況レポート
 
 **更新日：** 2026-02-15（Stage 3 完了）
 **詳細レポート：** [`simulation/results/final_report.md`](results/final_report.md)
@@ -24,7 +24,7 @@
 | Notebook（Stage 2） | `simulation/notebooks/02_scenario_testing.ipynb` | T001〜T010実行、全指標可視化 | 2 |
 | Notebook（Stage 3） | `simulation/notebooks/03_parameter_optimization.ipynb` | DoE分析、感度分析、T010比較 | **3新** |
 
-### ❌ 未実施（Phase 1 以降）
+### ❌ 未実施（Phase 3 以降）
 
 | 項目 | 優先度 | 理由 |
 |---|---|---|
@@ -82,7 +82,7 @@
 | 20 | 1.3758 | 0.9597 | 4層 ✅ |
 | 50 | 0.6810 | 0.8441 | 3層 ✅ |
 
-**→ Phase 0 は 3層（D軸なし）で継続**
+**→ Phase 2 は 3層（D軸なし）で継続**
 
 ---
 
@@ -99,7 +99,7 @@
 
 ---
 
-## 4. Phase 0 チェックリスト 最終状況
+## 4. Phase 2 チェックリスト 最終状況
 
 | 項目 | 状態 |
 |---|---|
@@ -108,7 +108,7 @@
 | κ, θ の最適値を決定 | ✅ **κ=0.5, θ=0.35** |
 | Bloom 間隔・配分量を決定 | ✅ **7日間隔, 75/25 比率** |
 | Grace Period 期間を決定 | ✅ **14日** |
-| 距離軸（D軸）の要否を結論 | ✅ **Phase 0 では不使用（3層）** |
+| 距離軸（D軸）の要否を結論 | ✅ **Phase 2 では不使用（3層）** |
 | コミュニティ検出アルゴリズムを選定 | ✅ Louvain（安定性 90〜100%） |
 | ZK-SNARK 証明コスト確認 | ❌ 未実施 |
 | 全テストケースで合格 | ❌ Sybil ROI / TPR / Gini が未達 |
@@ -143,5 +143,5 @@ Meguri_pre3/
 │   └── final_report.md         ← 最終推奨パラメータレポート
 ├── SIMULATION_STATUS.md        ← このファイル
 ├── requirements.txt
-└── phase0_specification.html
+└── phase2_specification.html
 ```

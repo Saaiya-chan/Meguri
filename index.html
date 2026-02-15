@@ -361,14 +361,16 @@
             </div>
         </header>
 
-        <!-- ===== Phase 1: 見解集 ===== -->
+        <!-- ===== Phase 1: 討論 ===== -->
         <div class="phase-section">
             <div class="phase-header">
                 <h2>Phase 1</h2>
-                <span class="phase-badge p1">見解集</span>
+                <span class="phase-badge p1">討論</span>
             </div>
-            <p class="phase-description">各メンバーが専門視点から見解を発表。論点の整理と対立ポイントの洗い出し。</p>
+            <p class="phase-description">各メンバーが専門視点から見解を発表し、対立ポイントを掘り下げ、合意と残課題を導出。</p>
         </div>
+
+        <div class="phase-subheader" style="padding: 12px 0 4px 0; font-size: 13px; color: #8b949e; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">— 見解集 —</div>
 
         <div class="discussion-grid">
 
@@ -518,14 +520,7 @@
 
         </div>
 
-        <!-- ===== Phase 2: 本格討論 ===== -->
-        <div class="phase-section">
-            <div class="phase-header">
-                <h2>Phase 2</h2>
-                <span class="phase-badge p2">本格討論</span>
-            </div>
-            <p class="phase-description">Phase 1 の対立ポイントを掘り下げ、三者が本気でぶつかり合う掛け合い形式の討論。合意と残課題を導出。</p>
-        </div>
+        <div class="phase-subheader" style="padding: 12px 0 4px 0; font-size: 13px; color: #8b949e; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">— 本格討論 —</div>
 
         <div class="discussion-grid">
 
@@ -627,7 +622,7 @@
                 <h2>外部レビュー</h2>
                 <span class="phase-badge review">指摘事項</span>
             </div>
-            <p class="phase-description">外部レビュアーによる矛盾点・設計課題の指摘と分析。Phase 3 の討論テーマ候補。</p>
+            <p class="phase-description">外部レビュアーによる矛盾点・設計課題の指摘と分析。Phase 3 実装フェーズへの課題候補。</p>
         </div>
 
         <div class="discussion-grid">
@@ -635,7 +630,7 @@
                 <div class="card-number" style="color: #f85149; border-color: #f85149;">R</div>
                 <h3 class="card-title">春日（はるひ）の指摘事項</h3>
                 <p class="card-description">
-                    Phase 2 全6討論に対する外部レビュー。雨モデル vs 品質評価のインセンティブ崩壊、AI大量参入による希釈問題、デジタル追放、コミュニティ定義の曖昧さなど7件の指摘。
+                    Phase 1 全6討論に対する外部レビュー。雨モデル vs 品質評価のインセンティブ崩壊、AI大量参入による希釈問題、デジタル追放、コミュニティ定義の曖昧さなど7件の指摘。
                 </p>
                 <div class="card-members">
                     <span class="member-badge" style="border-color: #f85149;">
@@ -664,20 +659,20 @@
             </div>
         </div>
 
-        <!-- ===== Phase 0: シミュレーション仕様 ===== -->
+        <!-- ===== Phase 2: シミュレーション ===== -->
         <div class="phase-section">
             <div class="phase-header">
-                <h2>Phase 0</h2>
+                <h2>Phase 2</h2>
                 <span class="phase-badge"
-                    style="background: rgba(210, 168, 255, 0.15); color: #d2a8ff; border: 1px solid rgba(210, 168, 255, 0.3);">シミュレーション仕様</span>
+                    style="background: rgba(210, 168, 255, 0.15); color: #d2a8ff; border: 1px solid rgba(210, 168, 255, 0.3);">シミュレーション</span>
             </div>
-            <p class="phase-description">Phase 2 の全メカニズムを合成データで検証する事前フェーズ。パラメータ最適化と攻撃耐性の定量化。</p>
+            <p class="phase-description">Phase 1 の全メカニズムを合成データで検証。パラメータ最適化と攻撃耐性の定量化。</p>
         </div>
 
         <div class="discussion-grid">
             <div class="discussion-card" style="border-top: 4px solid #d2a8ff;">
-                <div class="card-number" style="color: #d2a8ff; border-color: #d2a8ff;">P0</div>
-                <h3 class="card-title">Phase 0 シミュレーション仕様</h3>
+                <div class="card-number" style="color: #d2a8ff; border-color: #d2a8ff;">P2</div>
+                <h3 class="card-title">Phase 2 シミュレーション仕様</h3>
                 <p class="card-description">
                     7つの検証対象メカニズム、最適化パラメータ（κ, θ, Grace Period
                     など）、7つの攻撃シナリオ、詳細な評価指標、実装仕様、テストケース、8週間のタイムラインを定義。本実装前のリスク評価を完了。
@@ -688,13 +683,13 @@
                         議事録係
                     </span>
                 </div>
-                <a href="phase0_specification.html" class="card-button"
+                <a href="phase2_specification.html" class="card-button"
                     style="background: #d2a8ff; color: #0d1117;">仕様を読む →</a>
             </div>
 
             <div class="discussion-card" style="border-top: 4px solid #7c6af7;">
                 <div class="card-number" style="color: #7c6af7; border-color: #7c6af7;">📊</div>
-                <h3 class="card-title">Phase 0 シミュレーション結果レポート</h3>
+                <h3 class="card-title">Phase 2 シミュレーション結果レポート</h3>
                 <p class="card-description">
                     Stage 1〜3 の全シミュレーション結果を可視化。DoE L16パラメータ最適化（16実験）、T010距離軸比較、Grace Periodスキャンの結果と、推奨パラメータ（κ=0.5, θ=0.35）を図表で解説。
                 </p>
