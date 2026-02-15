@@ -1,0 +1,230 @@
+<!DOCTYPE html><html lang="ja"> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.17.2"><title>正当な複数ウォレット保有への対応を設計する</title><meta name="description" content="複数ウォレット保有を「許可する設計」と「常に不利にする設計」の二案を検討。哲学的には自然淘汰、数学的にはグループ評価、ゲーム論的には全面不利が望ましいと結論。"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous"></head> <body> <header style="border-bottom: 1px solid #30363d; padding: 1rem 1.5rem;"> <nav> <a href="/" style="margin-right: 1rem;">Meguri</a> <a href="/discussions/">議論一覧</a> </nav> </header> <main style="max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem;">  <article> <h1>正当な複数ウォレット保有への対応を設計する</h1> <p style="color: #8b949e; margin-bottom: 1.5rem;">2026-02-15</p> <h1 id="正当な複数ウォレット保有への対応を設計する">正当な複数ウォレット保有への対応を設計する</h1>
+<p>Meguri Project — Multi-Wallet Policy Discussion</p>
+<h2 id="議題">議題</h2>
+<p>1人のユーザーが複数の巣（ウォレット）を持つケースにどう対応するか。「正当な複数保有」は存在するのか、もし存在するなら評価モデルにどう組み込むか。</p>
+<ol>
+<li>複数保有の正当性を哲学的に検討する</li>
+<li>宣言あり/なしの評価モデルを数式化する</li>
+<li>ゲーム論的に各設計の攻撃耐性を検証する</li>
+</ol>
+<h2 id="phase-1-世界観からの問い直し">Phase 1: 世界観からの問い直し</h2>
+<h3 id="philosopher">philosopher</h3>
+<p>まず問い方を変えたい。</p>
+<p>「複数の巣は正当か、攻撃か」── この二項対立自体が Meguri らしくない。問うべきは</p>
+<p>「その複数の巣は生態的に持続可能か」</p>
+<p>だ。</p>
+<p>自然界を見てほしい。渡り鳥は夏の巣と冬の巣を持つ。それは「攻撃」じゃなく、生態的に自然な行動。でも1匹のヤドカリが100個の殻を占有していたら？ それは不自然で、他の生き物の生存を圧迫している。</p>
+<p>つまり判断基準は「数」ではなく</p>
+<p>「生態的な合理性」</p>
+<p>。</p>
+<blockquote>
+<p>💡 **たとえ話：**東京と京都に家を持つ人を想像しよう。仕事で東京、週末は京都のアトリエで創作活動── これは「二拠点生活」であって不正じゃない。でも誰も住んでいないマンションを100戸買い占めている人は？ 同じ「複数の家を持つ」でも、生態が全然違う。前者は2つの場所で「生きている」。後者はただ「所有している」。</p>
+</blockquote>
+<blockquote>
+<p><em>二項対立から生態的持続可能性へ</em></p>
+</blockquote>
+<h3 id="philosopher-1">philosopher</h3>
+<p>そして Meguri の三軸評価（距離・時間・エントロピー）は、まさにこの「生態的持続可能性」を測っている。</p>
+<p>複数の巣を持つこと自体は禁止する必要がない。</p>
+<p>三軸評価が「自然法則」として機能</p>
+<p>し、不自然な存在は勝手に育たないからだ。</p>
+<p>維持できる巣は生きる。維持できない巣は衰退する。これは</p>
+<p>「裁判ではなく自然淘汰」</p>
+<p>。</p>
+<p>さらに提案したいのが</p>
+<p>「巣のクラスタリング」</p>
+<p>という考え方。似た行動パターンを持つ複数の巣は、同じ「群れ」として自動検出される。意図的に分散させているなら統計的に見抜ける。</p>
+<blockquote>
+<p>💡 **たとえ話：**森の生態系。枯れた木に「お前は違法だ！」と裁判する森はない。日光が届かない場所の木は自然に衰退し、日当たりのいい場所で新しい木が育つ。── 森は「法律」ではなく「自然法則」でバランスを保っている。Meguri の三軸評価もそういう存在であるべき。</p>
+</blockquote>
+<blockquote>
+<p><em>自然淘汰 &#x26; 巣のクラスタリング提案</em></p>
+</blockquote>
+<h2 id="phase-2-グループ評価の数式モデル">Phase 2: グループ評価の数式モデル</h2>
+<h3 id="mathematician">mathematician</h3>
+<p>哲学的フレームは理解した。それを数式に落とし込む。</p>
+<p>ケース1: 宣言ありグループ評価</p>
+<p>ユーザーが「この巣は同じ人間のものです」と自己申告する場合の評価式：</p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext>group</mtext></msub><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">(</mo><msub><mi>n</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>×</mo><msup><mi>k</mi><mrow><mo>−</mo><mi>δ</mi></mrow></msup><mo>+</mo><mi>ε</mi></mrow><annotation encoding="application/x-tex">S_\text{group} = \max(S(n_i)) \times k^{-\delta} + \varepsilon</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">group</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">max</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">))</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9324em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.03785em;">δ</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">ε</span></span></span></span></p>
+<p>ここで：</p>
+<ul>
+<li><code>max(S(ni))</code> = グループ内で最もスコアの高い巣の評価</li>
+<li><code>k</code> = 巣の数</li>
+<li><code>δ</code> = 減衰パラメータ（推奨値 0.3）</li>
+<li><code>ε</code> = 最低保証項（完全にゼロにはしない）</li>
+</ul>
+<p>δ = 0.3 の場合の具体例：</p>
+<ul>
+<li><strong>1巣</strong>：100%（そのまま）</li>
+<li><strong>2巣</strong>：81%（k-0.3 = 0.812）</li>
+<li><strong>3巣</strong>：72%（k-0.3 = 0.720）</li>
+<li><strong>5巣</strong>：62%（k-0.3 = 0.617）</li>
+</ul>
+<blockquote>
+<p>💡 **たとえ話：**飲食店の支店展開で考えてみよう。1店舗なら店長が毎日いて、味も接客もベスト（100%）。2店舗に増やすと、店長は行ったり来たりで各店のクオリティが少し下がる（81%）。5店舗になると、さらに目が届かなくなる（62%）。── 店舗は増やせるけど、品質は必ず下がる。「増やすほど不利」の構造。</p>
+</blockquote>
+<blockquote>
+<p><em>宣言ありグループ評価式</em></p>
+</blockquote>
+<h3 id="mathematician-1">mathematician</h3>
+<p>ケース2: 宣言なし（未申告）の場合</p>
+<p>宣言なしで複数巣を運用し、後から同一人物と判明した場合は、宣言ありより厳しい評価になるべき。</p>
+<p>具体的には、δ を大きくする（例：0.3 → 0.6）か、追加のペナルティ係数を掛ける。</p>
+<p>さらに重要なポイントが2つある：</p>
+<ol>
+<li>巣間の移動は距離スコアにカウントしない</li>
+</ol>
+<p>A巣 → B巣 → A巣 のような巣間シャトル移動は、距離軸の評価から中立化する。これで「自分の巣の間を往復して距離スコアを稼ぐ」というハックを防ぐ。</p>
+<ol start="2">
+<li>必ず「巣が少ないほど有利」の単調性を保つ</li>
+</ol>
+<p>どんなパラメータ設定でも</p>
+<p>S(k) > S(k+1)</p>
+<p>が成り立つことを数学的に保証する。これが崩れると複数保有のインセンティブが生まれてしまう。</p>
+<blockquote>
+<p>💡 **たとえ話：**会社の経費精算。出張を事前申告すれば通常の精算（宣言あり）。無断出張が後からバレたら、より厳しい監査と減額（宣言なし）。── そして「東京オフィスと大阪オフィスを往復しただけ」は出張距離としてカウントしない。当たり前の話だけど、数式にも同じルールが必要。</p>
+</blockquote>
+<blockquote>
+<p><em>宣言なしの場合 &#x26; 不正利用防止</em></p>
+</blockquote>
+<h2 id="phase-3-ゲーム論的破綻の指摘">Phase 3: ゲーム論的破綻の指摘</h2>
+<h3 id="game-economist">game-economist</h3>
+<p>すまない、数式は美しいけど、この設計には</p>
+<p>致命的なゲーム論的欠陥</p>
+<p>がある。</p>
+<p>「正当な複数保有」を許容する設計は、</p>
+<p>逆選択（Adverse Selection）</p>
+<p>を引き起こす。</p>
+<ul>
+<li><strong>正直なユーザー</strong>は複数巣を宣言し、ペナルティ（81%スコア）を受け入れる</li>
+<li><strong>不正なユーザー</strong>は宣言せず、各巣で100%スコアを維持しようとする</li>
+</ul>
+<p>結果、</p>
+<p>宣言するインセンティブがない</p>
+<p>。「嘘をつく（宣言しない）」が支配戦略になる。正直者だけが損をする世界。</p>
+<p>これは保険市場のレモン問題と同じ構造。健康な人ほど保険に入らず、病気がちな人だけが加入し、保険料が上がり、さらに健康な人が離脱する── 悪循環。</p>
+<blockquote>
+<p>💡 **たとえ話：**駐車場の例えが分かりやすい。「2台目以降は駐車料金20%割引します。ただし自己申告制です」。── 正直に申告する人は割引を受けるけど台数が記録される。申告しない人は割引なしだけど「1台しか持ってない」顔ができる。もし台数が多いほど将来の不利（税金増加など）があるなら、誰も申告しない。<strong>正直者だけが損をする制度設計</strong>。</p>
+</blockquote>
+<blockquote>
+<p><em>逆選択（Adverse Selection）の発生</em></p>
+</blockquote>
+<h3 id="game-economist-1">game-economist</h3>
+<p>もう一つの問題がある。</p>
+<p>宣言制は「嘘をつくのが支配戦略」になる</p>
+<p>。</p>
+<p>複数巣の宣言/未宣言をゲームの利得表で分析すると：</p>
+<ul>
+<li><strong>宣言する</strong> → スコア81%（正直者ペナルティ）</li>
+<li><strong>宣言しない＋バレない</strong> → スコア100%（丸儲け）</li>
+<li><strong>宣言しない＋バレる</strong> → スコア40%程度（厳しいペナルティ）</li>
+</ul>
+<p>バレる確率が十分に高ければ宣言が合理的になるけど、</p>
+<p>クラスタリング精度が100%でない限り</p>
+<p>、期待値的に「宣言しない」が有利になる確率が高い。</p>
+<p>しかも検出精度を上げるほどシステムが複雑になり、プライバシーリスクも増大する。これは設計として望ましくない。</p>
+<blockquote>
+<p>💡 **たとえ話：**学校の試験で「カンニングしたら自己申告してください。申告すれば10点減点、バレたら50点減点」。── ほとんどの人は「バレなきゃいいや」と思う。監視カメラを大量に設置すれば抑止できるけど、それは学校を「刑務所」にすることを意味する。そもそも「カンニングが構造的に不可能」な試験の方がずっといい。</p>
+</blockquote>
+<blockquote>
+<p><em>宣言制の致命的問題</em></p>
+</blockquote>
+<h3 id="game-economist-2">game-economist</h3>
+<p>したがって、ゲーム理論的に最も堅牢な設計は：</p>
+<p>「複数保有は常に不利」── 例外なく。</p>
+<p>理由を整理する：</p>
+<ul>
+<li><strong>シンプルさ</strong>：「正当な複数保有」の判定が不要。判定基準の設計・運用・争いがすべてなくなる</li>
+<li><strong>耐攻撃性</strong>：「正当です」と主張する逃げ道がない。全員に同じルール</li>
+<li><strong>インセンティブ整合</strong>：「1巣に集中する」が支配戦略になる</li>
+<li><strong>Meguri の思想との整合</strong>：「所有を増やす」こと自体が不利な世界</li>
+</ul>
+<p>ただし、</p>
+<p>引っ越しや端末移行</p>
+<p>のようなケースへの対応は必要。これは Decay（減価）による自然消滅で対処できる。古い巣は使わなくなれば自然に衰退し、新しい巣に「生態」が移行する。特別なルールは不要。</p>
+<blockquote>
+<p>💡 **たとえ話：**携帯電話の番号ポータビリティ。「古い番号の携帯」と「新しい番号の携帯」を同時に持つ期間は自然にある。でも古い方は徐々に使わなくなり、着信も減り、最終的に解約される。これを「移行のための複数保有ルール」で管理するより、「使われない携帯は自然に休眠する」方がシンプル。引っ越しは禁止ではなく、古い家は自然に空き家になるだけ。</p>
+</blockquote>
+<blockquote>
+<p><em>結論：「複数保有は常に不利」が最適設計</em></p>
+</blockquote>
+<h2 id="phase-4-結論の収束">Phase 4: 結論の収束</h2>
+<h3 id="philosopher-2">philosopher</h3>
+<p>game-economist の分析には一理ある。</p>
+<p>ただ強調したいのは、「常に不利」は</p>
+<p>「禁止」とは違う</p>
+<p>ということ。</p>
+<p>Meguri の世界で複数の巣を持つことは「違法」ではない。ただ、自然法則として「1つの存在は1つの巣で最も輝く」。それは渡り鳥が2つの巣を持てても、</p>
+<p>同時に2箇所で眠れない</p>
+<p>のと同じ自然の摂理。</p>
+<p>「禁止する」のではなく「自然に不利になる」── この区別は Meguri の世界観にとって非常に重要。</p>
+<blockquote>
+<p>💡 **たとえ話：**太陽は「夜を禁止」しているわけじゃない。ただ、太陽が沈めば暗くなる── それは自然法則。Meguri も「複数の巣を禁止」するのではなく、「1つの巣でないと光が当たりにくい」という自然法則を設計する。禁止と自然法則では、同じ結果でも世界観がまるで違う。</p>
+</blockquote>
+<blockquote>
+<p><em>「禁止」と「自然に不利」の区別</em></p>
+</blockquote>
+<h3 id="mathematician-2">mathematician</h3>
+<p>両者の議論を踏まえ、数式モデルを修正する。</p>
+<p>「宣言ありグループ評価」は取り下げ、代わりに</p>
+<p>三軸評価の自然な性質として「複数巣が不利になる」ことを数学的に保証する</p>
+<p>設計にする。</p>
+<p>具体的には：</p>
+<ul>
+<li><strong>距離軸</strong>：同一人物の複数巣は物理的に同じ場所にある（＝距離パターンが重複）→ 多様性が低下</li>
+<li><strong>時間軸</strong>：1人が24時間を複数巣に分配 → 各巣の活動密度が低下 → freshness が下がる</li>
+<li><strong>エントロピー軸</strong>：同一人物の行動パターンは巣をまたいで類似する → クロスエントロピーが低い</li>
+</ul>
+<p>つまり</p>
+<p>三軸評価が正しく機能すれば、追加のペナルティ項なしで複数巣が自動的に不利になる</p>
+<p>。宣言制は不要。</p>
+<blockquote>
+<p>💡 **たとえ話：**体育のテストをもう一度使おう。双子が二人分のテストを一人で受けようとしたら？ 腕立てを一人分やってから、もう一人分やる── でも体力は一人分しかない。2回目は確実に成績が下がる。しかも「筋肉の動き方」が同じだから、採点者が見たら「これ同じ人じゃない？」と気づく。<strong>ペナルティを設定しなくても、物理的に不利</strong>。</p>
+</blockquote>
+<blockquote>
+<p><em>数式モデルの修正方針</em></p>
+</blockquote>
+<h2 id="次のステップ">次のステップ</h2>
+<p><strong>3者の合意ポイント：</strong></p>
+<p><strong>複数保有は「常に不利」</strong>── 例外的な「正当なケース」を設けない <strong>「禁止」ではなく「自然に不利」</strong>── 世界観として重要な区別 <strong>宣言制は採用しない</strong>── 逆選択の問題が致命的 <strong>三軸評価の自然な性質で対処</strong>── 追加のペナルティ項は不要 <strong>引っ越し・移行は Decay で対処</strong>── 古い巣は自然に衰退する</p>
+<h2 id="対立議論ポイント">対立・議論ポイント</h2>
+<ul>
+<li><strong>三軸の複数巣検出能力</strong> ─ 現行の三軸評価が「同一人物の複数巣」を十分に不利にできるか、シミュレーションでの定量検証が必要。特に巧妙な分離（別の場所で別の時間帯に運用）への耐性。</li>
+<li><strong>クラスタリングの扱い</strong> ─ philosopher 提案の「巣のクラスタリング」をスコア計算に組み込むか、監視用の参考指標にとどめるか。</li>
+<li><strong>移行期間の設計</strong> ─ Decay による自然消滅が「引っ越しの移行期間」として十分スムーズか。ユーザー体験の観点から検証が必要。</li>
+<li><strong>δ パラメータの存続</strong> ─ 宣言制を廃止しても、同一人物と検出された場合に <code>k(−δ)</code> を適用するオプションは残すべきか。</li>
+</ul>
+<h2 id="次のステップ-1">次のステップ</h2>
+<p><strong>次のステップ：</strong>
+三軸評価の「複数巣自動検出能力」をシミュレーションで検証する。特に (1) 同一場所・同一時間帯での複数巣運用、(2) 意図的に分離した巣の運用、(3) 引っ越し移行時の UX の3シナリオについて定量データを取得し、追加パラメータの要否を判断する。</p>
+<h2 id="用語集">用語集</h2>
+<h3 id="巣ウォレット">巣（ウォレット）</h3>
+<p>Meguri における活動の拠点。財布や口座ではなく、Meguri が一時的に立ち寄る「休憩所」。1人1巣が最も効率的に機能する設計。</p>
+<p><strong>今回の議論：</strong> 今回の結論： 複数巣は「禁止」ではなく「自然に不利」。三軸評価が自然法則として機能する。</p>
+<h3 id="sybil-攻撃">Sybil 攻撃</h3>
+<p>1人が複数の偽アカウント（巣）を作成し、別人のふりをして不当に利益を得る攻撃手法。複数巣の議論はSybil対策と密接に関連する。</p>
+<p><strong>今回の議論：</strong> 今回の議論： 「正当な複数保有」を認めるとSybil攻撃者の隠れ蓑になるため、全面的に不利とする設計が最適。</p>
+<h3 id="逆選択adverse-selection">逆選択（Adverse Selection）</h3>
+<p>情報の非対称性により、望ましくない相手だけが取引に参加する現象。保険市場では「病気がちな人だけが加入→保険料上昇→健康な人が離脱」の悪循環で知られる。</p>
+<p><strong>今回の議論：</strong> 今回の議論： 宣言制を導入すると、正直者だけが宣言してペナルティを受け、不正者は宣言しない── 逆選択の典型パターン。</p>
+<h3 id="支配戦略">支配戦略</h3>
+<p>ゲーム論の用語。他のプレイヤーの行動に関係なく、常に最適となる戦略。制度設計では「望ましい行動が支配戦略になる」ことが理想。</p>
+<p><strong>今回の議論：</strong> 今回の議論： 宣言制では「嘘をつく」が支配戦略。「常に不利」設計では「1巣に集中する」が支配戦略。後者が望ましい。</p>
+<h3 id="グループ評価式">グループ評価式</h3>
+<p>mathematician が提案した複数巣の評価式。<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mtext>group</mtext></msub><mo>=</mo><mi>max</mi><mo>⁡</mo><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">(</mo><msub><mi>n</mi><mi>i</mi></msub><mo stretchy="false">)</mo><mo stretchy="false">)</mo><mo>×</mo><msup><mi>k</mi><mrow><mo>−</mo><mi>δ</mi></mrow></msup><mo>+</mo><mi>ε</mi></mrow><annotation encoding="application/x-tex">S_\text{group} = \max(S(n_i)) \times k^{-\delta} + \varepsilon</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">group</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">max</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">))</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9324em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mathnormal mtight" style="margin-right:0.03785em;">δ</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">ε</span></span></span></span>。巣の数 k が増えるほどスコアが減衰する構造。</p>
+<p><strong>今回の議論：</strong> 結果： 宣言制の逆選択問題により採用見送り。三軸評価の自然な性質で代替する方針に。</p>
+<h3 id="三軸評価">三軸評価</h3>
+<p>Proof of Being の核心。距離（D）・時間（T）・エントロピー（E）の3軸で巣の「生態」を評価する。複数巣は三軸すべてで自然にスコアが低下する。</p>
+<p><strong>今回の議論：</strong> 複数巣への効果： D: 移動パターン重複、T: 活動密度低下、E: 行動パターン類似 → 追加ペナルティなしで不利に。</p>
+<h3 id="decay減価">Decay（減価）</h3>
+<p>時間の経過とともに Meguri が自然に減少する仕組み。使われない巣の Meguri は徐々に「蒸発」する。移行・引っ越し時には旧巣の Decay が自然な解決策となる。</p>
+<p><strong>今回の議論：</strong> 今回の役割： 引っ越し時に特別なルールは不要。古い巣は使わなくなれば自然に衰退する。</p>
+<h3 id="巣のクラスタリング">巣のクラスタリング</h3>
+<p>philosopher が提案した概念。似た行動パターン（距離・時間・エントロピー）を持つ複数の巣を統計的に「同じ群れ」として自動検出する手法。</p>
+<p><strong>今回の議論：</strong> 未決定： スコア計算に直接組み込むか、監視用参考指標にとどめるかは今後の検討課題。</p>
+<h3 id="proof-of-beingpob">Proof of Being（PoB）</h3>
+<p>「何をしたか」ではなく「どう存在しているか」を評価する Meguri 独自のコンセンサスメカニズム。複数巣問題に対しても、追加ルールではなく PoB の自然な評価構造で対処する。</p>
+<p><strong>今回の議論：</strong> 関連議論： Proof of Being の定義を明確化する</p>
+<h3 id="エントロピー">エントロピー</h3>
+<p>情報理論における「予測困難性」の指標。同一人物が複数巣を運用すると、巣をまたいだ行動パターンが類似し、クロスエントロピーが低下する。</p>
+<p><strong>今回の議論：</strong> 複数巣での問題： 同一人物の「癖」は隠せない。タイピングの速度、活動時間帯、取引パターンの偏り── すべてが巣をまたいで一致する。</p> </article>  </main> </body></html>

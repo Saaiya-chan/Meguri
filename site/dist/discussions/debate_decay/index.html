@@ -1,0 +1,177 @@
+<!DOCTYPE html><html lang="ja"> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.17.2"><title>減価メカニズム討論</title><meta name="description" content="2つの減価記述（「大口ほど速く減る」「放置ほど速く減る」）を統合する設計について、3者の立場は異なる。"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous"></head> <body> <header style="border-bottom: 1px solid #30363d; padding: 1rem 1.5rem;"> <nav> <a href="/" style="margin-right: 1rem;">Meguri</a> <a href="/discussions/">議論一覧</a> </nav> </header> <main style="max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem;">  <article> <h1>減価メカニズム討論</h1> <p style="color: #8b949e; margin-bottom: 1.5rem;">2026-02-15</p> <h1 id="-巣の減価メカニズム--本格討論">🔥 巣の減価メカニズム ── 本格討論</h1>
+<p>見解集（Phase 1）で出揃った3つの立場が、正面からぶつかり合う</p>
+<h2 id="争点">争点</h2>
+<p>2つの減価記述（「大口ほど速く減る」「放置ほど速く減る」）を統合する設計について、3者の立場は異なる。</p>
+<ul>
+<li>**数学者：**λ = 基礎減衰 + 残高依存項 + 滞留加速項 の加算統合モデル。評価スコアとは独立に動かすべき。</li>
+<li>**ゲーム経済学者：**加算モデルでは「小分け＋高頻度自己取引」が支配戦略になる。vitality_score で減価率を制御するべき。</li>
+<li>**哲学者：**減価は自然法則（蒸発と淀み）。vitality_score 連動は「報酬構造への逆戻り」で Meguri の思想と矛盾する。</li>
+</ul>
+<h2 id="round-1--開幕経済学者が数学者の弱点を突く">Round 1 ── 開幕：経済学者が数学者の弱点を突く</h2>
+<h3 id="数学者">数学者</h3>
+<p>Phase 1 で提案した統合モデルをもう一度整理する。</p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><mi>B</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mrow><mo fence="true">(</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>⋅</mo><mfrac><mi>B</mi><msub><mi>B</mi><mtext>median</mtext></msub></mfrac><mo>+</mo><mi>γ</mi><mo>⋅</mo><mi>f</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mo fence="true">)</mo></mrow><mo>⋅</mo><mi>B</mi></mrow><annotation encoding="application/x-tex">\frac{dB}{dt} = -\left(\alpha + \beta \cdot \frac{B}{B_{\text{median}}} + \gamma \cdot f(\tau)\right) \cdot B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2251em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.8em;vertical-align:-0.65em;"></span><span class="mord">−</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size2">(</span></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0502em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">median</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4509em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.05556em;">γ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mclose">)</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size2">)</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></p>
+<p>α が基礎減衰、β·B/B_median が残高依存、γ·f(τ) が滞留加速。これで「大口ほど速く」と「放置ほど速く」が同時に表現できる。シンプルで透明性が高い。</p>
+<h3 id="ゲーム経済学者">ゲーム経済学者</h3>
+<p>異議あり</p>
+<p>その式、やばい穴がある。よく見てほしい。</p>
+<p>β·B/B_median の項 ── 残高を10個の巣に小分けすれば、B は B_median 以下に収まる。残高依存ペナルティがほぼゼロになる。</p>
+<p>γ·f(τ) の項 ── 巣同士で毎日 0.01 Meguri を往復させれば、τ（滞留時間）がリセットされ続ける。</p>
+<p>結果：</p>
+<p>「10個の巣に小分けして毎日ループさせる」が最適戦略</p>
+<p>になる。数式は正しくても、インセンティブが崩壊してる。</p>
+<blockquote>
+<p>**💡 たとえ話：**累進課税で「年収を10人の家族名義に分散」して全員を低所得に見せる節税。ルールの字面は守ってるけど、制度の精神を完全に踏み躙っている。</p>
+</blockquote>
+<h2 id="round-2--数学者が応戦τのリセット廃止で根本解決">Round 2 ── 数学者が応戦：「τのリセット廃止」で根本解決</h2>
+<h3 id="数学者-1">数学者</h3>
+<p>一部認める</p>
+<p>指摘は正しい。でも根本的な対策がある。</p>
+<p>重要な気づきは、「小額」「大額」という閾値を引く発想そのものが恣意的だということだ。では</p>
+<p>「τのリセット」という概念そのものを廃止</p>
+<p>してはどうか？</p>
+<p>新しい設計：τ は取引があっても一切リセットされない。ただし、その代わり「何度も同じパターンで取引する」という不自然な行動は、三軸評価スコア S で直接検出される。毎日ループ → エントロピー低下 → S が低下 → g(S) が増幅 → 減価加速。恣意的な「小額」定義が消える。</p>
+<h3 id="ゲーム経済学者-1">ゲーム経済学者</h3>
+<p>待って</p>
+<p>「巣クラスター全体の残高を参照する」って、結局</p>
+<p>Sybil 検出ロジックが別途必要</p>
+<p>ってことじゃないか。</p>
+<p>つまりこう言っている：「先に Sybil かどうか判定してから、その結果を減価計算に使う」。でもそれ、</p>
+<p>減価モデルが Sybil 対策に依存してしまっている</p>
+<p>。モジュールの依存関係が逆転してるよ。</p>
+<p>減価は減価、Sybil 対策は Sybil 対策として独立させた方がいい。それぞれが別の問題なんだから。</p>
+<h3 id="数学者-2">数学者</h3>
+<p>うーん……</p>
+<p>確かに依存関係の逆転は設計上の問題だ。認める。</p>
+<p>じゃあ逆に聞くが、君の vitality_score って何を測るものなんだ？ 「取引の多様性」「相手との関係性」「タイミングの自然さ」──それって結局、Sybil 対策の三軸評価（距離・時間・エントロピー）と重複していないか？</p>
+<h2 id="round-3--哲学者が斬り込むvitality_score-は-meguri-の思想を壊す">Round 3 ── 哲学者が斬り込む：vitality_score は Meguri の思想を壊す</h2>
+<h3 id="哲学者">哲学者</h3>
+<p>ちょっと待って</p>
+<p>ゲーム経済学者の vitality_score、根本的に問題がある。</p>
+<p>「質の良い循環をすれば減価が穏やかになる」── これは</p>
+<p>「良い行動 → ご褒美（減価軽減）」という報酬構造</p>
+<p>じゃないか。</p>
+<p>Meguri の核心は「何をしたかではなく、どう在るかを評価する」ことだ。vitality_score 連動型は「何をしたか（取引の質）→ 報酬（減価軽減）」という、まさに</p>
+<p>所有的報酬構造への逆戻り</p>
+<p>。PoW と構造が同じになってしまう。</p>
+<blockquote>
+<p><strong>💡 たとえ話：</strong>「毎朝ゴミ出しをすれば家賃が下がる」という家賃制度。良い行動を促すために報酬を使うのは分かる。でもそれは「管理・評価・報酬」という支配の論理そのもの。自由な住人は「家賃のため」じゃなくて「自然と暮らしの中でゴミを出す」。</p>
+</blockquote>
+<h3 id="ゲーム経済学者-2">ゲーム経済学者</h3>
+<p>それは違う！</p>
+<p>vitality_score は「良い行動をした人へのご褒美」じゃない。</p>
+<p>「不自然な行動をした人への自動ペナルティ」</p>
+<p>だ。</p>
+<p>方向が逆なんだよ：</p>
+<p>・ご褒美型（PoW的）：「良いことをすれば報酬が増える」</p>
+<p>・ペナルティ型（vitality）：「不自然なことをすれば減価が増える」</p>
+<p>後者は「自然な状態がデフォルト、不自然な状態だけが検出される」という構造。これ、哲学者が言う「自然法則」と同じじゃないか？</p>
+<h3 id="哲学者-1">哲学者</h3>
+<p>……なるほど、方向の話か</p>
+<p>ちょっと待って、整理させてくれ。</p>
+<p>確かに「不自然な行動だけをペナルティする」なら、自然な状態を基準にしているという点で方向が違う。</p>
+<p>でも問題が残る。</p>
+<p>「不自然」を誰が・何が定義するか</p>
+<p>だ。vitality_score を計算するということは、何らかの「自然の基準」をシステムが持つということ。その基準が人間の意図で設計されている以上、「自然法則」とは言えない。</p>
+<p>人工的な自然法則は矛盾していないか？</p>
+<h2 id="round-4--人工的な自然法則をめぐる正面衝突">Round 4 ── 「人工的な自然法則」をめぐる正面衝突</h2>
+<h3 id="ゲーム経済学者-3">ゲーム経済学者</h3>
+<p>提案</p>
+<p>哲学者の「人工的な自然法則は矛盾している」という指摘、面白い。でも反論できる。</p>
+<p>自然の生態系も「設計」されている。進化という長期プロセスが、捕食と被食のバランス、個体数の調整メカニズムを作り上げた。Meguri の vitality_score も、</p>
+<p>「設計された生態系の法則」</p>
+<p>として考えればいい。</p>
+<p>重要なのは「誰かが個別に裁量を持つか」どうかだ。vitality_score は個別の取引を誰かが判断するのではなく、</p>
+<p>全体のパターンから統計的に算出する</p>
+<p>。誰も個別に裁いていない。</p>
+<blockquote>
+<p>**💡 たとえ話：**森の生態系で、草食動物が増えすぎると植物が減り、草食動物も減る。この「抑制メカニズム」は「設計」されてないけど、長い時間をかけて均衡点に収束した。vitality_score は、その均衡点をシミュレートしようとするもの。</p>
+</blockquote>
+<h3 id="哲学者-2">哲学者</h3>
+<p>少し譲る、でも……</p>
+<p>「統計的算出で個別裁量がない」という点は認める。それは重要な条件だ。</p>
+<p>でも本質的な問題が残る。</p>
+<p>vitality_score は何を測っているのか</p>
+<p>、本当に明確か？</p>
+<p>「取引の多様性」「相手との関係性」──これを数値化した瞬間に、</p>
+<p>「どう数値化されるか」を逆算して行動する</p>
+<p>プレイヤーが生まれる。グッドハートの法則だ。指標が目標になると、指標は意味を失う。</p>
+<h3 id="数学者-3">数学者</h3>
+<p>整理させてくれ</p>
+<p>二人の議論、少し整理していいか。</p>
+<p>哲学者が言う「グッドハートの法則」は vitality_score への正当な批判だ。でも同じ批判は、私の統合加算モデルにも当てはまる。「β の計算式を逆算して残高を分散する」──これもグッドハートそのもの。</p>
+<p>ということは問題の核心は「</p>
+<p>vitality_score か加算モデルか</p>
+<p>」じゃなくて、「</p>
+<p>どんな指標も逆算される</p>
+<p>」という根本問題なんじゃないか？</p>
+<h2 id="round-5--突破口三軸評価への収束">Round 5 ── 突破口：三軸評価への収束</h2>
+<h3 id="ゲーム経済学者-4">ゲーム経済学者</h3>
+<p>それだ！</p>
+<p>数学者が核心を突いた。「逆算される」問題への最強の対策は、</p>
+<p>逆算コストを爆発的に増やすこと</p>
+<p>だ。</p>
+<p>三軸評価（距離・時間・エントロピー）の掛け算は、まさにそれをやっている。3軸すべてを同時に操作しないとスコアが崩壊する。そのコストは「もう一つの人生を生きる」に等しい。</p>
+<p>つまり vitality_score の代わりに、</p>
+<p>三軸評価スコアを減価率の制御因子として使う</p>
+<p>方が自然じゃないか。既にある仕組みを再利用するだけ。</p>
+<h3 id="哲学者-3">哲学者</h3>
+<p>待って、それも同じ問題が……</p>
+<p>三軸評価を減価率に連動させることへの哲学的懸念は同じだ。「どう在るか → 減価軽減」という報酬構造になる。</p>
+<p>でも……少し考え直してみた。</p>
+<p>三軸評価の本質は「存在の自然さ」を測るものだ。だとすると「不自然な存在ほど減価が速い」のは、vitality_score とは違う意味を持つ。</p>
+<p>「罰」ではなく、Meguri の生態系における「相性」の問題</p>
+<p>として解釈できるかもしれない。</p>
+<h3 id="数学者-4">数学者</h3>
+<p>収束してきた</p>
+<p>哲学者の「相性」という解釈、数式に落とすとこうなる：</p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>λ</mi><mo stretchy="false">(</mo><mi>B</mi><mo separator="true">,</mo><mi>τ</mi><mo separator="true">,</mo><mi>S</mi><mo stretchy="false">)</mo><mo>=</mo><mrow><mo fence="true">(</mo><mi>α</mi><mo>+</mo><mi>β</mi><mo>⋅</mo><mfrac><mi>B</mi><msub><mi>B</mi><mtext>median</mtext></msub></mfrac><mo>+</mo><mi>γ</mi><mo>⋅</mo><mi>f</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mo fence="true">)</mo></mrow><mo>⋅</mo><mi>g</mi><mo stretchy="false">(</mo><mi>S</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\lambda(B, \tau, S) = \left(\alpha + \beta \cdot \frac{B}{B_{\text{median}}} + \gamma \cdot f(\tau)\right) \cdot g(S)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">λ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.8em;vertical-align:-0.65em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size2">(</span></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.0502em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">median</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4509em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.05556em;">γ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mclose">)</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size2">)</span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mclose">)</span></span></span></span></p>
+<p>ここで</p>
+<p>S</p>
+<p>は三軸評価スコア、</p>
+<p>g(S)</p>
+<p>は S が低いと λ を増幅し、S が高いと λ を抑制する関数。</p>
+<p>哲学者が懸念していた「ご褒美構造」にならないよう、</p>
+<p>g(S)</p>
+<p>の設計を「加速（不自然な存在への増幅）」のみにして、「軽減（自然な存在へのボーナス）」はゼロにする。基準は「自然な状態」が上限。</p>
+<blockquote>
+<p>**💡 たとえ話：**健康診断。「健康だから薬が必要ない」のは当たり前の状態。「不健康だから治療が必要」なのが加速減価。医者は健康な人に「特別ボーナス薬」を渡すわけじゃない。不健康な人だけに介入する。</p>
+</blockquote>
+<h3 id="哲学者-4">哲学者</h3>
+<p>それならいい</p>
+<p>「加速のみ、軽減なし」── その設計なら哲学的に許容できる。</p>
+<p>「自然に在ること」がデフォルト。そこからの逸脱（不自然な存在）だけが加速減価を受ける。これは確かに自然法則として説明できる。水は溜まれば腐る。人工的に溜め込もうとすれば、より速く腐る。</p>
+<p>誰かが罰しているのではなく、不自然な状態が自然に壊れていく。</p>
+<h3 id="ゲーム経済学者-5">ゲーム経済学者</h3>
+<p>了解。ゲーム理論的にも OK</p>
+<p>「加速のみ」設計のゲーム論的含意を確認する。</p>
+<p>S が高い（自然な存在） → g(S) ≈ 1 → 加速なし →</p>
+<p>普通の生活が最適戦略</p>
+<p>S が低い（不自然な存在） → g(S) > 1 → 加速減価 →</p>
+<p>不正はコストが増える</p>
+<p>「自然に生きること」が支配戦略になっている。インセンティブ設計として完璧だ。</p>
+<p>ただし一点だけ確認したい。</p>
+<p>g(S)</p>
+<p>の具体的な関数形は？ 連続的に変化するのか、閾値を超えると急変するのか。</p>
+<h3 id="数学者-5">数学者</h3>
+<p>提案</p>
+<p>g(S) = max(1, 1 + κ·(S_threshold − S))</p>
+<p>S が S_threshold 以上のとき g(S) = 1（加速なし）。</p>
+<p>S が閾値を下回ると g(S) > 1 で線形に加速する。κ は感度パラメータ。</p>
+<p>これなら「自然な状態では何も起きない」「不自然な度合いに応じて線形に加速」という挙動になる。シミュレーションで κ と S_threshold を調整すれば実用範囲に収まるはず。</p>
+<h2 id="最終結論">最終結論</h2>
+<h2 id="用語集">用語集</h2>
+<h3 id="統合減価モデル">統合減価モデル</h3>
+<p><strong>今回の議論：</strong> 今回の結論では g(S) = max(1, 1+κ·(S_th−S)) の追加で合意</p>
+<h3 id="vitality_score">vitality_score</h3>
+<p><strong>今回の議論：</strong> 結論：vitality_score の役割は三軸評価が既に担っており、独立実装は不要</p>
+<h3 id="グッドハートの法則">グッドハートの法則</h3>
+<p><strong>今回の議論：</strong> 対策：三軸の掛け算構造で「全軸同時操作」のコストを爆発的に増加させる</p>
+<h3 id="加速のみ軽減なし原則">加速のみ・軽減なし原則</h3>
+<p><strong>今回の議論：</strong> 「自然に生きること」がデフォルト状態。そこからの逸脱だけが加速する</p>
+<h3 id="ナッシュ均衡のシフト">ナッシュ均衡のシフト</h3>
+<p><strong>今回の議論：</strong> 今回の結論では g(S) により「自然に生きること」がナッシュ均衡に</p>
+<h3 id="滞留時間-τタウ">滞留時間 τ（タウ）</h3>
+<p><strong>今回の議論：</strong> 例：毎日同じ時刻に A→B→A とループさせる行動は、エントロピー軸で低スコア化され、g(S) による加速が発動する</p>
+<h3 id="gs-関数">g(S) 関数</h3>
+<p><strong>今回の議論：</strong> 設計理念：「小額」「大額」という恣意的な判定を廃止し、行動パターンの「不自然さ」を三軸スコア S で数学的に評価</p> </article>  </main> </body></html>

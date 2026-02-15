@@ -1,0 +1,188 @@
+<!DOCTYPE html><html lang="ja"> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.17.2"><title>「良い循環」の定義 討論</title><meta name="description" content="Meguri の「良い循環」を測る指標の設計で、3者の立場が鋭く対立している。"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous"></head> <body> <header style="border-bottom: 1px solid #30363d; padding: 1rem 1.5rem;"> <nav> <a href="/" style="margin-right: 1rem;">Meguri</a> <a href="/discussions/">議論一覧</a> </nav> </header> <main style="max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem;">  <article> <h1>「良い循環」の定義 討論</h1> <p style="color: #8b949e; margin-bottom: 1.5rem;">2026-02-15</p> <h1 id="-良い循環の定義--本格討論">🌊 「良い循環」の定義 ── 本格討論</h1>
+<p>乗算・加算・そもそも測ること自体への問い ── 3者が正面からぶつかる</p>
+<h2 id="争点">争点</h2>
+<p>Meguri の「良い循環」を測る指標の設計で、3者の立場が鋭く対立している。</p>
+<ul>
+<li><strong>数学者：</strong><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>Q</mi><mtext>spread</mtext></msub><mo>×</mo><msub><mi>Q</mi><mtext>equity</mtext></msub><mo>×</mo><msub><mi>Q</mi><mtext>activity</mtext></msub><mo>×</mo><msub><mi>Q</mi><mtext>depth</mtext></msub></mrow><annotation encoding="application/x-tex">Q(t) = Q_\text{spread} \times Q_\text{equity} \times Q_\text{activity} \times Q_\text{depth}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">Q</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">spread</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">equity</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">activity</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord text mtight"><span class="mord mtight">depth</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> の乗算モデル。全4軸が同時に必要（AND条件）。Mana 配分は均等 1/n。</li>
+<li>**ゲーム経済学者：**CQS = 重み付き加算モデル。弱い軸を強い軸で補える柔軟性あり。Path Diversity を最重視（w=0.30）。配分は貢献反映型。</li>
+<li>**哲学者：**循環の質は「小川」の比喩で語れる。どちらのモデルも指標をゲーム化するリスク（グッドハートの法則）がある。指標は「結果」であって「定義」ではない。</li>
+</ul>
+<h2 id="round-1--乗算-vs-加算どちらがand条件を実現できるか">Round 1 ── 乗算 vs 加算：どちらが「AND条件」を実現できるか</h2>
+<h3 id="数学者">数学者</h3>
+<p>乗算モデルを推す一番の理由を改めて言う。</p>
+<p>「4軸が全部必要」という AND 条件</p>
+<p>を数式で表現できるのは乗算だけだ。</p>
+<p>加算は実質 OR 条件になる。「Q_spread が低くても、Q_activity で補える」── これは「広がってないけど活発な循環」を良い循環と認めることになる。2つの巣がものすごい頻度で取引してたら加算モデルで高スコアを取れてしまう。</p>
+<blockquote>
+<p>**💡 たとえ話：**テトラポッド（防波堤の石）の強度テスト。4本の足がバランスよく全部地面についてないと意味がない。1本の足が超強力でも残り3本が浮いていたら倒れる。乗算 = 一番弱い足が全体を規定する。加算 = 1本の強い足で補える = テトラポッドとして機能しない。</p>
+</blockquote>
+<h3 id="ゲーム経済学者">ゲーム経済学者</h3>
+<p>異議あり</p>
+<p>その論理、逆の問題がある。</p>
+<p>乗算は「1軸がゼロで全体がゼロ」になる</p>
+<p>けど、これが不当にユーザーを罰するケースがある。</p>
+<p>たとえば、過疎地に住んでいるユーザー。取引相手が少ないから Q_spread（広がり）が構造的に低くなる。本人は普通に使っているのに、地域の問題で全スコアがゼロ近くになる。これは「場所が悪い罰」で、Meguri の世界観と合わない。</p>
+<p>加算モデルなら「広がりは弱いが、持続性と多様性は高い」という</p>
+<p>状況依存の評価</p>
+<p>ができる。</p>
+<h3 id="数学者-1">数学者</h3>
+<p>それは……</p>
+<p>過疎地の問題は確かに盲点だった。ただ、解決策がある。</p>
+<p>Q_spread を「ネットワーク全体のうち何割の巣と接触したか」ではなく、</p>
+<p>「自分が接触可能な巣のうち何割と接触したか」</p>
+<p>に定義し直す。過疎地なら分母が小さい。都市部なら分母が大きい。</p>
+<p>これで「利用可能な範囲での広がり」を測れる。過疎地でも都市でも同じ基準。</p>
+<h3 id="ゲーム経済学者-1">ゲーム経済学者</h3>
+<p>「接触可能な巣」の定義が難しい</p>
+<p>「接触可能な巣」ってどう定義する？ 地理的な近さ？ 過去の取引履歴？</p>
+<p>それを定義した瞬間、</p>
+<p>プレイヤーは「接触可能な巣の集合」を意図的に狭める</p>
+<p>戦略が生まれる。「自分の周囲に少数の信頼できる巣だけを作れば、Q_spread を簡単に最大化できる」── 孤立した小グループが高スコアを取れてしまう。</p>
+<h2 id="round-2--哲学者が割り込む測ること自体を疑え">Round 2 ── 哲学者が割り込む：「測ること」自体を疑え</h2>
+<h3 id="哲学者">哲学者</h3>
+<p>待ってくれ</p>
+<p>二人とも同じ前提の上で争っている。</p>
+<p>「良い循環を指標で測れる」という前提</p>
+<p>だ。でもこれ、本当に正しいか？</p>
+<p>2人の議論を聞いていると、どちらのモデルも「抜け道を探すプレイヤー」の存在を前提にして設計を複雑にしている。でも抜け道を探すこと自体が問題なのに、その問題を「より複雑な指標」で塞ごうとしていることにならないか？</p>
+<p>指標を作る → 抜け道が生まれる → 指標を修正 → 新しい抜け道 → 以下無限ループ。</p>
+<p>これがグッドハートの法則の罠</p>
+<p>。</p>
+<h3 id="ゲーム経済学者-2">ゲーム経済学者</h3>
+<p>じゃあ何もしないのか？</p>
+<p>哲学者の言いたいことはわかる。でも「指標を作るな」という結論になったら、</p>
+<p>Sybil 対策が全部崩れる</p>
+<p>。</p>
+<p>不正を検出するには何かを測らないといけない。「自然に生きているかどうか」を評価するには、「自然さ」を操作可能な変数に落とし込む必要がある。指標を使わずに「自然さ」を測る方法があるなら教えてほしい。</p>
+<h3 id="哲学者-1">哲学者</h3>
+<p>整理しよう</p>
+<p>2つのことを区別してほしい。</p>
+<p>A. 「不正を検出する」ための指標</p>
+<p>── これは必要。Sybil 対策。</p>
+<p>B. 「良い循環」の定義そのもの</p>
+<p>── これを指標と同一視するのが問題。</p>
+<p>「体温計は病気を検出する」けど「体温計 = 健康の定義」ではない。同じように、vitality_score は「悪い循環を検出する」ためのツールであって、「vitality_score が高い = 良い循環」ではない。</p>
+<p>この区別が崩れると、指標を上げること自体が目的になる。</p>
+<blockquote>
+<p>**💡 たとえ話：**GDP は経済活動を「測る」けど「幸福の定義」ではない。GDP を上げるために環境を破壊したり、戦争をしたりすれば数字は上がる。でも豊かさとは無関係。測定ツールと定義を混同した悲劇。</p>
+</blockquote>
+<h2 id="round-3--配分問題均等か貢献反映か">Round 3 ── 配分問題：均等か、貢献反映か</h2>
+<h3 id="数学者-2">数学者</h3>
+<p>哲学者の「指標 ≠ 定義」という区別、重要な視点だ。一旦受け入れた上で話を進める。</p>
+<p>Mana が閾値を超えて新規 Meguri が発行されるとき、</p>
+<p>配分を均等（1/n）</p>
+<p>にすることを強く主張する。</p>
+<p>理由：配分にスコアを絡めると、「スコアを上げるゲーム」が始まる。スコアを指標として使いながら、配分はスコアと無関係にする。これが指標と定義を分離する唯一の実装方法だ。</p>
+<h3 id="ゲーム経済学者-3">ゲーム経済学者</h3>
+<p>それは貢献を無視している</p>
+<p>均等配分には根本的な問題がある。</p>
+<p>貢献した人も貢献しなかった人も同じ恩恵を受ける</p>
+<p>。これはフリーライダー問題を生む。</p>
+<p>「自分がどれだけ循環に貢献しても、結果は全員同じ」なら、誰も積極的に循環を促進しない。経済学的には「公共財のジレンマ」。コモンズの悲劇に繋がる可能性がある。</p>
+<p>せめて「貢献度に応じた傾斜配分」にすべきでは？</p>
+<blockquote>
+<p>**💡 たとえ話：**学校の文化祭。「準備を頑張っても手抜きしても同じ評価」なら、一部の真面目な人だけが全部やって燃え尽きる。フリーライダーを引き寄せる設計。</p>
+</blockquote>
+<h3 id="数学者-3">数学者</h3>
+<p>待って、前提が違う</p>
+<p>Meguri の設計思想を思い出してほしい。</p>
+<p>「個人への報酬ではなく、社会全体の豊かさが増える」</p>
+<p>のがコンセプト。</p>
+<p>文化祭の例えでいうと、「頑張った人への個人賞」ではなく「文化祭が盛り上がることで学校全体の雰囲気が良くなる」を目指している。フリーライダーの問題は「個人の得」を前提にした話で、Meguri では「社会全体の得」が目的。</p>
+<p>個人への直接インセンティブを外すことが、むしろ Meguri の設計意図。</p>
+<h3 id="哲学者-2">哲学者</h3>
+<p>数学者の論点を支持</p>
+<p>Meguri の循環は「誰かがやれば全員が恩恵を受ける」構造で成立する。それは個人の自然な行動の副産物として社会が豊かになる設計だ。</p>
+<p>ただし、経済学者の言う「フリーライダー問題」は完全に無視できない。</p>
+<p>「誰かがやってくれるから自分はやらなくていい」が全員の戦略になったら、誰もやらなくなる</p>
+<p>。</p>
+<p>鍵は「積極的な貢献」ではなく、</p>
+<p>「普通に生活することが自然と貢献になる」</p>
+<p>設計にすること。フリーライダーの問題は「貢献がコストを要する」ときに発生する。Meguri では普通に使うだけで循環が生まれるなら、フリーライダーの概念自体が成立しない。</p>
+<h2 id="round-4--グッドハートの法則どう逃げるか">Round 4 ── グッドハートの法則：どう逃げるか</h2>
+<h3 id="ゲーム経済学者-4">ゲーム経済学者</h3>
+<p>認める、ただし対策がある</p>
+<p>フリーライダー問題について、哲学者の反論を受け入れた。「普通に使うだけで自然と貢献になる」設計なら、コストを要する貢献という前提が崩れる。</p>
+<p>ではグッドハートの法則への対策を話したい。哲学者は「指標が目標になる」ことを問題にしたが、これを防ぐ方法がある：</p>
+<p>「指標を非公開にする」</p>
+<p>。</p>
+<p>CQS の計算式をブラックボックスにして、逆算不可能にする。プレイヤーは「自然に生活すれば自然とスコアが上がる」という体感だけを持つ。スコアの最適化ゲームを始めようにも、最適化する対象が見えない。</p>
+<h3 id="哲学者-3">哲学者</h3>
+<p>ブラックボックスはもっと危険だ</p>
+<p>指標を非公開にする案、根本から反対する。</p>
+<p>Meguri の世界観は「管理しない、所有しない、裁かない」。ブラックボックスの評価システムは</p>
+<p>「見えない管理者が存在する」</p>
+<p>ことを意味する。プレイヤーには評価されているという感覚だけが残る。これは監視社会の究極形だ。</p>
+<p>透明性のない評価は、信頼ではなく恐怖で行動を制御することになる。Meguri の「自然法則」とは正反対。</p>
+<h3 id="数学者-4">数学者</h3>
+<p>別のアプローチがある</p>
+<p>二人の対立を整理すると：</p>
+<p>・経済学者：指標を隠す（ブラックボックス）</p>
+<p>・哲学者：指標を使うな（透明性 = 悪用される）</p>
+<p>どちらも極端だ。第3の道を提案する：</p>
+<p>「指標を公開するが、報酬に直結させない」</p>
+<p>。</p>
+<p>Q(t) も CQS も完全に公開する。プレイヤーは計算式も知っている。ただし、その数値は直接的な個人報酬に繋がらない。Q(t) は Mana の蓄積速度に影響するが、Mana 配分は均等。「数値を上げても自分だけ得する仕組みがない」なら、最適化するインセンティブが生まれない。</p>
+<h2 id="round-5--突破口測ると報酬に使うの分離">Round 5 ── 突破口：「測る」と「報酬に使う」の分離</h2>
+<h3 id="哲学者-4">哲学者</h3>
+<p>それだ</p>
+<p>数学者の「公開するが報酬に直結させない」── これが答えかもしれない。</p>
+<p>グッドハートの法則が発動する条件は「指標 → 個人の得」の回路が存在することだ。その回路を断ち切れば、指標を公開しても問題ない。</p>
+<p>Q(t) はネットワーク全体の「体温計」</p>
+<p>として公開する。体温が高い（良い循環）ときは Mana が速く貯まる。でも「体温を上げること」で個人が直接得をしない。全員が均等に恩恵を受けるだけ。</p>
+<p>体温計を温めても意味がない。なぜなら恩恵が全員に薄く広がるだけだから。</p>
+<h3 id="ゲーム経済学者-5">ゲーム経済学者</h3>
+<p>ゲーム論的にも成立する</p>
+<p>「公開・報酬非連動」設計のゲーム論的確認をする。</p>
+<p>Q(t) を最適化するためには、多数の巣を使って広範な循環を作る必要がある。でもその恩恵は社会全体に均等配分。コストは自分だけが負い、恩恵は全員に分散。</p>
+<p>投資対効果が合わない</p>
+<p>ので、誰も Q(t) のための操作をしない。</p>
+<p>自然に生活してネットワーク全体の Q(t) に微小に貢献する ── これが支配戦略に収束する。完璧だ。</p>
+<p>一点追記：CQS は Sybil 検出の補助指標として引き続き有効。こちらも報酬に直結させず、「スコアが低すぎる巣は検査対象になる」という閾値判定にのみ使う。</p>
+<h3 id="数学者-5">数学者</h3>
+<p>設計をまとめよう</p>
+<p>3人の議論を統合すると、こうなる：</p>
+<p>Q(t) の役割：</p>
+<p><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mrow><mi>d</mi><mi>M</mi><mi>a</mi><mi>n</mi><mi>a</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>γ</mi><mo>⋅</mo><mi>Q</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\frac{dMana}{dt} = \gamma \cdot Q(t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2251em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="mord mathnormal mtight" style="margin-right:0.10903em;">M</span><span class="mord mathnormal mtight">ana</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05556em;">γ</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">Q</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span></p>
+<p>ネットワーク全体の「体温計」。Mana 蓄積速度に影響。公開。個人報酬に非連動。</p>
+<p>Mana 配分：</p>
+<p>均等（1/n）</p>
+<p>個人の操作が不可能。フリーライダー問題が成立しない設計。</p>
+<p>CQS の役割：</p>
+<p>Sybil 検出の補助指標</p>
+<p>閾値以下の巣を検査対象にするだけ。報酬計算には使わない。</p>
+<p>そして Q(t) の計算式は乗算か加算か、という元々の争点だが ── 「報酬非連動」なら加算でも乗算でも</p>
+<p>どちらも操作インセンティブがほぼない</p>
+<p>。ならシンプルな方を選ぶ。最終的には</p>
+<p>解釈しやすい加算モデルを推奨</p>
+<p>する。</p>
+<h3 id="ゲーム経済学者-6">ゲーム経済学者</h3>
+<p>乗算か加算かの決着、意外な形になったな</p>
+<p>「報酬非連動にすればどちらでもいい」か……確かにそれは正しい。</p>
+<p>ただ補足すると、</p>
+<p>乗算モデルは Sybil 検出のシグナルとして優秀</p>
+<p>。1軸が極端に低いとスコアが急落するので、不自然なパターンを見つけやすい。</p>
+<p>提案：</p>
+<p>Q(t) は加算（人間が理解しやすい）、Sybil 検出用スコアは乗算（異常値に敏感）</p>
+<p>で使い分けるのが最善。目的が違うなら指標も分けるべき。</p>
+<h3 id="哲学者-5">哲学者</h3>
+<p>それで合意できる</p>
+<p>「用途によって指標を使い分ける」── 最初から指標を一つにまとめようとしていたのが間違いだったかもしれない。</p>
+<p>最終的な整理：</p>
+<p>「良い循環」の定義は小川の比喩のまま（多様性・非定型性・連続性）</p>
+<p>。Q(t) と乗算スコアはどちらもその定義の「近似的な測定ツール」に過ぎない。定義と指標は永遠に別物。</p>
+<p>その区別さえ守れば、どちらのモデルを使っても問題ない。</p>
+<h2 id="最終結論">最終結論</h2>
+<h2 id="用語集">用語集</h2>
+<h3 id="qt--循環の質">Q(t) ── 循環の質</h3>
+<p><strong>今回の議論：</strong> 4軸：広がり(Reach)・均等さ(Equity)・活発さ(Activity)・持続性(Persistence)</p>
+<h3 id="乗算-vs-加算">乗算 vs 加算</h3>
+<p><strong>今回の議論：</strong> Q(t) = 加算（体温計・公開）/ Sybil 検出 = 乗算（異常センサー）</p>
+<h3 id="グッドハートの法則">グッドハートの法則</h3>
+<p><strong>今回の議論：</strong> GDP = 豊かさを測る指標。GDP 最大化のために環境破壊 → 数字は上がるが豊かさは失われる</p>
+<h3 id="均等配分1n">均等配分（1/n）</h3>
+<p><strong>今回の議論：</strong> 雨が降ると森全員が潤う。特定の木が「雨を呼んだ」わけではない</p>
+<h3 id="フリーライダー問題">フリーライダー問題</h3>
+<h3 id="三重循環構造">三重循環構造</h3>
+<p><strong>今回の議論：</strong> 未解決：三層それぞれに Q(t) / Sybil スコアをどう対応させるか</p>
+<h3 id="良い循環の定義">良い循環の定義</h3> </article>  </main> </body></html>

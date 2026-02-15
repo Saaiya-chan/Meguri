@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="ja"> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.17.2"><title>討論: コミュニティ境界定義と正規化</title><meta name="description" content="Phase 2-04で「取引グラフのネットワーク距離でコミュニティを定義」と合意したが、Phase 2-06では「クラスタリングはスコアリングから除外」と決めた。矛盾に見える「スコアリングには使わないが正規化には使う」という仕様を、論..."><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous"></head> <body> <header style="border-bottom: 1px solid #30363d; padding: 1rem 1.5rem;"> <nav> <a href="/" style="margin-right: 1rem;">Meguri</a> <a href="/discussions/">議論一覧</a> </nav> </header> <main style="max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem;">  <article> <h1>討論: コミュニティ境界定義と正規化</h1> <p style="color: #8b949e; margin-bottom: 1.5rem;">2026-02-15</p> <h1 id="コミュニティ境界定義と正規化">コミュニティ境界定義と正規化</h1>
+<p>GPS廃止後のコミュニティ定義と、スコアリング・正規化の分離設計</p>
+<h2 id="議題">議題</h2>
+<p>Phase 2-04で「取引グラフのネットワーク距離でコミュニティを定義」と合意したが、Phase 2-06では「クラスタリングはスコアリングから除外」と決めた。矛盾に見える「スコアリングには使わないが正規化には使う」という仕様を、論理的かつ安全に実装する方法を検討する。</p>
+<h2 id="round-1--問題の確認">Round 1 — 問題の確認</h2>
+<h3 id="mathematician">mathematician</h3>
+<p>外部レビューの指摘は正しい。私たちの設計には矛盾がある：</p>
+<p>Phase 2-04: 「取引グラフでコミュニティを定義」</p>
+<p>コミュニティ相対評価のため、Q_equity（循環品質）を正規化する必要がある。</p>
+<p>Phase 2-06: 「クラスタリングはスコアリングから除外」</p>
+<p>ネットワーク分析をスコアリングに使うと、攻撃者が取引グラフを操作してスコアを上げる可能性がある。</p>
+<p>結果：「スコアリングには使わないが正規化には使う」？これは論理的に矛盾している。クラスタリング結果を正規化に使うなら、その精度に依存している。精度が低いなら正規化も無意味になる。</p>
+<h3 id="game-economist">game-economist</h3>
+<p>ゲーム論の観点からも危険だ。</p>
+<p>もしクラスタリング結果が Q_equity に影響するなら（どんな形でも）、攻撃者は「クラスタリング結果に自分たちが都合よく入る」ように取引パターンを操作する動機を得てしまう。</p>
+<p>つまり：</p>
+<ul>
+<li>ローカルでクラスタリング分析 → 都合よいコミュニティ図が出る</li>
+<li>攻撃者たちが協力して、その結果に合わせた取引をシミュレート</li>
+<li>結果的に高い Q_equity を得る</li>
+</ul>
+<p>「スコアリングには使わない」と言っても、正規化経由で影響するなら、実質的には使っているのと同じ。</p>
+<h3 id="philosopher">philosopher</h3>
+<p>二人の指摘はもっともだ。ただ、一つの見方を提示したい。</p>
+<p>「情報の流れ」を分離する</p>
+<p>という考え方：</p>
+<ul>
+<li><strong>スコアリング層</strong>：ローカル・個人的な取引行動のみを分析。ネットワーク構造は見ない</li>
+<li><strong>正規化層</strong>：システム全体の取引グラフを「参考情報」として、一度だけ分析。攻撃者が個々の行動で操作できない、システムレベルの統計</li>
+</ul>
+<p>つまり、</p>
+<p>正規化係数は「定期的に（例：月1回）更新される定数」</p>
+<p>であって、個人の行動に即座に反応しない。だから個人の攻撃行動の効果がない。</p>
+<h2 id="round-2--オフライン分析の提案">Round 2 — オフライン分析の提案</h2>
+<h3 id="mathematician-1">mathematician</h3>
+<p>philosopher の「情報分離」という考え方に基づいて、具体的な設計を提案する。</p>
+<p>2つの層の分離：</p>
+<p>① スコアリング層（リアルタイム）</p>
+<p>S(v) = softmin(d, t, e) × F(v)</p>
+<ul>
+<li>
+<p>個人の循環品質（時間・エントロピー・滞留時間）のみ</p>
+</li>
+<li>
+<p>ネットワーク情報は使わない</p>
+</li>
+<li>
+<p>毎日更新</p>
+</li>
+</ul>
+<p>② 正規化層（定期的オフライン）</p>
+<p>Q’_equity(v) = S(v) × α(cluster(v))</p>
+<ul>
+<li>
+<p>月1回、全取引グラフをオフラインで分析</p>
+</li>
+<li>
+<p>クラスタリングアルゴリズムでコミュニティ検出</p>
+</li>
+<li>
+<p>各コミュニティの「規模」「密度」から正規化係数 α を計算</p>
+</li>
+<li>
+<p>正規化係数は定数として適用（毎日の変動なし）</p>
+</li>
+</ul>
+<p>結果：個人の行動で正規化係数は変わらない → 攻撃インセンティブが生じない。</p>
+<h3 id="game-economist-1">game-economist</h3>
+<p>いい。ゲーム論的に分析する：</p>
+<p>攻撃者が「月1回のオフライン分析に影響させよう」と思っても：</p>
+<ul>
+<li>月間の全取引グラフは数百万〜数億の取引ノード</li>
+<li>攻撃者の取引パターンは小さなノイズに過ぎない</li>
+<li>クラスタリング結果を有意に変えるには、全体の5%以上の取引量が必要だと仮定するなら、個人の操作では不可能</li>
+</ul>
+<p>つまり、正規化係数を操作できない → 攻撃の効果がない → ROI ≤ 0。</p>
+<p>同時に、正規化係数が「固定」なので、個人がいくら行動を変えても即座には効果がない。支配戦略は変わらない：「自然に生きる」が最適。</p>
+<h2 id="round-3--正規化係数の仕様確定">Round 3 — 正規化係数の仕様確定</h2>
+<h3 id="mathematician-2">mathematician</h3>
+<p>正規化係数 α(cluster) の具体的な計算方法を定義する。</p>
+<p>月1回のオフライン分析処理：</p>
+<h1 id="step-1-過去30日の取引グラフから-community-detection">Step 1: 過去30日の取引グラフから Community Detection</h1>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="plaintext"><code><span class="line"><span>                     graph = past_30_days_transactions()</span></span>
+<span class="line"><span>                     clusters = community_detection(graph)  // e.g., Louvain</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>                     # Step 2: 各クラスタの統計を計算</span></span>
+<span class="line"><span>                     FOR EACH cluster IN clusters:</span></span>
+<span class="line"><span>                     　　size = |cluster|</span></span>
+<span class="line"><span>                     　　density = edge_count / possible_edges</span></span>
+<span class="line"><span>                     　　avg_q = mean(S(v) for v in cluster)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>                     # Step 3: 正規化係数を計算</span></span>
+<span class="line"><span>                     　　α(cluster) = global_avg_q / avg_q  // 全体平均 / クラスタ平均</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>                     # Step 4: 翌月のスコアリングに適用</span></span>
+<span class="line"><span>                     Q'_equity(v) = S(v) × α(cluster(v))</span></span></code></pre>
+<p>このことで、大規模コミュニティでスコアが低めなら、α で上昇補正され、小規模コミュニティとの間で「公平さ」が実現される。</p>
+<h3 id="philosopher-1">philosopher</h3>
+<p>理想的だ。この設計なら：</p>
+<p>小規模コミュニティの人たち：</p>
+<p>「少ないメンバー内での流動」でも、α による正規化で評価されて、大規模コミュニティとの不公平感がなくなる。</p>
+<p>大規模コミュニティの人たち：</p>
+<p>「多くの選択肢がある環境」での流動パターンは、その環境の中での相対的な質が見られる。</p>
+<p>攻撃者：</p>
+<p>月1回の確定係数に対して行動を最適化するのは実質的に不可能（システム全体を変える必要がある）。</p>
+<p>Meguri の「自然に存在するものを保護する」という原則が、地理的・規模的な偏りなく実装される。</p>
+<h2 id="round-4--合意">Round 4 — 合意</h2>
+<h3 id="mathematician-3">mathematician</h3>
+<p>R2-4 の設計に合意する。矛盾を解いた。</p>
+<h3 id="game-economist-2">game-economist</h3>
+<p>ゲーム論的に安全性が確保された。合意する。</p>
+<h3 id="philosopher-2">philosopher</h3>
+<p>倫理的に公平性が確保された。合意する。</p>
+<h2 id="用語集">用語集</h2>
+<h3 id="コミュニティcommunity">コミュニティ（Community）</h3>
+<p>取引グラフ上で密に相互作用する巣のグループ。GPS距離軸廃止後は、ネットワーク距離（何ステップ離れているか）でコミュニティを定義。月1回のオフライン分析で検出。</p>
+<h3 id="正規化係数α">正規化係数（α）</h3>
+<p>コミュニティ間のスコア格差を補正する係数。α(cluster) = global_avg_q / avg_q で計算。大規模コミュニティは α が小さく、小規模コミュニティは α が大きくなる傾向があり、公平性を実現。</p>
+<h3 id="オフライン分析">オフライン分析</h3>
+<p>月1回、システム全体の取引グラフをまとめて分析する処理。リアルタイムではなく定期的に実行されるため、個人の行動で結果を操作できない安全性がある。</p>
+<h3 id="2層分離設計">2層分離設計</h3>
+<p>スコアリング層（リアルタイム、個人的）と正規化層（定期的、システムレベル）に情報処理を分離する設計。スコアリングではネットワーク情報を使わず攻撃耐性を確保し、正規化のみで地理的・規模的な公平性を実現。</p> </article>  </main> </body></html>

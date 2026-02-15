@@ -1,0 +1,158 @@
+<!DOCTYPE html><html lang="ja"> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.17.2"><title>討論: 長期離脱からの復帰パスを設計する</title><meta name="description" content="Phase 2-06（静寂閾値：90日無活動で分母Nから除外）と Phase 2-01（減衰加速）の組み合わせで、長期離脱者は通貨がゼロに近づいて復帰困難になる。これは「自然に存在するものを保護する」という Meguri の世界観と矛..."><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous"></head> <body> <header style="border-bottom: 1px solid #30363d; padding: 1rem 1.5rem;"> <nav> <a href="/" style="margin-right: 1rem;">Meguri</a> <a href="/discussions/">議論一覧</a> </nav> </header> <main style="max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem;">  <article> <h1>討論: 長期離脱からの復帰パスを設計する</h1> <p style="color: #8b949e; margin-bottom: 1.5rem;">2026-02-15</p> <h1 id="長期離脱からの復帰パスを設計する">長期離脱からの復帰パスを設計する</h1>
+<p>病気・災害で離脱した巣の救済メカニズムを、不正を許さずに実装する</p>
+<h2 id="議題">議題</h2>
+<p>Phase 2-06（静寂閾値：90日無活動で分母Nから除外）と Phase 2-01（減衰加速）の組み合わせで、長期離脱者は通貨がゼロに近づいて復帰困難になる。これは「自然に存在するものを保護する」という Meguri の世界観と矛盾する。しかし、単に grace period を与えるだけでは「復帰と詐称」を区別できず、Sybil 攻撃に利用される。デバイス紐づけを活用して、本当の復帰者を証明しながら保護する仕組みを検討する。</p>
+<h2 id="round-1--問題の確認と不正防止の課題">Round 1 — 問題の確認と不正防止の課題</h2>
+<h3 id="philosopher">philosopher</h3>
+<p>外部レビューで指摘された通り、</p>
+<p>現在の設計は事実上のデジタル追放</p>
+<p>だ。</p>
+<p>病気や災害で90日間動けなかった人を考えてほしい。その人は：</p>
+<ul>
+<li>分母Nから除外されて配分がゼロになり</li>
+<li>同時に減価が加速して通貨が消滅し</li>
+<li>復帰しても何も残っていない</li>
+</ul>
+<p>「自然に存在するものを守る」って言ったのに、自然な離脱（病気や災害）を罰している。これは矛盾している。</p>
+<p>ただし一つの工夫：</p>
+<p>「復帰です」という詐称を許してはいけない</p>
+<p>。つまり「復帰したい」と言ってきた人が、本当にその巣の所有者なのか、それとも Sybil 攻撃者が別人のふりをしているのかを区別する必要がある。</p>
+<h3 id="mathematician">mathematician</h3>
+<p>philosopher の指摘は正しい。そして「所有者であることの証明」はすでに解決済みだ。</p>
+<p>Phase 2-02（第4軸：デバイス紐づけ）で、各巣は「デバイス固有ID」と紐づけられている。つまり：</p>
+<ul>
+<li>長期離脱していたユーザーが同じデバイルで復帰申請 → <strong>その人物と巣の同一性が暗号学的に証明される</strong></li>
+<li>別の人が他のデバイスから「その巣を復帰させたい」と言っても → <strong>デバイスが異なるから拒否</strong></li>
+</ul>
+<p>これで「本当の復帰」と「詐称」を区別できる。</p>
+<p>ただし心配なのは：復帰時に一度に全配分を受け取られたら、その後すぐに何度も離脱・復帰を繰り返す攻略法が出てくるのでは？</p>
+<h3 id="game-economist">game-economist</h3>
+<p>mathematician の懸念はもっともだ。復帰の詐称は防げるが、「反復的な離脱・復帰」の濫用は防ぐ必要がある。</p>
+<p>提案：</p>
+<p>「段階的な grace period」</p>
+<ul>
+<li>デバイス紐づけで復帰が証明された → 一度だけ grace period 開始</li>
+<li>その grace period 中（例：30日）は、配分が100%保障される</li>
+<li>30日後、正常な活動に戻る → 配分再開</li>
+<li><strong>ただし、grace period 中に再び90日無活動になったら → 新しい grace period は付与されない（1回限り）</strong></li>
+</ul>
+<p>これで「本当の長期離脱者は救済する」「反復的な濫用は防ぐ」両方できる。</p>
+<h2 id="round-2--デバイス紐づけの仕組み確認">Round 2 — デバイス紐づけの仕組み確認</h2>
+<h3 id="mathematician-1">mathematician</h3>
+<p>game-economist の段階的 grace period 案に同意する。数学的に言い直すと：</p>
+<p>grace_remaining(v) = 0 initially</p>
+<p>復帰申請時：</p>
+<p>IF device_match(v_申請, v_記録) AND grace_remaining(v) == 0 THEN
+　　grace_remaining(v) ← 30日
+　　配分 ← 100% × (ΔM / N)
+END</p>
+<p>重要な点：</p>
+<ul>
+<li><code>device_match()</code>：デバイスID が巣の記録と一致するか暗号学的に検証</li>
+<li><code>grace_remaining(v) == 0</code>：以前の grace period がもう残っていないか確認</li>
+<li>grace period 中でも「正常な活動」が続けば、grace 期間後は完全に回復</li>
+</ul>
+<p>これでデバイス交換時はどうするか？という問題が出てくる。</p>
+<h3 id="philosopher-1">philosopher</h3>
+<p>いいアイデアだが、</p>
+<p>デバイスが壊れたり、新しく買い替えたりしたらどうなる？</p>
+<p>例えば：</p>
+<ul>
+<li>iPhone を 5年使って、バッテリーが死んで Android に乗り替えた人</li>
+<li>水に落とした人</li>
+<li>盗まれた人</li>
+</ul>
+<p>こういう人たちは「本当にその人」なのに、デバイスが違うから「詐称者」と見なされてしまう。</p>
+<p>つまり：デバイス紐づけは Sybil 攻撃を防ぐには強力だが、</p>
+<p>正当な人の利便性を損ねる</p>
+<p>。どうバランスを取る？</p>
+<h3 id="game-economist-1">game-economist</h3>
+<p>重要な指摘だ。解決案：</p>
+<p>「デバイス移行の grace period」</p>
+<ul>
+<li>旧デバイス（スマホが壊れた直後）で最後の取引から30日以内に</li>
+<li>新デバイスから「デバイス移行申請」をする</li>
+<li>その新デバイスに新しく紐づけ直す</li>
+</ul>
+<p>これにより：</p>
+<ul>
+<li>本当のデバイス破損・交換は許可（30日の猶予）</li>
+<li>長期間経過した「昔のデバイスで新しい巣を作る」詐称は防止（30日後は新デバイス固定）</li>
+</ul>
+<p>つまり</p>
+<p>「複数のデバイス移行」は許可するが、その間隔に制限を付ける</p>
+<p>。</p>
+<h2 id="round-3--grace-period-の長さと仕様確定">Round 3 — Grace Period の長さと仕様確定</h2>
+<h3 id="mathematician-2">mathematician</h3>
+<p>game-economist のデバイス移行プロセスを組み込んだ、完全な復帰フロー：</p>
+<p>ケース1：同じデバイスで復帰</p>
+<p>IF device_match(申請) AND 静寂状態 AND grace_used == FALSE THEN
+　　grace_period ← 30日
+　　配分率 ← 100%
+　　grace_used ← TRUE
+END</p>
+<p>ケース2：デバイス交換後の復帰</p>
+<p>IF device_mismatch(申請) AND 最終取引から30日以内 THEN
+　　new_device ← 申請元デバイス
+　　grace_period ← 30日
+　　配分率 ← 100%
+　　grace_used ← TRUE
+END</p>
+<p>つまり「同一デバイス」か「30日以内の新デバイス」なら grace_period を付与。grace_period は巣ごとに1回限り。</p>
+<h3 id="philosopher-2">philosopher</h3>
+<p>この設計なら「自然に存在するものを保護する」という原則と一致する。</p>
+<p>保護される人たち：</p>
+<ul>
+<li>病気や災害で長期離脱した人 → 復帰時に grace period で救済</li>
+<li>デバイスが壊れた人 → 新デバイスでの移行を30日以内に認める</li>
+</ul>
+<p>防止される悪用：</p>
+<ul>
+<li>「離脱・復帰」を何度も繰り返す game → grace period は1回限り</li>
+<li>「古い巣を装う」Sybil → デバイス一致が必須。または30日以内の新デバイス移行に限定</li>
+</ul>
+<p>Meguri の脱所有理念を守りながら、不正も防ぐ。いい。</p>
+<h3 id="game-economist-2">game-economist</h3>
+<p>ゲーム論的に分析すると：</p>
+<p>攻撃者の視点：</p>
+<p>複数デバイスで巣を量産 → 各巣で1回だけ grace period を使う？</p>
+<p>→ これは Phase 2-02（第4軸：1デバイス = 1主要な巣）で既に防止済み。複数デバイス自体が高コスト。</p>
+<p>正直者の視点：</p>
+<p>「病気で動けなかった」「デバイスが壊れた」という自然な事象に対して、ペナルティなしで復帰できる。インセンティブ構造が正直者に有利。</p>
+<p>支配戦略は変わらない：「自然に存在する」ことが最適戦略。</p>
+<h2 id="round-4--合意と再定式化">Round 4 — 合意と再定式化</h2>
+<h3 id="philosopher-3">philosopher</h3>
+<p>R2-3 の解決案に合意する。</p>
+<p>復帰パスの設計原則：</p>
+<ul>
+<li><strong>デバイス紐づけで本人確認</strong>：「本当の復帰」と「詐称」を区別</li>
+<li><strong>1回限りの grace period（30日）</strong>：反復的濫用を防止しながら、真の困窮者を救済</li>
+<li><strong>デバイス交換の猶予（30日）</strong>：自然な機器交換を許可</li>
+</ul>
+<p>これで Meguri の「自然に存在するものを保護する」という哲学と、「構造的に不正を無力化する」という技術が両立する。</p>
+<h3 id="mathematician-3">mathematician</h3>
+<p>数学的にも整合している。最終仕様：</p>
+<p>restore_grace_period(v, device_申請) {
+　　IF静寂状態(v) {
+　　　　IF device_match(device_申請, v.device_record) {
+　　　　　　← ケース1：同じデバイス
+　　　　　　grace_remaining(v) ← 30日, grace_used ← TRUE
+　　　　} ELSE IF (NOW - last_tx(v)) ≤ 30日 {
+　　　　　　← ケース2：最近のデバイス交換
+　　　　　　v.device_record ← device_申請
+　　　　　　grace_remaining(v) ← 30日, grace_used ← TRUE
+　　　　}
+　　}
+}</p>
+<p>grace_remaining(v) > 0 の期間は、配分 = 100% × (ΔM / N) を保障。</p>
+<h3 id="game-economist-3">game-economist</h3>
+<p>ゲーム論的に支配戦略は維持される。合意する。</p>
+<h2 id="用語集">用語集</h2>
+<h3 id="復帰パスrestoration-path">復帰パス（Restoration Path）</h3>
+<p>長期離脱（90日以上無活動）から復帰する際の仕組み。デバイス紐づけで本人確認を行い、1回限りの grace period を付与することで、真の困窮者を救済しながら Sybil 攻撃を防止する。</p>
+<h3 id="デバイス紐づけ復帰確認">デバイス紐づけ復帰確認</h3>
+<p>復帰申請時に、デバイス固有ID（TPM、Secure Enclave など）が巣の記録と一致するか暗号学的に検証する。一致すれば「本当の所有者の復帰」と認定。一致しない場合は、最後の取引から30日以内の新デバイスなら移行を許可。</p>
+<h3 id="復帰用-grace-period30日">復帰用 Grace Period（30日）</h3>
+<p>静寂状態から復帰が確認された巣に対して、1回限り30日間付与される配分保障期間。この間は、巣は通常通り 100% × (ΔM / N) の配分を受け取る。</p>
+<h3 id="デバイス交換猶予30日">デバイス交換猶予（30日）</h3>
+<p>デバイスが壊れたり、機器交換したりした場合、最後の取引から30日以内であれば新しいデバイスからの復帰申請を認める。これにより、スマートフォン故障などの自然な事象に対応。30日経過した場合は「新しい巣」として扱われる。</p> </article>  </main> </body></html>
