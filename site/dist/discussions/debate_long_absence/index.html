@@ -1,4 +1,194 @@
-<!DOCTYPE html><html lang="ja"> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.17.2"><title>討論: 長期離脱からの復帰パスを設計する</title><meta name="description" content="Phase 2-06（静寂閾値：90日無活動で分母Nから除外）と Phase 2-01（減衰加速）の組み合わせで、長期離脱者は通貨がゼロに近づいて復帰困難になる。これは「自然に存在するものを保護する」という Meguri の世界観と矛..."><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous"></head> <body> <header style="border-bottom: 1px solid #30363d; padding: 1rem 1.5rem;"> <nav> <a href="/" style="margin-right: 1rem;">Meguri</a> <a href="/discussions/">議論一覧</a> </nav> </header> <main style="max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem;">  <article> <h1>討論: 長期離脱からの復帰パスを設計する</h1> <p style="color: #8b949e; margin-bottom: 1.5rem;">2026-02-15</p> <h1 id="長期離脱からの復帰パスを設計する">長期離脱からの復帰パスを設計する</h1>
+<!DOCTYPE html><html lang="ja"> <head><meta charset="utf-8"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta name="viewport" content="width=device-width"><meta name="generator" content="Astro v5.17.2"><title>討論: 長期離脱からの復帰パスを設計する</title><meta name="description" content="Phase 2-06（静寂閾値：90日無活動で分母Nから除外）と Phase 2-01（減衰加速）の組み合わせで、長期離脱者は通貨がゼロに近づいて復帰困難になる。これは「自然に存在するものを保護する」という Meguri の世界観と矛..."><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+<style id="rich-discussion-style">
+/* ===== Base ===== */
+body {
+  background: #0d1117 !important;
+  color: #c9d1d9;
+  font-family: 'Segoe UI', 'Noto Sans JP', sans-serif;
+  line-height: 1.75;
+  margin: 0; padding: 0;
+}
+
+/* ===== Site nav ===== */
+header {
+  background: #161b22 !important;
+  border-bottom: 1px solid #30363d !important;
+  padding: 0.8rem 1.5rem !important;
+}
+header nav a {
+  color: #58a6ff !important;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  margin-right: 1.2rem;
+}
+header nav a:hover { text-decoration: underline; }
+
+/* ===== Main / Article ===== */
+main { max-width: 900px !important; margin: 0 auto; padding: 2.5rem 1.5rem !important; }
+
+article > h1:first-of-type {
+  font-size: 1.9rem;
+  color: #58a6ff;
+  border-bottom: 2px solid #30363d;
+  padding-bottom: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+article > p:nth-of-type(1) { color: #8b949e; font-size: 13px; margin-bottom: 2rem; }
+
+/* ===== Overview headings (争点, まとめ etc.) ===== */
+article h2:not(.round-divider):not(.conclusion-title) {
+  color: #f0f6fc;
+  font-size: 1.15rem;
+  border-left: 4px solid #388bfd;
+  padding-left: 0.8rem;
+  margin: 2.5rem 0 0.8rem;
+}
+article h1:not(:first-of-type) {
+  color: #f0f6fc;
+  font-size: 1.4rem;
+  border-left: 4px solid #58a6ff;
+  padding-left: 0.8rem;
+  margin: 2rem 0 0.8rem;
+}
+
+/* ===== Round divider ===== */
+.round-divider {
+  border: none !important;
+  padding: 0.6rem 1.6rem !important;
+  background: linear-gradient(90deg, #0d1117, #1f2d3d, #0d1117) !important;
+  border-top: 1px solid #388bfd !important;
+  border-bottom: 1px solid #388bfd !important;
+  color: #79c0ff !important;
+  text-align: center;
+  margin: 2.5rem 0 1.5rem !important;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+/* ===== Speaker block ===== */
+.speaker-block {
+  display: flex;
+  gap: 1rem;
+  margin: 1.2rem 0;
+  align-items: flex-start;
+}
+.speaker-label {
+  flex-shrink: 0;
+  width: 84px;
+  padding: 0.35rem 0.5rem;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+.speaker-content {
+  flex: 1;
+  background: #161b22;
+  border-radius: 10px;
+  padding: 1rem 1.3rem;
+  border: 1px solid #30363d;
+  min-width: 0;
+}
+.speaker-content p { margin: 0 0 0.6rem; }
+.speaker-content p:last-child { margin-bottom: 0; }
+.speaker-content ul, .speaker-content ol { padding-left: 1.4rem; margin: 0.4rem 0; }
+.speaker-content li { margin-bottom: 0.3rem; }
+
+/* Mathematician — blue */
+.speaker-mathematician .speaker-label {
+  background: rgba(88,166,255,0.15);
+  color: #79c0ff;
+  border: 1px solid rgba(88,166,255,0.4);
+}
+.speaker-mathematician .speaker-content { border-left: 3px solid #388bfd; }
+
+/* Economist — green */
+.speaker-economist .speaker-label {
+  background: rgba(126,231,135,0.15);
+  color: #7ee787;
+  border: 1px solid rgba(126,231,135,0.4);
+}
+.speaker-economist .speaker-content { border-left: 3px solid #3fb950; }
+
+/* Philosopher — purple */
+.speaker-philosopher .speaker-label {
+  background: rgba(210,168,255,0.15);
+  color: #d2a8ff;
+  border: 1px solid rgba(210,168,255,0.4);
+}
+.speaker-philosopher .speaker-content { border-left: 3px solid #8957e5; }
+
+/* Architect — orange */
+.speaker-architect .speaker-label {
+  background: rgba(255,188,100,0.15);
+  color: #ffa657;
+  border: 1px solid rgba(255,188,100,0.4);
+}
+.speaker-architect .speaker-content { border-left: 3px solid #e3b341; }
+
+/* Other */
+.speaker-other .speaker-label {
+  background: rgba(139,148,158,0.15);
+  color: #8b949e;
+  border: 1px solid rgba(139,148,158,0.4);
+}
+.speaker-other .speaker-content { border-left: 3px solid #6e7681; }
+
+/* ===== Blockquotes (たとえ話) ===== */
+.speaker-content blockquote, article > blockquote {
+  background: rgba(56,139,253,0.07);
+  border: 1px solid rgba(56,139,253,0.3);
+  border-left: 4px solid #388bfd;
+  border-radius: 6px;
+  padding: 0.9rem 1.1rem;
+  margin: 0.8rem 0 0;
+  font-size: 0.93rem;
+  color: #b0bec5;
+}
+
+/* ===== Conclusion ===== */
+.conclusion-block {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+}
+.conclusion-title {
+  color: #58a6ff !important;
+  border-left: none !important;
+  font-size: 1.2rem !important;
+  margin: 0 0 1rem !important;
+  padding: 0 !important;
+}
+
+/* ===== Glossary ===== */
+.glossary-section { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #30363d; }
+.glossary-item {
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin: 0.8rem 0;
+}
+.glossary-item h3 {
+  color: #f0f6fc !important;
+  font-size: 1rem !important;
+  margin: 0 0 0.4rem !important;
+}
+.glossary-item p { font-size: 0.9rem; margin: 0; color: #c9d1d9; }
+
+/* ===== Inline code ===== */
+code { background: #1f2937; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; color: #e2e8f0; }
+pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 1rem; overflow-x: auto; }
+
+/* ===== KaTeX ===== */
+.katex-display { overflow-x: auto; padding: 0.5rem 0; }
+</style>
+</head> <body> <header style="border-bottom: 1px solid #30363d; padding: 1rem 1.5rem;"> <nav> <a href="/" style="margin-right: 1rem;">Meguri</a> <a href="/discussions/">議論一覧</a> </nav> </header> <main style="max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem;">  <article> <h1>討論: 長期離脱からの復帰パスを設計する</h1> <p style="color: #8b949e; margin-bottom: 1.5rem;">2026-02-15</p> <h1 id="長期離脱からの復帰パスを設計する">長期離脱からの復帰パスを設計する</h1>
 <p>病気・災害で離脱した巣の救済メカニズムを、不正を許さずに実装する</p>
 <h2 id="議題">議題</h2>
 <p>Phase 2-06（静寂閾値：90日無活動で分母Nから除外）と Phase 2-01（減衰加速）の組み合わせで、長期離脱者は通貨がゼロに近づいて復帰困難になる。これは「自然に存在するものを保護する」という Meguri の世界観と矛盾する。しかし、単に grace period を与えるだけでは「復帰と詐称」を区別できず、Sybil 攻撃に利用される。デバイス紐づけを活用して、本当の復帰者を証明しながら保護する仕組みを検討する。</p>
@@ -155,4 +345,92 @@ END</p>
 <h3 id="復帰用-grace-period30日">復帰用 Grace Period（30日）</h3>
 <p>静寂状態から復帰が確認された巣に対して、1回限り30日間付与される配分保障期間。この間は、巣は通常通り 100% × (ΔM / N) の配分を受け取る。</p>
 <h3 id="デバイス交換猶予30日">デバイス交換猶予（30日）</h3>
-<p>デバイスが壊れたり、機器交換したりした場合、最後の取引から30日以内であれば新しいデバイスからの復帰申請を認める。これにより、スマートフォン故障などの自然な事象に対応。30日経過した場合は「新しい巣」として扱われる。</p> </article>  </main> </body></html>
+<p>デバイスが壊れたり、機器交換したりした場合、最後の取引から30日以内であれば新しいデバイスからの復帰申請を認める。これにより、スマートフォン故障などの自然な事象に対応。30日経過した場合は「新しい巣」として扱われる。</p> </article>  </main> 
+<script>
+(function(){
+  var article = document.querySelector('article');
+  if (!article) return;
+
+  var speakerMap = {
+    '数学者': 'mathematician',
+    'ゲーム経済学者': 'economist',
+    '哲学者': 'philosopher',
+    'アーキテクト': 'architect',
+    'architect': 'architect',
+    '議事録係': 'other',
+    '春日': 'other',
+  };
+
+  var nodes = Array.from(article.childNodes);
+  var frag = document.createDocumentFragment();
+  var speakerBlock = null;
+  var speakerContent = null;
+  var inGlossary = false;
+  var glossaryItem = null;
+  var conclusionBlock = null;
+
+  nodes.forEach(function(el) {
+    if (el.nodeType !== 1) { // text node
+      if (speakerContent) speakerContent.appendChild(el.cloneNode(true));
+      else frag.appendChild(el.cloneNode(true));
+      return;
+    }
+    var tag = el.tagName;
+    var txt = el.textContent.trim();
+
+    if (tag === 'H2') {
+      speakerBlock = null; speakerContent = null; glossaryItem = null;
+      if (/^Round\s*\d+/.test(txt) || /^最終結論/.test(txt)) {
+        el.classList.add('round-divider');
+        inGlossary = false; conclusionBlock = null;
+        frag.appendChild(el);
+      } else if (txt === '用語集') {
+        var gs = document.createElement('div');
+        gs.className = 'glossary-section';
+        var gh = el.cloneNode(true);
+        gh.style.cssText = 'color:#58a6ff;font-size:1.2rem;margin-bottom:1rem;';
+        gs.appendChild(gh);
+        frag.appendChild(gs);
+        inGlossary = true; conclusionBlock = gs;
+      } else {
+        inGlossary = false; conclusionBlock = null;
+        frag.appendChild(el);
+      }
+    } else if (tag === 'H3') {
+      if (inGlossary) {
+        glossaryItem = document.createElement('div');
+        glossaryItem.className = 'glossary-item';
+        var gh3 = el.cloneNode(true);
+        glossaryItem.appendChild(gh3);
+        if (conclusionBlock) conclusionBlock.appendChild(glossaryItem);
+        else frag.appendChild(glossaryItem);
+        speakerContent = glossaryItem;
+      } else {
+        var speakerKey = null;
+        Object.keys(speakerMap).forEach(function(k){ if (txt.indexOf(k) !== -1) speakerKey = k; });
+        var cls = speakerKey ? speakerMap[speakerKey] : 'other';
+        speakerBlock = document.createElement('div');
+        speakerBlock.className = 'speaker-block speaker-' + cls;
+        var label = document.createElement('div');
+        label.className = 'speaker-label';
+        label.textContent = speakerKey || txt;
+        speakerContent = document.createElement('div');
+        speakerContent.className = 'speaker-content';
+        speakerBlock.appendChild(label);
+        speakerBlock.appendChild(speakerContent);
+        frag.appendChild(speakerBlock);
+      }
+    } else {
+      if (speakerContent) {
+        speakerContent.appendChild(el);
+      } else {
+        frag.appendChild(el);
+      }
+    }
+  });
+
+  article.innerHTML = '';
+  article.appendChild(frag);
+})();
+</script>
+</body></html>
