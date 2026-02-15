@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meguri Phase 0 シミュレーション結果レポート</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #1a1d27;
+    --bg3: #222535;
+    --border: #2e3248;
+    --accent: #7c6af7;
+    --accent2: #56cfb2;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --success: #22c55e;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1d27 0%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 48px 32px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .header p { color: var(--muted); font-size: 13px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 20px; padding: 4px 12px; font-size: 12px;
+    margin-top: 16px; margin-right: 8px;
+  }
+  .badge .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot-green { background: var(--success); }
+  .dot-yellow { background: var(--warn); }
+  .dot-red { background: var(--danger); }
+  .dot-blue { background: var(--accent); }
+
+  .main { padding: 32px 48px; max-width: 1400px; margin: 0 auto; }
+  .section { margin-bottom: 48px; }
+  .section-title {
+    font-size: 18px; font-weight: 700; color: #fff;
+    margin-bottom: 20px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title span { font-size: 20px; }
+
+  /* Summary cards */
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+    box-shadow: var(--card-shadow);
+  }
+  .card-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .card-value { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .card-sub { font-size: 12px; color: var(--muted); }
+  .card-good .card-value { color: var(--success); }
+  .card-warn .card-value { color: var(--warn); }
+  .card-bad .card-value { color: var(--danger); }
+  .card-blue .card-value { color: var(--accent); }
+
+  /* Charts grid */
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .charts-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .chart-box {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+    box-shadow: var(--card-shadow);
+  }
+  .chart-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+  .chart-sub { font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+  .chart-box canvas { max-height: 260px; }
+
+  /* Tables */
+  .table-box {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    box-shadow: var(--card-shadow);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--bg3); }
+  th {
+    padding: 10px 16px; text-align: left;
+    font-size: 11px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.07em;
+    white-space: nowrap;
+  }
+  td { padding: 9px 16px; font-size: 13px; border-top: 1px solid var(--border); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .best-row td { background: rgba(124,106,247,0.08) !important; }
+  .pass { color: var(--success); font-weight: 600; }
+  .fail { color: var(--danger); }
+  .warn { color: var(--warn); }
+  .mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; }
+  .tag {
+    display: inline-block; border-radius: 4px; padding: 2px 8px;
+    font-size: 11px; font-weight: 600;
+  }
+  .tag-pass { background: rgba(34,197,94,0.15); color: var(--success); }
+  .tag-fail { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .tag-skip { background: rgba(100,116,139,0.15); color: var(--muted); }
+  .tag-best { background: rgba(124,106,247,0.2); color: var(--accent); }
+
+  /* Param chips */
+  .params { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .param {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 14px; font-size: 13px;
+  }
+  .param .k { color: var(--muted); font-size: 11px; margin-right: 4px; }
+  .param .v { color: #fff; font-weight: 700; }
+
+  /* Insight boxes */
+  .insight {
+    border-radius: 10px; padding: 16px 20px; margin-top: 16px;
+    border-left: 3px solid;
+    font-size: 13px;
+  }
+  .insight-info { background: rgba(86,207,178,0.08); border-color: var(--accent2); }
+  .insight-warn { background: rgba(245,158,11,0.08); border-color: var(--warn); }
+  .insight-danger { background: rgba(239,68,68,0.08); border-color: var(--danger); }
+  .insight-title { font-weight: 700; margin-bottom: 4px; }
+
+  /* Progress bars */
+  .prog-bar {
+    width: 100%; height: 6px; background: var(--bg3);
+    border-radius: 3px; overflow: hidden; margin-top: 6px;
+  }
+  .prog-fill { height: 100%; border-radius: 3px; transition: width 1s; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .full-width { grid-column: 1 / -1; }
+
+  @media (max-width: 900px) {
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .charts-grid, .two-col { grid-template-columns: 1fr; }
+    .charts-grid-3 { grid-template-columns: 1fr; }
+    .main { padding: 20px 16px; }
+    .header { padding: 24px 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <h1>🌀 Meguri Phase 0 シミュレーション結果</h1>
+  <p>2026-02-15 ／ Stage 1〜3 完了 ／ DoE L16 × 16実験・T010・Grace Period スキャン</p>
+  <div>
+    <span class="badge"><span class="dot dot-green"></span>Stage 1 完了</span>
+    <span class="badge"><span class="dot dot-green"></span>Stage 2 完了</span>
+    <span class="badge"><span class="dot dot-green"></span>Stage 3 完了</span>
+    <span class="badge"><span class="dot dot-blue"></span>パラメータ決定済み</span>
+    <span class="badge"><span class="dot dot-yellow"></span>D軸 Phase 1 へ</span>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ===== 推奨パラメータ ===== -->
+<div class="section">
+  <div class="section-title"><span>✅</span> Stage 3 最終推奨パラメータ</div>
+  <div class="params">
+    <div class="param"><span class="k">κ 減価加速</span><span class="v">0.5</span></div>
+    <div class="param"><span class="k">θ 異常閾値</span><span class="v">0.35</span></div>
+    <div class="param"><span class="k">β softmin</span><span class="v">0.5</span></div>
+    <div class="param"><span class="k">Bloom 間隔</span><span class="v">7日</span></div>
+    <div class="param"><span class="k">Grace Period</span><span class="v">14日</span></div>
+    <div class="param"><span class="k">D軸</span><span class="v">不使用（Phase 0）</span></div>
+  </div>
+  <div class="insight insight-info" style="margin-top:16px;">
+    <div class="insight-title">🔬 DoE L16（16実験）で探索</div>
+    κ・θ・β・Bloom間隔の4因子を各2水準、合計16実験で評価。フルグリッドサーチ（576通り）の97%を削減しながら主効果・交互作用を推定。
+  </div>
+</div>
+
+<!-- ===== サマリーカード ===== -->
+<div class="section">
+  <div class="section-title"><span>📊</span> Stage 2 ベースライン（デフォルトパラメータ κ=1.0, θ=0.3）</div>
+  <div class="cards">
+    <div class="card card-bad">
+      <div class="card-label">Sybil ROI（Scenario A, k=10）</div>
+      <div class="card-value">0.645</div>
+      <div class="card-sub">目標 &lt; 0.100 ❌</div>
+    </div>
+    <div class="card card-bad">
+      <div class="card-label">False Positive Rate（FPR）</div>
+      <div class="card-value">7.8〜12%</div>
+      <div class="card-sub">目標 &lt; 1% ❌</div>
+    </div>
+    <div class="card card-bad">
+      <div class="card-label">True Positive Rate（TPR）</div>
+      <div class="card-value">0〜14%</div>
+      <div class="card-sub">目標 &gt; 95% ❌</div>
+    </div>
+    <div class="card card-bad">
+      <div class="card-label">Gini 係数（格差指数）</div>
+      <div class="card-value">0.50〜0.70</div>
+      <div class="card-sub">目標 0.2〜0.3 ❌</div>
+    </div>
+  </div>
+
+  <!-- Stage 2 テストケース表 -->
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>シナリオ</th>
+          <th>規模 N/k</th>
+          <th>Sybil ROI</th>
+          <th>ROI 目標</th>
+          <th>FPR</th>
+          <th>TPR</th>
+          <th>Gini</th>
+          <th>特記事項</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="mono">T001</td>
+          <td>A: 単純Sybil</td>
+          <td>1K / k=1</td>
+          <td class="warn">0.250</td>
+          <td>&lt;1.000 <span class="tag tag-pass">✅</span></td>
+          <td class="fail">12.0%</td>
+          <td class="fail">0%</td>
+          <td class="fail">0.685</td>
+          <td>k=1は目標クリア</td>
+        </tr>
+        <tr>
+          <td class="mono">T002</td>
+          <td>A: 単純Sybil</td>
+          <td>1K / k=10</td>
+          <td class="fail">0.645</td>
+          <td>&lt;0.100 <span class="tag tag-fail">❌</span></td>
+          <td class="fail">7.8%</td>
+          <td class="fail">10%</td>
+          <td class="fail">0.702</td>
+          <td>FPR高・TPR低</td>
+        </tr>
+        <tr>
+          <td class="mono">T003</td>
+          <td>A: 単純Sybil</td>
+          <td>10K / k=50</td>
+          <td class="fail">0.556</td>
+          <td>&lt;0.020 <span class="tag tag-fail">❌</span></td>
+          <td class="fail">9.3%</td>
+          <td class="fail">14%</td>
+          <td class="fail">0.704</td>
+          <td>大規模でも同様</td>
+        </tr>
+        <tr>
+          <td class="mono">T004</td>
+          <td>A: 単純Sybil</td>
+          <td>100K / k=100</td>
+          <td colspan="5" style="color:var(--muted); text-align:center;">— 未実行（推定4〜6時間） —</td>
+          <td><span class="tag tag-skip">⏭️</span></td>
+        </tr>
+        <tr>
+          <td class="mono">T005</td>
+          <td>B: デバイス制約</td>
+          <td>10K / k=10</td>
+          <td class="fail" style="font-weight:700;">2.052</td>
+          <td>&lt;0.100 <span class="tag tag-fail">❌</span></td>
+          <td class="fail">9.3%</td>
+          <td class="fail">10%</td>
+          <td class="fail">0.707</td>
+          <td style="color:var(--warn);">⚠️ 攻撃者が正直者を上回る</td>
+        </tr>
+        <tr>
+          <td class="mono">T006</td>
+          <td>C: 高頻度ループ</td>
+          <td>10K / k=5</td>
+          <td class="fail" style="font-weight:700; font-size:16px;">69.7</td>
+          <td>&lt;0.200 <span class="tag tag-fail">❌</span></td>
+          <td class="pass">0.01%</td>
+          <td class="fail">0%</td>
+          <td class="fail">0.520</td>
+          <td style="color:var(--danger);">🔴 深刻：ループ攻撃70倍利得</td>
+        </tr>
+        <tr>
+          <td class="mono">T007</td>
+          <td>D: 農村FP</td>
+          <td>10K / k=0</td>
+          <td colspan="2" style="color:var(--muted);">攻撃者なし</td>
+          <td class="pass">0.17%</td>
+          <td>—</td>
+          <td class="fail">0.601</td>
+          <td class="pass">FPR ✅ 農村も保護</td>
+        </tr>
+        <tr>
+          <td class="mono">T008</td>
+          <td>E: 新規参加</td>
+          <td>10K / k=0</td>
+          <td colspan="2" style="color:var(--muted);">攻撃者なし</td>
+          <td class="pass">0.01%</td>
+          <td>—</td>
+          <td class="warn">0.507</td>
+          <td class="pass">FPR ✅ 新規参加に優しい</td>
+        </tr>
+        <tr>
+          <td class="mono">T009</td>
+          <td>F: Grace Period</td>
+          <td>10K / k=0</td>
+          <td colspan="2" style="color:var(--muted);">攻撃者なし</td>
+          <td class="pass">0.00%</td>
+          <td>—</td>
+          <td class="warn">0.509</td>
+          <td class="pass">FPR ✅ 復帰者を保護</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== Stage 2 チャート ===== -->
+<div class="section">
+  <div class="section-title"><span>📈</span> シナリオ別 Sybil ROI 比較</div>
+  <div class="charts-grid">
+    <div class="chart-box">
+      <div class="chart-title">Sybil ROI（攻撃採算性） — 低いほど良い</div>
+      <div class="chart-sub">ROI=1 で攻撃者と正直者が同等。目標は各シナリオに応じた閾値以下</div>
+      <canvas id="roiChart"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">FPR vs TPR — FPR低・TPR高が理想</div>
+      <div class="chart-sub">FPR: 正直者の誤検出率 / TPR: 攻撃者の検出率（目標: FPR&lt;1%, TPR&gt;95%）</div>
+      <canvas id="fprTprChart"></canvas>
+    </div>
+  </div>
+
+  <div class="insight insight-warn" style="margin-top:16px;">
+    <div class="insight-title">⚠️ Scenario A の根本的限界</div>
+    Sybil 攻撃者が正直者と<strong>全く同じ行動</strong>をとる場合、行動ベースのスコアリングでは区別できません。
+    デバイス紐づけ（D軸・ZK-SNARK）がないと ROI &lt; 0.1 は達成困難です。
+  </div>
+  <div class="insight insight-danger" style="margin-top:8px;">
+    <div class="insight-title">🔴 Scenario C の深刻な問題（Stage 2）</div>
+    ループ攻撃者が高頻度取引 → 旧 E(v) では「活発なユーザー」と判定 → Mana 大量獲得 → ROI = 69.7。
+    Stage 3 で E(v) に取引相手の多様性（Partner Diversity）を追加して改善。
+  </div>
+</div>
+
+<!-- ===== DoE L16 結果 ===== -->
+<div class="section">
+  <div class="section-title"><span>🔬</span> Stage 3: DoE L16 パラメータ最適化（16実験）</div>
+
+  <div class="charts-grid">
+    <div class="chart-box">
+      <div class="chart-title">DoE スコア（低いほど良い）</div>
+      <div class="chart-sub">目標関数 = 5×ROI + 20×FPR + 5×(0.95−TPR) + 3×|Gini−0.25|</div>
+      <canvas id="doeScoreChart"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">主効果: κ と θ の影響</div>
+      <div class="chart-sub">各パラメータ水準でのスコア平均（棒が低いほど良いパラメータ値）</div>
+      <canvas id="mainEffectsChart"></canvas>
+    </div>
+  </div>
+
+  <!-- DoE 結果テーブル -->
+  <div style="margin-top: 24px;">
+    <div class="table-box">
+      <table>
+        <thead>
+          <tr>
+            <th>順位</th>
+            <th>Run</th>
+            <th>κ</th>
+            <th>θ</th>
+            <th>β</th>
+            <th>Bloom</th>
+            <th>スコア</th>
+            <th>ROI (Scenario A)</th>
+            <th>FPR (Scenario A)</th>
+            <th>TPR (Scenario A)</th>
+            <th>ROI (Scenario C)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="best-row">
+            <td><span class="tag tag-best">🏆 1位</span></td>
+            <td class="mono">#0</td>
+            <td class="pass">0.5</td><td class="pass">0.35</td><td>0.5</td><td>7日</td>
+            <td class="pass"><strong>22.28</strong></td>
+            <td>0.679</td><td class="warn">28.1%</td><td>30.0%</td><td class="fail">70.9</td>
+          </tr>
+          <tr>
+            <td>2位</td><td class="mono">#7</td>
+            <td>2.5</td><td>0.60</td><td>2.0</td><td>7日</td>
+            <td>26.58</td>
+            <td>0.608</td><td class="fail">100%</td><td class="pass">100%</td><td class="fail">68.2</td>
+          </tr>
+          <tr>
+            <td>3位</td><td class="mono">#6</td>
+            <td>0.5</td><td>0.60</td><td>2.0</td><td>7日</td>
+            <td>26.83</td>
+            <td>0.666</td><td class="fail">99.5%</td><td class="pass">100%</td><td class="fail">71.2</td>
+          </tr>
+          <tr>
+            <td>4位</td><td class="mono">#8</td>
+            <td>0.5</td><td>0.35</td><td>0.5</td><td>14日</td>
+            <td>26.85</td>
+            <td>0.564</td><td class="fail">88.6%</td><td class="warn">80.0%</td><td class="fail">71.5</td>
+          </tr>
+          <tr>
+            <td>5位</td><td class="mono">#9</td>
+            <td>2.5</td><td>0.35</td><td>0.5</td><td>14日</td>
+            <td>26.96</td>
+            <td>0.659</td><td class="fail">87.6%</td><td class="warn">80.0%</td><td class="fail">72.7</td>
+          </tr>
+          <tr style="color:var(--muted); font-size:12px;">
+            <td colspan="11" style="text-align:center; padding:8px;">… Run #10〜#15（スコア 27〜29） …</td>
+          </tr>
+          <tr>
+            <td>最下位</td><td class="mono">#2</td>
+            <td>0.5</td><td>0.60</td><td>0.5</td><td>7日</td>
+            <td class="fail">28.56</td>
+            <td class="fail">0.806</td><td class="fail">99.4%</td><td class="warn">90.0%</td><td class="fail">72.8</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="insight insight-info" style="margin-top:16px;">
+    <div class="insight-title">💡 主効果のまとめ</div>
+    <strong>κ（0.5 推奨）</strong>：高すぎると正直者も過剰減価してFPRが上昇。低めが安定。<br>
+    <strong>θ（0.35 推奨）</strong>：高くするとTPR改善するが正直者のFPRも急増（θ=0.60 でFPR=99〜100%）。<br>
+    <strong>β（0.5 推奨）</strong>：低めでsoftminが穏やか。高βはスコア差を強調しすぎる。<br>
+    <strong>Bloom（7日 推奨）</strong>：頻繁なBloomで公平性を維持。
+  </div>
+</div>
+
+<!-- ===== T010 ===== -->
+<div class="section">
+  <div class="section-title"><span>🏗️</span> T010: 3層 vs 4層 距離軸比較（Scenario G）</div>
+  <div class="charts-grid">
+    <div class="chart-box">
+      <div class="chart-title">Sybil ROI: 3層（D軸なし）vs 4層（D軸あり）</div>
+      <div class="chart-sub">N=1000, 攻撃者数 k を変化。ROI低＝攻撃採算なし（良）</div>
+      <canvas id="t010Chart"></canvas>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">T010 結果サマリー</div>
+      <div class="chart-sub">各 k における優劣</div>
+      <div style="margin-top: 20px;">
+        <table>
+          <thead>
+            <tr>
+              <th>攻撃者数 k</th>
+              <th>3層 ROI</th>
+              <th>4層 ROI</th>
+              <th>判定</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>k=1</td><td class="pass">0.0045</td><td class="fail">0.3510</td>
+              <td><span class="tag tag-pass">3層 ✅</span></td>
+            </tr>
+            <tr>
+              <td>k=5</td><td>0.2632</td><td>0.2677</td>
+              <td><span class="tag tag-pass">3層 ✅</span></td>
+            </tr>
+            <tr>
+              <td>k=10</td><td>0.5704</td><td class="fail">0.6647</td>
+              <td><span class="tag tag-pass">3層 ✅</span></td>
+            </tr>
+            <tr>
+              <td>k=20</td><td class="fail">1.3758</td><td class="warn">0.9597</td>
+              <td><span class="tag tag-fail">4層 ✅ (+30%)</span></td>
+            </tr>
+            <tr>
+              <td>k=50</td><td>0.6810</td><td class="fail">0.8441</td>
+              <td><span class="tag tag-pass">3層 ✅</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="insight insight-info" style="margin-top:12px;">
+          <div class="insight-title">🏁 結論: Phase 0 は 3層で進める</div>
+          D軸はWatts-Strogatz小世界ネットワークで一貫した効果を示さない。
+          実際のGPS/地理データがあれば再評価推奨。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Grace Period ===== -->
+<div class="section">
+  <div class="section-title"><span>🌙</span> Grace Period スキャン（推奨パラメータで）</div>
+  <div class="charts-grid-3">
+    <div class="chart-box">
+      <div class="chart-title">Grace Period = 14日 <span class="tag tag-best">推奨</span></div>
+      <div class="chart-sub">Scenario F: 復帰ユーザー</div>
+      <div style="margin-top:12px;">
+        <div style="margin-bottom:8px;"><span style="color:var(--muted);">FPR</span><br>
+          <strong class="pass" style="font-size:22px;">0.00%</strong>
+          <div class="prog-bar"><div class="prog-fill" style="width:0%;background:var(--success);"></div></div>
+        </div>
+        <div style="margin-bottom:8px;"><span style="color:var(--muted);">コミュニティ安定性</span><br>
+          <strong class="pass" style="font-size:22px;">100%</strong>
+          <div class="prog-bar"><div class="prog-fill" style="width:100%;background:var(--success);"></div></div>
+        </div>
+        <div><span style="color:var(--muted);">正直者 平均残高</span><br>
+          <strong style="font-size:22px;">49.47</strong>
+        </div>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Grace Period = 30日</div>
+      <div class="chart-sub">Scenario F: 復帰ユーザー</div>
+      <div style="margin-top:12px;">
+        <div style="margin-bottom:8px;"><span style="color:var(--muted);">FPR</span><br>
+          <strong class="pass" style="font-size:22px;">0.00%</strong>
+          <div class="prog-bar"><div class="prog-fill" style="width:0%;background:var(--success);"></div></div>
+        </div>
+        <div style="margin-bottom:8px;"><span style="color:var(--muted);">コミュニティ安定性</span><br>
+          <strong class="warn" style="font-size:22px;">90.3%</strong>
+          <div class="prog-bar"><div class="prog-fill" style="width:90.3%;background:var(--warn);"></div></div>
+        </div>
+        <div><span style="color:var(--muted);">正直者 平均残高</span><br>
+          <strong style="font-size:22px;">49.48</strong>
+        </div>
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">Grace Period = 60日</div>
+      <div class="chart-sub">Scenario F: 復帰ユーザー</div>
+      <div style="margin-top:12px;">
+        <div style="margin-bottom:8px;"><span style="color:var(--muted);">FPR</span><br>
+          <strong class="pass" style="font-size:22px;">0.00%</strong>
+          <div class="prog-bar"><div class="prog-fill" style="width:0%;background:var(--success);"></div></div>
+        </div>
+        <div style="margin-bottom:8px;"><span style="color:var(--muted);">コミュニティ安定性</span><br>
+          <strong class="pass" style="font-size:22px;">96.6%</strong>
+          <div class="prog-bar"><div class="prog-fill" style="width:96.6%;background:var(--success);"></div></div>
+        </div>
+        <div><span style="color:var(--muted);">正直者 平均残高</span><br>
+          <strong style="font-size:22px;">49.44</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="insight insight-info" style="margin-top:16px;">
+    <div class="insight-title">💡 Grace Period の結論</div>
+    14日・30日・60日すべてで FPR=0%・ROI=0（復帰者への悪影響なし）。差がないため<strong>最短の14日</strong>を推奨（悪用リスクを最小化）。
+  </div>
+</div>
+
+<!-- ===== Phase 1 課題 ===== -->
+<div class="section">
+  <div class="section-title"><span>🚀</span> Phase 1 への提言（残存課題）</div>
+  <div class="two-col">
+    <div>
+      <div class="insight insight-danger">
+        <div class="insight-title">🔴 最優先: D軸（デバイス紐づけ）の本実装</div>
+        Scenario A の ROI が 0.5〜0.8 で高止まりしているのは、攻撃者が正直者と同じ行動をとるため。
+        <strong>ZK-SNARK または類似証明で「1巣1デバイス」を強制</strong>すれば、
+        複数巣の維持コストが急増し、ROI &lt; 0.1 が現実的になる。
+      </div>
+      <div class="insight insight-warn" style="margin-top:8px;">
+        <div class="insight-title">🟡 高優先: ループ攻撃対策の追加</div>
+        DoE 後も ROI(C5) = 66〜73 倍で高止まり。E(v) 改善だけでは不十分。
+        <strong>日次取引上限（daily cap）</strong>を設けることで、
+        ループ攻撃の採算性を根本的に下げられる見込み。
+      </div>
+    </div>
+    <div>
+      <div class="insight insight-warn">
+        <div class="insight-title">🟡 中優先: Gini 係数の改善</div>
+        全テストで Gini = 0.5〜0.7（目標 0.2〜0.3）。Bloom イベントが1巣に集中することで格差が拡大。
+        <strong>Bloom 受賞者を3〜5巣に分散</strong>することで大幅改善が期待できる。
+      </div>
+      <div class="insight insight-info" style="margin-top:8px;">
+        <div class="insight-title">🔵 中優先: T004 大規模検証</div>
+        N=100K, k=100 の検証が未実施。推定4〜6時間。
+        大規模マシンまたはクラウド環境（GPU並列化）で実行推奨。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Phase 0 チェックリスト ===== -->
+<div class="section">
+  <div class="section-title"><span>☑️</span> Phase 0 達成チェックリスト</div>
+  <div class="table-box">
+    <table>
+      <thead>
+        <tr><th>項目</th><th>状態</th><th>備考</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sybil ROI(100) &lt; 1/150</td>
+          <td><span class="tag tag-fail">❌ 未達</span></td>
+          <td>T004未実行。D軸なしでは達成困難</td>
+        </tr>
+        <tr>
+          <td>False Positive 率 &lt; 1%</td>
+          <td><span class="tag" style="background:rgba(245,158,11,0.15);color:var(--warn);">△ 部分達成</span></td>
+          <td>Scenario D/E/F は達成 ✅ / Scenario A は 28% ❌</td>
+        </tr>
+        <tr>
+          <td>κ, θ の最適値を決定</td>
+          <td><span class="tag tag-pass">✅ 完了</span></td>
+          <td>κ=0.5, θ=0.35（DoE L16 Run #0）</td>
+        </tr>
+        <tr>
+          <td>Bloom 間隔・配分量を決定</td>
+          <td><span class="tag tag-pass">✅ 完了</span></td>
+          <td>7日間隔、75%均等 + 25% VRF</td>
+        </tr>
+        <tr>
+          <td>Grace Period 期間を決定</td>
+          <td><span class="tag tag-pass">✅ 完了</span></td>
+          <td>14日（最短。14/30/60で差なし）</td>
+        </tr>
+        <tr>
+          <td>距離軸（D軸）の要否を結論</td>
+          <td><span class="tag tag-pass">✅ 完了</span></td>
+          <td>Phase 0 は不使用（3層）。実GPS データで再評価</td>
+        </tr>
+        <tr>
+          <td>コミュニティ検出アルゴリズムを選定</td>
+          <td><span class="tag tag-pass">✅ 完了</span></td>
+          <td>Louvain（月次）、安定性 90〜100%</td>
+        </tr>
+        <tr>
+          <td>ZK-SNARK 証明コスト確認</td>
+          <td><span class="tag tag-fail">❌ 未実施</span></td>
+          <td>シミュレーション外の実装・計測が必要</td>
+        </tr>
+        <tr>
+          <td>全テストケースでサクセス条件を満たす</td>
+          <td><span class="tag tag-fail">❌ 一部未達</span></td>
+          <td>D軸実装・ループ対策・Gini改善後に再検証</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+const COLORS = {
+  purple: 'rgba(124,106,247,0.85)',
+  purpleLight: 'rgba(124,106,247,0.2)',
+  teal: 'rgba(86,207,178,0.85)',
+  tealLight: 'rgba(86,207,178,0.2)',
+  red: 'rgba(239,68,68,0.85)',
+  redLight: 'rgba(239,68,68,0.2)',
+  yellow: 'rgba(245,158,11,0.85)',
+  yellowLight: 'rgba(245,158,11,0.2)',
+  green: 'rgba(34,197,94,0.85)',
+  muted: 'rgba(100,116,139,0.5)',
+};
+
+const chartDefaults = {
+  responsive: true,
+  maintainAspectRatio: true,
+  plugins: {
+    legend: { labels: { color: '#94a3b8', font: { size: 11 } } },
+    tooltip: {
+      backgroundColor: '#1a1d27',
+      borderColor: '#2e3248',
+      borderWidth: 1,
+      titleColor: '#e2e8f0',
+      bodyColor: '#94a3b8',
+    }
+  },
+  scales: {
+    x: {
+      ticks: { color: '#64748b', font: { size: 11 } },
+      grid: { color: 'rgba(46,50,72,0.5)' },
+    },
+    y: {
+      ticks: { color: '#64748b', font: { size: 11 } },
+      grid: { color: 'rgba(46,50,72,0.5)' },
+    }
+  }
+};
+
+// 1. ROI Chart
+new Chart(document.getElementById('roiChart'), {
+  type: 'bar',
+  data: {
+    labels: ['T001\nk=1', 'T002\nk=10', 'T003\nk=50', 'T005\nDevice', 'T006\nLoop'],
+    datasets: [{
+      label: 'Sybil ROI',
+      data: [0.250, 0.645, 0.556, 2.052, 69.745],
+      backgroundColor: [COLORS.teal, COLORS.yellow, COLORS.yellow, COLORS.red, COLORS.red],
+      borderRadius: 6,
+    }]
+  },
+  options: {
+    ...chartDefaults,
+    plugins: {
+      ...chartDefaults.plugins,
+      annotation: {}
+    },
+    scales: {
+      ...chartDefaults.scales,
+      y: { ...chartDefaults.scales.y, type: 'logarithmic', title: { display: true, text: 'ROI (log scale)', color: '#64748b' } }
+    }
+  }
+});
+
+// 2. FPR vs TPR Chart
+new Chart(document.getElementById('fprTprChart'), {
+  type: 'bar',
+  data: {
+    labels: ['T001', 'T002', 'T003', 'T005', 'T006', 'T007', 'T008', 'T009'],
+    datasets: [
+      {
+        label: 'FPR (%)',
+        data: [12.01, 7.78, 9.28, 9.34, 0.01, 0.17, 0.01, 0.00],
+        backgroundColor: COLORS.red,
+        borderRadius: 4,
+      },
+      {
+        label: 'TPR (%)',
+        data: [0, 10, 14, 10, 0, null, null, null],
+        backgroundColor: COLORS.teal,
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    ...chartDefaults,
+    scales: {
+      ...chartDefaults.scales,
+      y: { ...chartDefaults.scales.y, title: { display: true, text: '(%)', color: '#64748b' } }
+    }
+  }
+});
+
+// 3. DoE Score Chart
+const doeRuns = ['#0','#7','#6','#8','#9','#12','#1','#5','#15','#4','#13','#11','#10','#3','#2'];
+const doeScores = [22.28,26.58,26.83,26.85,26.96,27.02,27.08,27.18,27.22,27.25,27.51,28.17,28.44,28.56,28.56];
+new Chart(document.getElementById('doeScoreChart'), {
+  type: 'bar',
+  data: {
+    labels: doeRuns,
+    datasets: [{
+      label: 'DoE スコア（低いほど良い）',
+      data: doeScores,
+      backgroundColor: doeRuns.map((_, i) => i === 0 ? COLORS.green : COLORS.purple),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    ...chartDefaults,
+    scales: {
+      ...chartDefaults.scales,
+      y: { ...chartDefaults.scales.y, min: 20, title: { display: true, text: 'スコア', color: '#64748b' } }
+    }
+  }
+});
+
+// 4. Main Effects Chart
+new Chart(document.getElementById('mainEffectsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['κ=0.5', 'κ=2.5', 'θ=0.35', 'θ=0.60', 'β=0.5', 'β=2.0', 'Bloom=7d', 'Bloom=14d'],
+    datasets: [{
+      label: '平均スコア（低いほど良い）',
+      data: [26.44, 27.39, 26.62, 27.20, 27.45, 26.39, 26.54, 27.29],
+      backgroundColor: [
+        COLORS.green, COLORS.red,
+        COLORS.green, COLORS.red,
+        COLORS.red, COLORS.green,
+        COLORS.green, COLORS.red,
+      ],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    ...chartDefaults,
+    scales: {
+      ...chartDefaults.scales,
+      y: { ...chartDefaults.scales.y, min: 25, max: 28, title: { display: true, text: '平均スコア', color: '#64748b' } }
+    }
+  }
+});
+
+// 5. T010 Chart
+new Chart(document.getElementById('t010Chart'), {
+  type: 'line',
+  data: {
+    labels: ['k=1', 'k=5', 'k=10', 'k=20', 'k=50'],
+    datasets: [
+      {
+        label: '3層（D軸なし）',
+        data: [0.0045, 0.2632, 0.5704, 1.3758, 0.6810],
+        borderColor: COLORS.teal,
+        backgroundColor: COLORS.tealLight,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+      },
+      {
+        label: '4層（D軸あり）',
+        data: [0.3510, 0.2677, 0.6647, 0.9597, 0.8441],
+        borderColor: COLORS.purple,
+        backgroundColor: COLORS.purpleLight,
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+      }
+    ]
+  },
+  options: {
+    ...chartDefaults,
+    scales: {
+      ...chartDefaults.scales,
+      y: { ...chartDefaults.scales.y, title: { display: true, text: 'Sybil ROI', color: '#64748b' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
